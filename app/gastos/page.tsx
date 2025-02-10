@@ -5,9 +5,12 @@ import { GastoDiario } from '../interfaces';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Pagination } from '@/app/_components/Pagination';
 import { SortIcon } from '../_components/SortIcon';
-import { TextFilter } from '..//_components/filtros/TextFilter';
+import { TextFilter } from '../_components/filtros/TextFilter';
 import { NumberRangeFilter } from '..//_components/filtros/NumberRangeFilter';
 import { DateRangeFilter } from '..//_components/filtros/DateRangeFilter';
+import { Modal } from '..//_components/Modal';
+import { ActionButton } from '..//_components/ActionButton';
+import { CreateButton } from '..//_components/CreateButton';
 
 const gastos: GastoDiario[] = [
   { id: 1, descricao: 'Compra de materiais', valor: 100, data: '2023-10-01' },
@@ -32,6 +35,12 @@ interface FilterValues {
   sortDirection: SortDirection;
 }
 
+interface GastoFormData {
+  descricao: string;
+  valor: string;
+  data: string;
+}
+
 const GastosPage: FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,6 +58,15 @@ const GastosPage: FC = () => {
   });
 
   const [filteredGastos, setFilteredGastos] = useState(gastos);
+  const [selectedGasto, setSelectedGasto] = useState<GastoDiario | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [formData, setFormData] = useState<GastoFormData>({
+    descricao: '',
+    valor: '',
+    data: new Date().toISOString().split('T')[0]
+  });
 
   const applyFilters = useCallback(() => {
     let filtered = [...gastos];
@@ -130,6 +148,56 @@ const GastosPage: FC = () => {
     }));
   };
 
+  const handleCreate = () => {
+    const newGasto = {
+      id: gastos.length + 1,
+      descricao: formData.descricao,
+      valor: Number(formData.valor),
+      data: formData.data
+    };
+    gastos.push(newGasto);
+    setFilteredGastos([...gastos]);
+    setIsCreateModalOpen(false);
+    setFormData({
+      descricao: '',
+      valor: '',
+      data: new Date().toISOString().split('T')[0]
+    });
+  };
+
+  const handleEdit = () => {
+    if (!selectedGasto) return;
+    const index = gastos.findIndex(g => g.id === selectedGasto.id);
+    gastos[index] = {
+      ...gastos[index],
+      descricao: formData.descricao,
+      valor: Number(formData.valor),
+      data: formData.data
+    };
+    setFilteredGastos([...gastos]);
+    setIsEditModalOpen(false);
+    setSelectedGasto(null);
+  };
+
+  const handleDelete = () => {
+    if (!selectedGasto) return;
+    const index = gastos.findIndex(g => g.id === selectedGasto.id);
+    gastos.splice(index, 1);
+    setFilteredGastos([...gastos]);
+    setIsDeleteModalOpen(false);
+    setSelectedGasto(null);
+  };
+
+  const openEditModal = (gasto: GastoDiario) => {
+    setSelectedGasto(gasto);
+    setFormData({
+      descricao: gasto.descricao,
+      valor: gasto.valor.toString(),
+      data: gasto.data
+    });
+    setIsEditModalOpen(true);
+  };
+
   const totalPages = Math.ceil(filteredGastos.length / filterValues.itemsPerPage);
   const startIndex = (filterValues.currentPage - 1) * filterValues.itemsPerPage;
   const paginatedGastos = filteredGastos.slice(startIndex, startIndex + filterValues.itemsPerPage);
@@ -138,6 +206,7 @@ const GastosPage: FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black">Gastos Diários</h1>
+        <CreateButton onClick={() => setIsCreateModalOpen(true)} label="Novo Gasto" />
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
@@ -234,14 +303,25 @@ const GastosPage: FC = () => {
                     />
                   </div>
                 </th>
+                <th className="w-20">Ações</th>
               </tr>
             </thead>
             <tbody>
               {paginatedGastos.map((gasto) => (
-                <tr key={gasto.id}>
+                <tr key={gasto.id} className="hover:bg-gray-50 transition-colors">
                   <td>{gasto.descricao}</td>
                   <td>R$ {gasto.valor.toFixed(2)}</td>
                   <td>{new Date(gasto.data).toLocaleDateString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                    <ActionButton variant="edit" onClick={() => openEditModal(gasto)} />
+                    <ActionButton
+                      variant="delete"
+                      onClick={() => {
+                        setSelectedGasto(gasto);
+                        setIsDeleteModalOpen(true);
+                      }}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -258,6 +338,151 @@ const GastosPage: FC = () => {
           onItemsPerPageChange={(itemsPerPage: number) => setFilterValues(prev => ({ ...prev, itemsPerPage, currentPage: 1 }))}
         />
       </div>
+
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Novo Gasto"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Descrição
+            </label>
+            <input
+              type="text"
+              value={formData.descricao}
+              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+              className="filter-input"
+              placeholder="Descrição do gasto"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Valor
+            </label>
+            <input
+              type="number"
+              value={formData.valor}
+              onChange={(e) => setFormData(prev => ({ ...prev, valor: e.target.value }))}
+              className="filter-input"
+              placeholder="Valor do gasto"
+              step="0.01"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data
+            </label>
+            <input
+              type="date"
+              value={formData.data}
+              onChange={(e) => setFormData(prev => ({ ...prev, data: e.target.value }))}
+              className="filter-input"
+            />
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleCreate}
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Criar
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Editar Gasto"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Descrição
+            </label>
+            <input
+              type="text"
+              value={formData.descricao}
+              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+              className="filter-input"
+              placeholder="Descrição do gasto"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Valor
+            </label>
+            <input
+              type="number"
+              value={formData.valor}
+              onChange={(e) => setFormData(prev => ({ ...prev, valor: e.target.value }))}
+              className="filter-input"
+              placeholder="Valor do gasto"
+              step="0.01"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data
+            </label>
+            <input
+              type="date"
+              value={formData.data}
+              onChange={(e) => setFormData(prev => ({ ...prev, data: e.target.value }))}
+              className="filter-input"
+            />
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={() => setIsEditModalOpen(false)}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleEdit}
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Excluir Gasto"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600">
+            Tem certeza que deseja excluir o gasto &quot;{selectedGasto?.descricao}&quot;?
+            Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

@@ -7,6 +7,9 @@ import { Pagination } from '@/app/_components/Pagination';
 import { SortIcon } from '../_components/SortIcon';
 import { TextFilter } from '../_components/filtros/TextFilter';
 import { NumberRangeFilter } from '../_components/filtros/NumberRangeFilter';
+import { Modal } from '../_components/Modal';
+import { ActionButton } from '../_components/ActionButton';
+import { CreateButton } from '../_components/CreateButton';
 
 const produtos: Produto[] = [
   { id: 1, nome: 'Produto 1', preco: 10, descricao: 'Descrição do Produto 1' },
@@ -29,6 +32,12 @@ interface FilterValues {
   sortDirection: SortDirection;
 }
 
+interface ProdutoFormData {
+  nome: string;
+  preco: string;
+  descricao: string;
+}
+
 const CardapioPage: FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -44,6 +53,15 @@ const CardapioPage: FC = () => {
   });
 
   const [filteredProdutos, setFilteredProdutos] = useState(produtos);
+  const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [formData, setFormData] = useState<ProdutoFormData>({
+    nome: '',
+    preco: '',
+    descricao: ''
+  });
 
   const applyFilters = useCallback(() => {
     let filtered = [...produtos];
@@ -111,6 +129,53 @@ const CardapioPage: FC = () => {
     }));
   };
 
+  const handleCreate = () => {
+    const newProduto = {
+      id: produtos.length + 1,
+      nome: formData.nome,
+      preco: Number(formData.preco),
+      descricao: formData.descricao
+    };
+    produtos.push(newProduto);
+    setFilteredProdutos([...produtos]);
+    setIsCreateModalOpen(false);
+    setFormData({ nome: '', preco: '', descricao: '' });
+  };
+
+  const handleEdit = () => {
+    if (!selectedProduto) return;
+    const index = produtos.findIndex(p => p.id === selectedProduto.id);
+    produtos[index] = {
+      ...produtos[index],
+      nome: formData.nome,
+      preco: Number(formData.preco),
+      descricao: formData.descricao
+    };
+    setFilteredProdutos([...produtos]);
+    setIsEditModalOpen(false);
+    setSelectedProduto(null);
+    setFormData({ nome: '', preco: '', descricao: '' });
+  };
+
+  const handleDelete = () => {
+    if (!selectedProduto) return;
+    const index = produtos.findIndex(p => p.id === selectedProduto.id);
+    produtos.splice(index, 1);
+    setFilteredProdutos([...produtos]);
+    setIsDeleteModalOpen(false);
+    setSelectedProduto(null);
+  };
+
+  const openEditModal = (produto: Produto) => {
+    setSelectedProduto(produto);
+    setFormData({
+      nome: produto.nome,
+      preco: produto.preco.toString(),
+      descricao: produto.descricao
+    });
+    setIsEditModalOpen(true);
+  };
+
   const totalPages = Math.ceil(filteredProdutos.length / filterValues.itemsPerPage);
   const startIndex = (filterValues.currentPage - 1) * filterValues.itemsPerPage;
   const paginatedProdutos = filteredProdutos.slice(startIndex, startIndex + filterValues.itemsPerPage);
@@ -119,6 +184,7 @@ const CardapioPage: FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-black">Cardápio</h1>
+        <CreateButton onClick={() => setIsCreateModalOpen(true)} label="Novo Produto" />
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow space-y-4">
@@ -196,6 +262,7 @@ const CardapioPage: FC = () => {
                     <span>Descrição</span>
                   </div>
                 </th>
+                <th className="w-20">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -209,6 +276,16 @@ const CardapioPage: FC = () => {
                   </td>
                   <td className="px-6 py-4 text-gray-900">
                     {produto.descricao}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
+                    <ActionButton variant="edit" onClick={() => openEditModal(produto)} />
+                    <ActionButton
+                      variant="delete"
+                      onClick={() => {
+                        setSelectedProduto(produto);
+                        setIsDeleteModalOpen(true);
+                      }}
+                    />
                   </td>
                 </tr>
               ))}
@@ -226,6 +303,153 @@ const CardapioPage: FC = () => {
           onItemsPerPageChange={(itemsPerPage: number) => setFilterValues(prev => ({ ...prev, itemsPerPage, currentPage: 1 }))}
         />
       </div>
+
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Novo Produto"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nome
+            </label>
+            <input
+              type="text"
+              value={formData.nome}
+              onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+              className="filter-input"
+              placeholder="Nome do produto"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Preço
+            </label>
+            <input
+              type="number"
+              value={formData.preco}
+              onChange={(e) => setFormData(prev => ({ ...prev, preco: e.target.value }))}
+              className="filter-input"
+              placeholder="Preço do produto"
+              step="0.01"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Descrição
+            </label>
+            <textarea
+              value={formData.descricao}
+              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+              className="filter-input"
+              placeholder="Descrição do produto"
+              rows={3}
+            />
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleCreate}
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Criar
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Editar Produto"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nome
+            </label>
+            <input
+              type="text"
+              value={formData.nome}
+              onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+              className="filter-input"
+              placeholder="Nome do produto"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Preço
+            </label>
+            <input
+              type="number"
+              value={formData.preco}
+              onChange={(e) => setFormData(prev => ({ ...prev, preco: e.target.value }))}
+              className="filter-input"
+              placeholder="Preço do produto"
+              step="0.01"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Descrição
+            </label>
+            <textarea
+              value={formData.descricao}
+              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+              className="filter-input"
+              placeholder="Descrição do produto"
+              rows={3}
+            />
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={() => setIsEditModalOpen(false)}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleEdit}
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Excluir Produto"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600">
+            Tem certeza que deseja excluir o produto &quot;{selectedProduto?.nome}&quot;?
+            Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
