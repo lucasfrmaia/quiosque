@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { Produto } from '../interfaces';
+import { EstoqueItem } from '../interfaces';
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';
@@ -9,78 +9,84 @@ import { Modal } from '@/app/_components/Modal';
 import { PageHeader } from '@/app/_components/common/PageHeader';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { DeleteModal } from '@/app/_components/common/DeleteModal';
-import { CardapioForm } from '@/app/_components/cardapio/CardapioForm';
-import { CardapioTable } from '@/app/_components/cardapio/CardapioTable';
-import { useCardapio } from '@/app/_components/cardapio/useCardapio';
+import { EstoqueForm } from '@/app/_components/estoque/EstoqueForm';
+import { EstoqueTable } from '@/app/_components/estoque/EstoqueTable';
+import { useEstoque } from '@/app/_components/estoque/useEstoque';
 import { ModalActions } from '@/app/_components/common/ModalActions';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
-const CardapioPage: FC = () => {
+const EstoquePage: FC = () => {
   const {
-    paginatedProdutos,
-    filteredProdutos,
+    paginatedEstoque,
+    filteredEstoque,
     filterValues,
     handleSort,
     handleFilter,
     handleCreate,
     handleEdit,
     handleDelete,
-  } = useCardapio();
+  } = useEstoque();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
-  const [formData, setFormData] = useState({ nome: '', preco: '', descricao: '' });
+  const [selectedItem, setSelectedItem] = useState<EstoqueItem | null>(null);
+  const [formData, setFormData] = useState({ nome: '', quantidade: '', preco: '' });
 
   const handleSubmitCreate = () => {
     handleCreate({
       nome: formData.nome,
+      quantidade: Number(formData.quantidade),
       preco: Number(formData.preco),
-      descricao: formData.descricao,
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', preco: '', descricao: '' });
+    setFormData({ nome: '', quantidade: '', preco: '' });
   };
 
   const handleSubmitEdit = () => {
-    if (!selectedProduto) return;
-    handleEdit(selectedProduto.id, {
+    if (!selectedItem) return;
+    handleEdit(selectedItem.id, {
       nome: formData.nome,
+      quantidade: Number(formData.quantidade),
       preco: Number(formData.preco),
-      descricao: formData.descricao,
     });
     setIsEditModalOpen(false);
-    setSelectedProduto(null);
-    setFormData({ nome: '', preco: '', descricao: '' });
+    setSelectedItem(null);
+    setFormData({ nome: '', quantidade: '', preco: '' });
   };
 
-  const openEditModal = (produto: Produto) => {
-    setSelectedProduto(produto);
+  const openEditModal = (item: EstoqueItem) => {
+    setSelectedItem(item);
     setFormData({
-      nome: produto.nome,
-      preco: produto.preco.toString(),
-      descricao: produto.descricao,
+      nome: item.nome,
+      quantidade: item.quantidade.toString(),
+      preco: item.preco.toString(),
     });
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (produto: Produto) => {
-    setSelectedProduto(produto);
+  const openDeleteModal = (item: EstoqueItem) => {
+    setSelectedItem(item);
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = () => {
-    if (!selectedProduto) return;
-    handleDelete(selectedProduto.id);
+    if (!selectedItem) return;
+    handleDelete(selectedItem.id);
     setIsDeleteModalOpen(false);
-    setSelectedProduto(null);
+    setSelectedItem(null);
   };
 
   const getActiveFilters = () => {
     const active = [];
     if (filterValues.search) {
-      active.push({ label: 'Busca', value: filterValues.search });
+      active.push({ label: 'Nome', value: filterValues.search });
+    }
+    if (filterValues.quantidadeMin) {
+      active.push({ label: 'Quantidade Mínima', value: filterValues.quantidadeMin });
+    }
+    if (filterValues.quantidadeMax) {
+      active.push({ label: 'Quantidade Máxima', value: filterValues.quantidadeMax });
     }
     if (filterValues.precoMin) {
       active.push({ label: 'Preço Mínimo', value: `R$ ${filterValues.precoMin}` });
@@ -96,8 +102,14 @@ const CardapioPage: FC = () => {
     const filterToRemove = activeFilters[index];
     
     switch (filterToRemove.label) {
-      case 'Busca':
+      case 'Nome':
         handleFilter({ search: '' });
+        break;
+      case 'Quantidade Mínima':
+        handleFilter({ quantidadeMin: '' });
+        break;
+      case 'Quantidade Máxima':
+        handleFilter({ quantidadeMax: '' });
         break;
       case 'Preço Mínimo':
         handleFilter({ precoMin: '' });
@@ -111,16 +123,18 @@ const CardapioPage: FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Cardápio"
+        title="Estoque"
         onCreateClick={() => setIsCreateModalOpen(true)}
-        createButtonLabel="Novo Produto"
+        createButtonLabel="Novo Item"
       />
 
       <FilterContainer
-        title="Filtros do Cardápio"
-        description="Pesquise produtos por nome, descrição ou faixa de preço"
+        title="Filtros do Estoque"
+        description="Filtre os itens do estoque por nome, quantidade ou preço"
         onReset={() => handleFilter({
           search: '',
+          quantidadeMin: '',
+          quantidadeMax: '',
           precoMin: '',
           precoMax: '',
           currentPage: 1,
@@ -130,22 +144,30 @@ const CardapioPage: FC = () => {
         <TextFilter
           value={filterValues.search}
           onChange={(search) => handleFilter({ search })}
-          placeholder="Pesquisar produtos..."
-          label="Busca por Nome ou Descrição"
-          description="Digite o nome ou descrição do produto que deseja encontrar"
+          placeholder="Pesquisar itens..."
+          label="Busca por Nome"
+          description="Digite o nome do item que deseja encontrar"
         />
-        <div className="col-span-2">
-          <NumberRangeFilter
-            minValue={filterValues.precoMin}
-            maxValue={filterValues.precoMax}
-            onMinChange={(precoMin) => handleFilter({ precoMin })}
-            onMaxChange={(precoMax) => handleFilter({ precoMax })}
-            minPlaceholder="Preço mínimo"
-            maxPlaceholder="Preço máximo"
-            label="Faixa de Preço"
-            description="Filtre produtos por faixa de preço"
-          />
-        </div>
+        <NumberRangeFilter
+          minValue={filterValues.quantidadeMin}
+          maxValue={filterValues.quantidadeMax}
+          onMinChange={(quantidadeMin) => handleFilter({ quantidadeMin })}
+          onMaxChange={(quantidadeMax) => handleFilter({ quantidadeMax })}
+          minPlaceholder="Quantidade mínima"
+          maxPlaceholder="Quantidade máxima"
+          label="Quantidade em Estoque"
+          description="Filtre por faixa de quantidade disponível"
+        />
+        <NumberRangeFilter
+          minValue={filterValues.precoMin}
+          maxValue={filterValues.precoMax}
+          onMinChange={(precoMin) => handleFilter({ precoMin })}
+          onMaxChange={(precoMax) => handleFilter({ precoMax })}
+          minPlaceholder="Preço mínimo"
+          maxPlaceholder="Preço máximo"
+          label="Faixa de Preço"
+          description="Filtre por faixa de preço dos itens"
+        />
       </FilterContainer>
 
       <ActiveFilters
@@ -153,6 +175,8 @@ const CardapioPage: FC = () => {
         onRemoveFilter={handleRemoveFilter}
         onClearAll={() => handleFilter({
           search: '',
+          quantidadeMin: '',
+          quantidadeMax: '',
           precoMin: '',
           precoMax: '',
           currentPage: 1,
@@ -160,31 +184,31 @@ const CardapioPage: FC = () => {
       />
 
       <div className="bg-white p-4 rounded-lg shadow">
-        <CardapioTable
-          items={paginatedProdutos}
+        <EstoqueTable
+          items={paginatedEstoque}
           filterValues={filterValues}
           onSort={handleSort}
           onEdit={openEditModal}
           onDelete={(id) => {
-            const produto = paginatedProdutos.find(p => p.id === id);
-            if (produto) openDeleteModal(produto);
+            const item = paginatedEstoque.find(i => i.id === id);
+            if (item) openDeleteModal(item);
           }}
         />
 
         <Pagination
           currentPage={filterValues.currentPage}
-          totalPages={Math.ceil(filteredProdutos.length / filterValues.itemsPerPage)}
+          totalPages={Math.ceil(filteredEstoque.length / filterValues.itemsPerPage)}
           itemsPerPage={filterValues.itemsPerPage}
-          totalItems={filteredProdutos.length}
+          totalItems={filteredEstoque.length}
           startIndex={(filterValues.currentPage - 1) * filterValues.itemsPerPage}
           onPageChange={(page) => handleFilter({ currentPage: page })}
           onItemsPerPageChange={(itemsPerPage) => handleFilter({ itemsPerPage, currentPage: 1 })}
         />
       </div>
 
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Novo Produto">
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Novo Item">
         <div className="space-y-4">
-          <CardapioForm formData={formData} onChange={setFormData} />
+          <EstoqueForm formData={formData} onChange={setFormData} />
           <ModalActions
             onCancel={() => setIsCreateModalOpen(false)}
             onConfirm={handleSubmitCreate}
@@ -193,9 +217,9 @@ const CardapioPage: FC = () => {
         </div>
       </Modal>
 
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Editar Produto">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Editar Item">
         <div className="space-y-4">
-          <CardapioForm formData={formData} onChange={setFormData} />
+          <EstoqueForm formData={formData} onChange={setFormData} />
           <ModalActions
             onCancel={() => setIsEditModalOpen(false)}
             onConfirm={handleSubmitEdit}
@@ -208,11 +232,11 @@ const CardapioPage: FC = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        itemName={selectedProduto?.nome || ''}
-        itemType="Produto"
+        itemName={selectedItem?.nome || ''}
+        itemType="Item"
       />
     </div>
   );
 };
 
-export default CardapioPage;
+export default EstoquePage;

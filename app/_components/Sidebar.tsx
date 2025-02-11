@@ -47,6 +47,11 @@ const Sidebar: FC = () => {
       text: 'Gastos', 
       href: '/gastos' 
     },
+    {
+      icon: <FaUtensils size={20} className="text-purple-600" />,
+      text: 'Estoque',
+      href: '/estoque'
+    },
     { 
       icon: <FaFileInvoice size={20} className="text-yellow-600" />, 
       text: 'Notas Fiscais', 

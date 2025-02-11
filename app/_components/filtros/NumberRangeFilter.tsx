@@ -7,6 +7,8 @@ interface NumberRangeFilterProps {
   onMaxChange: (value: string) => void;
   minPlaceholder: string;
   maxPlaceholder: string;
+  label?: string;
+  description?: string;
 }
 
 export const NumberRangeFilter: FC<NumberRangeFilterProps> = ({
@@ -16,23 +18,37 @@ export const NumberRangeFilter: FC<NumberRangeFilterProps> = ({
   onMaxChange,
   minPlaceholder,
   maxPlaceholder,
+  label,
+  description
 }) => {
   return (
-    <div className="flex space-x-2">
-      <input
-        type="number"
-        value={minValue}
-        onChange={(e) => onMinChange(e.target.value)}
-        placeholder={minPlaceholder}
-        className="filter-input"
-      />
-      <input
-        type="number"
-        value={maxValue}
-        onChange={(e) => onMaxChange(e.target.value)}
-        placeholder={maxPlaceholder}
-        className="filter-input"
-      />
+    <div className="filter-group">
+      {label && (
+        <label className="filter-label font-bold">
+          {label}
+        </label>
+      )}
+      {description && (
+        <p className="filter-description">
+          {description}
+        </p>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        <input
+          type="number"
+          value={minValue}
+          onChange={(e) => onMinChange(e.target.value)}
+          placeholder={minPlaceholder}
+          className="filter-input"
+        />
+        <input
+          type="number"
+          value={maxValue}
+          onChange={(e) => onMaxChange(e.target.value)}
+          placeholder={maxPlaceholder}
+          className="filter-input"
+        />
+      </div>
     </div>
   );
 };

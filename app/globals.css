@@ -66,8 +66,7 @@ input {
 }
 
 .table-modern th {
-  @apply px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider;
-  @apply cursor-pointer hover:bg-gray-100 transition-colors;
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 transition-colors;
 }
 
 .table-modern tbody tr {
@@ -75,7 +74,7 @@ input {
 }
 
 .table-modern td {
-  @apply px-6 py-4 whitespace-nowrap text-gray-900;
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
 }
 
 /* Estilos para select */
@@ -83,4 +82,44 @@ select {
   @apply border border-gray-300 rounded px-2 py-1 text-sm;
   @apply focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none;
   @apply cursor-pointer hover:bg-gray-50 transition-colors;
+}
+
+@layer components {
+  .filter-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+    focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+    disabled:bg-gray-50 disabled:text-gray-500 disabled:border-gray-200 disabled:cursor-not-allowed
+    transition-all duration-200;
+  }
+
+  .filter-group {
+    @apply p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors;
+  }
+
+  .filter-label {
+    @apply block text-sm font-medium text-gray-900 mb-1;
+  }
+
+  .filter-description {
+    @apply text-xs text-gray-500 mb-2 leading-relaxed;
+  }
+
+  .filter-active-tag {
+    @apply inline-flex items-center bg-blue-50 text-blue-700 rounded-full px-3 py-1 text-sm
+    border border-blue-100 hover:bg-blue-100 transition-colors;
+  }
+}
+
+/* Adiciona um sutil highlight na linha da tabela ao passar o mouse */
+.table-modern tr:hover {
+  @apply bg-gray-50 transition-colors;
+}
+
+/* Melhora a aparência dos inputs type="date" */
+input[type="date"] {
+  @apply appearance-none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  @apply opacity-60 hover:opacity-100 cursor-pointer;
 }
