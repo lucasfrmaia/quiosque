@@ -1,34 +1,38 @@
-import type { Metadata } from "next";
-import "./globals.css";
+'use client';
+
 import { FC } from 'react';
+import { usePathname } from 'next/navigation';
 import Sidebar from './_components/Sidebar';
+import { AuthProvider } from './contexts/AuthContext';
+// import { useAuth } from './contexts/AuthContext';
+import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Kiosque - Sistema de Gestão",
-  description: "Sistema de gestão para quiosques",
-};
+const LayoutContent: FC<{ children: React.ReactNode }> = ({ children }) => {
+  // const { isAuthenticated } = useAuth();
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
+  // Mudar depois, colocar isAuthenticaded no contexto
 
-const RootLayout: FC<LayoutProps> = ({ children }) => {
   return (
-    <html lang="pt-BR">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
-      <body>
-        <div className="flex min-h-screen bg-gray-50">
-          <Sidebar />
-          <main className="flex-1 ml-64 p-8">
-            {children}
-          </main>
-        </div>
-      </body>
-    </html>
+    <div className="flex min-h-screen bg-gray-50">
+      
+      {!isLoginPage && <Sidebar />}
+      <main className={`flex-1 ${!isLoginPage ? 'ml-64' : ''} p-8`}>
+        {children}
+      </main>
+    </div>
   );
 };
 
-export default RootLayout;
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="pt-BR">
+      <body>
+        <AuthProvider>
+          <LayoutContent>{children}</LayoutContent>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}

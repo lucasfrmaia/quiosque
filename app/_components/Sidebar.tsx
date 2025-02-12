@@ -3,7 +3,8 @@
 import { FC, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine } from 'react-icons/fa';
+import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine, FaSignOutAlt } from 'react-icons/fa';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarItemProps {
   icon: ReactNode;
@@ -30,6 +31,7 @@ const SidebarItem: FC<SidebarItemProps> = ({ icon, text, href, isActive }) => (
 
 const Sidebar: FC = () => {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const menuItems = [
     { 
@@ -80,7 +82,13 @@ const Sidebar: FC = () => {
           </ul>
         </nav>
         <div className="p-4 border-t border-gray-200">
-          <p className="text-sm text-gray-500">Versão 1.0.0</p>
+          <button
+            onClick={logout}
+            className="flex items-center space-x-3 px-4 py-3 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <FaSignOutAlt size={20} />
+            <span className="font-medium">Sair</span>
+          </button>
         </div>
       </div>
     </aside>
