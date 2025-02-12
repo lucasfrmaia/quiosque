@@ -25,6 +25,7 @@ const CardapioPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
+    setAppliedFilters
   } = useCardapio();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -119,13 +120,24 @@ const CardapioPage: FC = () => {
       <FilterContainer
         title="Filtros do Cardápio"
         description="Pesquise produtos por nome, descrição ou faixa de preço"
-        onReset={() => handleFilter({
-          search: '',
-          precoMin: '',
-          precoMax: '',
-          currentPage: 1,
-        })}
-        onApply={() => handleFilter(filterValues)}
+        onReset={() => {
+          setAppliedFilters({
+            search: '',
+            precoMin: '',
+            precoMax: '',
+            currentPage: 1,
+            itemsPerPage: 10,
+            sortField: 'nome',
+            sortDirection: 'asc'
+          });
+          handleFilter({
+            search: '',
+            precoMin: '',
+            precoMax: '',
+            currentPage: 1
+          });
+        }}
+        onApply={() => setAppliedFilters(filterValues)}
       >
         <TextFilter
           value={filterValues.search}
@@ -151,12 +163,23 @@ const CardapioPage: FC = () => {
       <ActiveFilters
         filters={getActiveFilters()}
         onRemoveFilter={handleRemoveFilter}
-        onClearAll={() => handleFilter({
-          search: '',
-          precoMin: '',
-          precoMax: '',
-          currentPage: 1,
-        })}
+        onClearAll={() => {
+          setAppliedFilters({
+            search: '',
+            precoMin: '',
+            precoMax: '',
+            currentPage: 1,
+            itemsPerPage: 10,
+            sortField: 'nome',
+            sortDirection: 'asc'
+          });
+          handleFilter({
+            search: '',
+            precoMin: '',
+            precoMax: '',
+            currentPage: 1
+          });
+        }}
       />
 
       <div className="bg-white p-4 rounded-lg shadow">

@@ -26,6 +26,7 @@ const GastosPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
+    setAppliedFilters
   } = useGastos();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -138,15 +139,28 @@ const GastosPage: FC = () => {
       <FilterContainer
         title="Filtros de Gastos"
         description="Filtre os gastos por descrição, valor ou período"
-        onReset={() => handleFilter({
-          search: '',
-          valorMin: '',
-          valorMax: '',
-          dataInicio: '',
-          dataFim: '',
-          currentPage: 1,
-        })}
-        onApply={() => handleFilter(filterValues)}
+        onReset={() => {
+          setAppliedFilters({
+            search: '',
+            valorMin: '',
+            valorMax: '',
+            dataInicio: '',
+            dataFim: '',
+            currentPage: 1,
+            itemsPerPage: 10,
+            sortField: 'data',
+            sortDirection: 'desc'
+          });
+          handleFilter({
+            search: '',
+            valorMin: '',
+            valorMax: '',
+            dataInicio: '',
+            dataFim: '',
+            currentPage: 1
+          });
+        }}
+        onApply={() => setAppliedFilters(filterValues)}
       >
         <TextFilter
           value={filterValues.search}

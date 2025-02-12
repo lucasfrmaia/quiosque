@@ -9,30 +9,33 @@ const notasIniciais: NotaFiscal[] = [
   { id: 5, produtoId: 5, quantidade: 2, data: '2023-10-05', total: 30 },
 ];
 
+type FilterState = {
+  search: string;
+  quantidadeMin: string;
+  quantidadeMax: string;
+  totalMin: string;
+  totalMax: string;
+  dataInicio: string;
+  dataFim: string;
+  currentPage: number;
+  itemsPerPage: number;
+  sortField: string;
+  sortDirection: 'asc' | 'desc';
+};
+
 interface UseNotasReturn {
   notas: NotaFiscal[];
   filteredNotas: NotaFiscal[];
   paginatedNotas: NotaFiscal[];
-  filterValues: {
-    search: string;
-    quantidadeMin: string;
-    quantidadeMax: string;
-    totalMin: string;
-    totalMax: string;
-    dataInicio: string;
-    dataFim: string;
-    currentPage: number;
-    itemsPerPage: number;
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
+  filterValues: FilterState;
   handleSort: (field: string) => void;
-  handleFilter: (updates: Partial<typeof filterValues>) => void;
+  handleFilter: (updates: Partial<FilterState>) => void;
+  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useNotas = (): UseNotasReturn => {
   const [notas] = useState<NotaFiscal[]>(notasIniciais);
-  const [filterValues, setFilterValues] = useState({
+  const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     quantidadeMin: '',
     quantidadeMax: '',
@@ -43,49 +46,53 @@ export const useNotas = (): UseNotasReturn => {
     currentPage: 1,
     itemsPerPage: 5,
     sortField: 'data',
-    sortDirection: 'desc' as const,
+    sortDirection: 'desc',
   });
 
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
+
   const handleSort = (field: string) => {
-    setFilterValues(prev => ({
-      ...prev,
-      sortField: field,
-      sortDirection: prev.sortField === field && prev.sortDirection === 'asc' ? 'desc' : 'asc'
-    }));
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
   };
 
-  const handleFilter = (updates: Partial<typeof filterValues>) => {
-    setFilterValues(prev => ({ ...prev, ...updates, currentPage: 1 }));
+  const handleFilter = (updates: Partial<FilterState>) => {
+    if ('currentPage' in updates) {
+      setAppliedFilters(prev => ({ ...prev, ...updates }));
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    } else {
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    }
   };
 
   const filteredNotas = notas.filter(nota => {
-    const matchesSearch = nota.produtoId.toString().includes(filterValues.search);
-    const matchesQuantidadeMin = !filterValues.quantidadeMin || nota.quantidade >= Number(filterValues.quantidadeMin);
-    const matchesQuantidadeMax = !filterValues.quantidadeMax || nota.quantidade <= Number(filterValues.quantidadeMax);
-    const matchesTotalMin = !filterValues.totalMin || nota.total >= Number(filterValues.totalMin);
-    const matchesTotalMax = !filterValues.totalMax || nota.total <= Number(filterValues.totalMax);
-    const matchesDataInicio = !filterValues.dataInicio || nota.data >= filterValues.dataInicio;
-    const matchesDataFim = !filterValues.dataFim || nota.data <= filterValues.dataFim;
+    const matchesSearch = nota.produtoId.toString().includes(appliedFilters.search);
+    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || nota.quantidade >= Number(appliedFilters.quantidadeMin);
+    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || nota.quantidade <= Number(appliedFilters.quantidadeMax);
+    const matchesTotalMin = !appliedFilters.totalMin || nota.total >= Number(appliedFilters.totalMin);
+    const matchesTotalMax = !appliedFilters.totalMax || nota.total <= Number(appliedFilters.totalMax);
+    const matchesDataInicio = !appliedFilters.dataInicio || nota.data >= appliedFilters.dataInicio;
+    const matchesDataFim = !appliedFilters.dataFim || nota.data <= appliedFilters.dataFim;
 
     return matchesSearch && matchesQuantidadeMin && matchesQuantidadeMax && 
            matchesTotalMin && matchesTotalMax && matchesDataInicio && matchesDataFim;
   }).sort((a, b) => {
-    const direction = filterValues.sortDirection === 'asc' ? 1 : -1;
-    if (filterValues.sortField === 'quantidade') {
+    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    if (appliedFilters.sortField === 'quantidade') {
       return (a.quantidade - b.quantidade) * direction;
     }
-    if (filterValues.sortField === 'total') {
+    if (appliedFilters.sortField === 'total') {
       return (a.total - b.total) * direction;
     }
-    if (filterValues.sortField === 'data') {
-      return a.data.localeCompare(b.data) * direction;
+    if (appliedFilters.sortField === 'data') {
+      return (a.data < b.data ? -1 : 1) * direction;
     }
-    return (a[filterValues.sortField as keyof NotaFiscal] - b[filterValues.sortField as keyof NotaFiscal]) * direction;
+    return (a.produtoId - b.produtoId) * direction;
   });
 
   const paginatedNotas = filteredNotas.slice(
-    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
-    filterValues.currentPage * filterValues.itemsPerPage
+    (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
+    appliedFilters.currentPage * appliedFilters.itemsPerPage
   );
 
   return {
@@ -95,5 +102,6 @@ export const useNotas = (): UseNotasReturn => {
     filterValues,
     handleSort,
     handleFilter,
+    setAppliedFilters,
   };
 };

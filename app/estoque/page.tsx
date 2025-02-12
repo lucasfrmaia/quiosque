@@ -25,6 +25,7 @@ const EstoquePage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
+    setAppliedFilters
   } = useEstoque();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -131,15 +132,28 @@ const EstoquePage: FC = () => {
       <FilterContainer
         title="Filtros do Estoque"
         description="Filtre os itens do estoque por nome, quantidade ou preço"
-        onReset={() => handleFilter({
-          search: '',
-          quantidadeMin: '',
-          quantidadeMax: '',
-          precoMin: '',
-          precoMax: '',
-          currentPage: 1,
-        })}
-        onApply={() => handleFilter(filterValues)}
+        onReset={() => {
+          setAppliedFilters({
+            search: '',
+            quantidadeMin: '',
+            quantidadeMax: '',
+            precoMin: '',
+            precoMax: '',
+            currentPage: 1,
+            itemsPerPage: 10,
+            sortField: 'nome',
+            sortDirection: 'asc'
+          });
+          handleFilter({
+            search: '',
+            quantidadeMin: '',
+            quantidadeMax: '',
+            precoMin: '',
+            precoMax: '',
+            currentPage: 1
+          });
+        }}
+        onApply={() => setAppliedFilters(filterValues)}
       >
         <TextFilter
           value={filterValues.search}

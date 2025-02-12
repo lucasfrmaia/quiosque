@@ -6,31 +6,34 @@ const gastosIniciais: GastoDiario[] = [
   { id: 2, descricao: 'Pagamento de funcionários', valor: 200, data: '2023-10-02' },
 ];
 
+type FilterState = {
+  search: string;
+  valorMin: string;
+  valorMax: string;
+  dataInicio: string;
+  dataFim: string;
+  currentPage: number;
+  itemsPerPage: number;
+  sortField: string;
+  sortDirection: 'asc' | 'desc';
+};
+
 interface UseGastosReturn {
   gastos: GastoDiario[];
   filteredGastos: GastoDiario[];
   paginatedGastos: GastoDiario[];
-  filterValues: {
-    search: string;
-    valorMin: string;
-    valorMax: string;
-    dataInicio: string;
-    dataFim: string;
-    currentPage: number;
-    itemsPerPage: number;
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
+  filterValues: FilterState;
   handleSort: (field: string) => void;
-  handleFilter: (updates: Partial<typeof filterValues>) => void;
+  handleFilter: (updates: Partial<FilterState>) => void;
   handleCreate: (gasto: Omit<GastoDiario, 'id'>) => void;
   handleEdit: (id: number, updates: Partial<GastoDiario>) => void;
   handleDelete: (id: number) => void;
+  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useGastos = (): UseGastosReturn => {
   const [gastos, setGastos] = useState<GastoDiario[]>(gastosIniciais);
-  const [filterValues, setFilterValues] = useState({
+  const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     valorMin: '',
     valorMax: '',
@@ -39,16 +42,25 @@ export const useGastos = (): UseGastosReturn => {
     currentPage: 1,
     itemsPerPage: 10,
     sortField: 'data',
-    sortDirection: 'desc' as const,
+    sortDirection: 'desc',
   });
 
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
+
   const handleSort = (field: string) => {
-    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
-    setFilterValues(prev => ({ ...prev, sortField: field, sortDirection: direction }));
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
   };
 
-  const handleFilter = (updates: Partial<typeof filterValues>) => {
-    setFilterValues(prev => ({ ...prev, ...updates, currentPage: 1 }));
+  const handleFilter = (updates: Partial<FilterState>) => {
+    if ('currentPage' in updates) {
+      // Atualizações de paginação são aplicadas imediatamente
+      setAppliedFilters(prev => ({ ...prev, ...updates }));
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    } else {
+      // Outros filtros só são armazenados nos valores temporários
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    }
   };
 
   const handleCreate = (gasto: Omit<GastoDiario, 'id'>) => {
@@ -70,27 +82,27 @@ export const useGastos = (): UseGastosReturn => {
   };
 
   const filteredGastos = gastos.filter(gasto => {
-    const matchesSearch = gasto.descricao.toLowerCase().includes(filterValues.search.toLowerCase());
-    const matchesValorMin = !filterValues.valorMin || gasto.valor >= Number(filterValues.valorMin);
-    const matchesValorMax = !filterValues.valorMax || gasto.valor <= Number(filterValues.valorMax);
-    const matchesDataInicio = !filterValues.dataInicio || gasto.data >= filterValues.dataInicio;
-    const matchesDataFim = !filterValues.dataFim || gasto.data <= filterValues.dataFim;
+    const matchesSearch = gasto.descricao.toLowerCase().includes(appliedFilters.search.toLowerCase());
+    const matchesValorMin = !appliedFilters.valorMin || gasto.valor >= Number(appliedFilters.valorMin);
+    const matchesValorMax = !appliedFilters.valorMax || gasto.valor <= Number(appliedFilters.valorMax);
+    const matchesDataInicio = !appliedFilters.dataInicio || gasto.data >= appliedFilters.dataInicio;
+    const matchesDataFim = !appliedFilters.dataFim || gasto.data <= appliedFilters.dataFim;
 
     return matchesSearch && matchesValorMin && matchesValorMax && matchesDataInicio && matchesDataFim;
   }).sort((a, b) => {
-    const direction = filterValues.sortDirection === 'asc' ? 1 : -1;
-    if (filterValues.sortField === 'valor') {
+    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    if (appliedFilters.sortField === 'valor') {
       return (a.valor - b.valor) * direction;
     }
-    if (filterValues.sortField === 'data') {
+    if (appliedFilters.sortField === 'data') {
       return (a.data < b.data ? -1 : 1) * direction;
     }
     return (a.descricao < b.descricao ? -1 : 1) * direction;
   });
 
   const paginatedGastos = filteredGastos.slice(
-    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
-    filterValues.currentPage * filterValues.itemsPerPage
+    (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
+    appliedFilters.currentPage * appliedFilters.itemsPerPage
   );
 
   return {
@@ -103,5 +115,6 @@ export const useGastos = (): UseGastosReturn => {
     handleCreate,
     handleEdit,
     handleDelete,
+    setAppliedFilters,
   };
 };

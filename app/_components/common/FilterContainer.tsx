@@ -19,8 +19,11 @@ export const FilterContainer: FC<FilterContainerProps> = ({
 
   const handleApply = async () => {
     setIsApplying(true);
-    await onApply();
-    setIsApplying(false);
+    try {
+      await onApply();
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   return (

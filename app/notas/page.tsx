@@ -18,6 +18,7 @@ const NotasPage: FC = () => {
     filterValues,
     handleSort,
     handleFilter,
+    setAppliedFilters
   } = useNotas();
 
   const getActiveFilters = () => {
@@ -92,17 +93,32 @@ const NotasPage: FC = () => {
       <FilterContainer
         title="Filtros de Notas Fiscais"
         description="Pesquise notas fiscais por ID do produto, quantidade, valor total ou período"
-        onReset={() => handleFilter({
-          search: '',
-          quantidadeMin: '',
-          quantidadeMax: '',
-          totalMin: '',
-          totalMax: '',
-          dataInicio: '',
-          dataFim: '',
-          currentPage: 1,
-        })}
-        onApply={() => handleFilter(filterValues)}
+        onReset={() => {
+          setAppliedFilters({
+            search: '',
+            quantidadeMin: '',
+            quantidadeMax: '',
+            totalMin: '',
+            totalMax: '',
+            dataInicio: '',
+            dataFim: '',
+            currentPage: 1,
+            itemsPerPage: 5,
+            sortField: 'data',
+            sortDirection: 'desc'
+          });
+          handleFilter({
+            search: '',
+            quantidadeMin: '',
+            quantidadeMax: '',
+            totalMin: '',
+            totalMax: '',
+            dataInicio: '',
+            dataFim: '',
+            currentPage: 1
+          });
+        }}
+        onApply={() => setAppliedFilters(filterValues)}
       >
         <TextFilter
           value={filterValues.search}

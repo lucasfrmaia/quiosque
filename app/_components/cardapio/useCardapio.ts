@@ -7,45 +7,55 @@ const produtosIniciais: Produto[] = [
   { id: 3, nome: 'Café', preco: 5, descricao: 'Café quente' },
 ];
 
+type FilterState = {
+  search: string;
+  precoMin: string;
+  precoMax: string;
+  currentPage: number;
+  itemsPerPage: number;
+  sortField: string;
+  sortDirection: 'asc' | 'desc';
+};
+
 interface UseCardapioReturn {
   produtos: Produto[];
   filteredProdutos: Produto[];
   paginatedProdutos: Produto[];
-  filterValues: {
-    search: string;
-    precoMin: string;
-    precoMax: string;
-    currentPage: number;
-    itemsPerPage: number;
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
+  filterValues: FilterState;
   handleSort: (field: string) => void;
-  handleFilter: (updates: Partial<typeof filterValues>) => void;
+  handleFilter: (updates: Partial<FilterState>) => void;
   handleCreate: (produto: Omit<Produto, 'id'>) => void;
   handleEdit: (id: number, updates: Partial<Produto>) => void;
   handleDelete: (id: number) => void;
+  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useCardapio = (): UseCardapioReturn => {
   const [produtos, setProdutos] = useState<Produto[]>(produtosIniciais);
-  const [filterValues, setFilterValues] = useState({
+  const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     precoMin: '',
     precoMax: '',
     currentPage: 1,
     itemsPerPage: 10,
     sortField: 'nome',
-    sortDirection: 'asc' as const,
+    sortDirection: 'asc',
   });
+  
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
 
   const handleSort = (field: string) => {
-    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
-    setFilterValues(prev => ({ ...prev, sortField: field, sortDirection: direction }));
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
   };
 
-  const handleFilter = (updates: Partial<typeof filterValues>) => {
-    setFilterValues(prev => ({ ...prev, ...updates, currentPage: 1 }));
+  const handleFilter = (updates: Partial<FilterState>) => {
+    if ('currentPage' in updates) {
+      setAppliedFilters(prev => ({ ...prev, ...updates }));
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    } else {
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    }
   };
 
   const handleCreate = (produto: Omit<Produto, 'id'>) => {
@@ -67,23 +77,23 @@ export const useCardapio = (): UseCardapioReturn => {
   };
 
   const filteredProdutos = produtos.filter(produto => {
-    const matchesSearch = produto.nome.toLowerCase().includes(filterValues.search.toLowerCase()) ||
-                         produto.descricao.toLowerCase().includes(filterValues.search.toLowerCase());
-    const matchesPrecoMin = !filterValues.precoMin || produto.preco >= Number(filterValues.precoMin);
-    const matchesPrecoMax = !filterValues.precoMax || produto.preco <= Number(filterValues.precoMax);
+    const matchesSearch = produto.nome.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
+                         produto.descricao.toLowerCase().includes(appliedFilters.search.toLowerCase());
+    const matchesPrecoMin = !appliedFilters.precoMin || produto.preco >= Number(appliedFilters.precoMin);
+    const matchesPrecoMax = !appliedFilters.precoMax || produto.preco <= Number(appliedFilters.precoMax);
 
     return matchesSearch && matchesPrecoMin && matchesPrecoMax;
   }).sort((a, b) => {
-    const direction = filterValues.sortDirection === 'asc' ? 1 : -1;
-    if (filterValues.sortField === 'preco') {
+    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    if (appliedFilters.sortField === 'preco') {
       return (a.preco - b.preco) * direction;
     }
-    return (a[filterValues.sortField as keyof Produto] < b[filterValues.sortField as keyof Produto] ? -1 : 1) * direction;
+    return (a[appliedFilters.sortField as keyof Produto] < b[appliedFilters.sortField as keyof Produto] ? -1 : 1) * direction;
   });
 
   const paginatedProdutos = filteredProdutos.slice(
-    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
-    filterValues.currentPage * filterValues.itemsPerPage
+    (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
+    appliedFilters.currentPage * appliedFilters.itemsPerPage
   );
 
   return {
@@ -96,5 +106,6 @@ export const useCardapio = (): UseCardapioReturn => {
     handleCreate,
     handleEdit,
     handleDelete,
+    setAppliedFilters,
   };
 };

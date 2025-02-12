@@ -1,26 +1,39 @@
 import { useState } from 'react';
-import { EstoqueItem, FilterValues } from '@/app/interfaces';
+import { EstoqueItem } from '@/app/interfaces';
 
 const estoqueInicial: EstoqueItem[] = [
   { id: 1, nome: 'Item 1', quantidade: 10, preco: 100 },
   { id: 2, nome: 'Item 2', quantidade: 5, preco: 200 },
 ];
 
+type FilterState = {
+  search: string;
+  quantidadeMin: string;
+  quantidadeMax: string;
+  precoMin: string;
+  precoMax: string;
+  currentPage: number;
+  itemsPerPage: number;
+  sortField: string;
+  sortDirection: 'asc' | 'desc';
+};
+
 interface UseEstoqueReturn {
   estoque: EstoqueItem[];
   filteredEstoque: EstoqueItem[];
   paginatedEstoque: EstoqueItem[];
-  filterValues: FilterValues;
+  filterValues: FilterState;
   handleSort: (field: string) => void;
-  handleFilter: (updates: Partial<FilterValues>) => void;
+  handleFilter: (updates: Partial<FilterState>) => void;
   handleCreate: (item: Omit<EstoqueItem, 'id'>) => void;
   handleEdit: (id: number, updates: Partial<EstoqueItem>) => void;
   handleDelete: (id: number) => void;
+  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useEstoque = (): UseEstoqueReturn => {
   const [estoque, setEstoque] = useState<EstoqueItem[]>(estoqueInicial);
-  const [filterValues, setFilterValues] = useState<FilterValues>({
+  const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     quantidadeMin: '',
     quantidadeMax: '',
@@ -32,13 +45,20 @@ export const useEstoque = (): UseEstoqueReturn => {
     sortDirection: 'asc',
   });
 
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
+
   const handleSort = (field: string) => {
-    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
-    setFilterValues(prev => ({ ...prev, sortField: field, sortDirection: direction }));
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
   };
 
-  const handleFilter = (updates: Partial<FilterValues>) => {
-    setFilterValues(prev => ({ ...prev, ...updates, currentPage: 1 }));
+  const handleFilter = (updates: Partial<FilterState>) => {
+    if ('currentPage' in updates) {
+      setAppliedFilters(prev => ({ ...prev, ...updates }));
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    } else {
+      setFilterValues(prev => ({ ...prev, ...updates }));
+    }
   };
 
   const handleCreate = (item: Omit<EstoqueItem, 'id'>) => {
@@ -61,17 +81,17 @@ export const useEstoque = (): UseEstoqueReturn => {
 
   const filteredEstoque = estoque.filter(item => {
     return (
-      item.nome.toLowerCase().includes(filterValues.search.toLowerCase()) &&
-      (filterValues.quantidadeMin === '' || item.quantidade >= Number(filterValues.quantidadeMin)) &&
-      (filterValues.quantidadeMax === '' || item.quantidade <= Number(filterValues.quantidadeMax)) &&
-      (filterValues.precoMin === '' || item.preco >= Number(filterValues.precoMin)) &&
-      (filterValues.precoMax === '' || item.preco <= Number(filterValues.precoMax))
+      item.nome.toLowerCase().includes(appliedFilters.search.toLowerCase()) &&
+      (appliedFilters.quantidadeMin === '' || item.quantidade >= Number(appliedFilters.quantidadeMin)) &&
+      (appliedFilters.quantidadeMax === '' || item.quantidade <= Number(appliedFilters.quantidadeMax)) &&
+      (appliedFilters.precoMin === '' || item.preco >= Number(appliedFilters.precoMin)) &&
+      (appliedFilters.precoMax === '' || item.preco <= Number(appliedFilters.precoMax))
     );
   });
 
   const paginatedEstoque = filteredEstoque.slice(
-    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
-    filterValues.currentPage * filterValues.itemsPerPage
+    (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
+    appliedFilters.currentPage * appliedFilters.itemsPerPage
   );
 
   return {
@@ -84,5 +104,6 @@ export const useEstoque = (): UseEstoqueReturn => {
     handleCreate,
     handleEdit,
     handleDelete,
+    setAppliedFilters,
   };
 };
