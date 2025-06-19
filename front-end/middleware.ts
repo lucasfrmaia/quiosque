@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-    /*
   const isAuthenticated = request.cookies.has('auth');
   const isLoginPage = request.nextUrl.pathname === '/login';
 
@@ -13,9 +12,7 @@ export function middleware(request: NextRequest) {
   if (isAuthenticated && isLoginPage) {
     return NextResponse.redirect(new URL('/', request.url));
   }
-  */
 
-  request.bytes()
   return NextResponse.next();
 }
 

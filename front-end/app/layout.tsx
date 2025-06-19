@@ -4,21 +4,19 @@ import { FC } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './_components/Sidebar';
 import { AuthProvider } from './contexts/AuthContext';
-// import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import "./globals.css";
 
 const LayoutContent: FC<{ children: React.ReactNode }> = ({ children }) => {
-  // const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
-
-  // Mudar depois, colocar isAuthenticaded no contexto
-
+  
   return (
     <div className="flex min-h-screen bg-gray-50">
       
-      {!isLoginPage && <Sidebar />}
-      <main className={`flex-1 ${!isLoginPage ? 'ml-64' : ''} p-8`}>
+      {isAuthenticated && !isLoginPage && <Sidebar />}
+      <main className={`flex-1 ${isAuthenticated && !isLoginPage ? 'ml-64' : ''} p-8`}>
         {children}
       </main>
     </div>
