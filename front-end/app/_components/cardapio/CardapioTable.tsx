@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Produto } from '@/app/interfaces';
+import { Produto } from '@/types/interfaces/interfaces';
 import { SortIcon } from '../SortIcon';
 import { ActionButton } from '../ActionButton';
 

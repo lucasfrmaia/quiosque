@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EstoqueItem } from '@/app/interfaces';
+import { EstoqueItem } from '@/types/interfaces/interfaces';
 
 const estoqueInicial: EstoqueItem[] = [
   { id: 1, nome: 'Item 1', quantidade: 10, preco: 100 },

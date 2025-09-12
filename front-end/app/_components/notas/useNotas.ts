@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NotaFiscal } from '@/app/interfaces';
+import { NotaFiscal } from '@/types/interfaces/interfaces';
 
 const notasIniciais: NotaFiscal[] = [
   { id: 1, produtoId: 1, quantidade: 10, data: '2023-10-01', total: 100 },

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Produto } from '@/app/interfaces';
+import { Produto } from '@/types/interfaces/interfaces';
 
 const produtosIniciais: Produto[] = [
   { id: 1, nome: 'Produto 1', preco: 10, descricao: 'Descrição do Produto 1' },

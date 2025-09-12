@@ -49,3 +49,12 @@ export interface FilterValues {
   sortField: string;
   sortDirection: SortDirection;
 }
+
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+}

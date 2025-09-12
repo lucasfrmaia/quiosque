@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GastoDiario } from '@/app/interfaces';
+import { GastoDiario } from '@/types/interfaces/interfaces';
 
 const gastosIniciais: GastoDiario[] = [
   { id: 1, descricao: 'Compra de materiais', valor: 100, data: '2023-10-01' },
