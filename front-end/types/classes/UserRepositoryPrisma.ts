@@ -8,6 +8,10 @@ export class UserRepositoryPrisma implements IUserRepository {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+  
+  findPerPage(page: number, limit: number): Promise<User[]> {
+    throw new Error('Method not implemented.');
+  }
 
   async create(user: Omit<User, 'id'>): Promise<User> {
     const createdUser = await this.prisma.user.create({

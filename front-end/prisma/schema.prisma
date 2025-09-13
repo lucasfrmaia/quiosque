@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -27,8 +27,8 @@ model Produto {
   descricao   String?
 
   notaFiscals NotaFiscal[]
-  estoque Estoque[]
-  cardapio Cardaptio[]
+  estoques   Estoque[]
+  cardapios  Cardapio[]
 
   @@map("produtos")
 }
@@ -47,12 +47,21 @@ model Estoque {
   @@map("estoques")
 }
 
-model Cardaptio {
+model Cardapio {
   id            Int      @id @default(autoincrement())
   produtoId     Int
-  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  produto       Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@map("cardapio")
+}
+
+model GastoDiario {
+  id        Int      @id @default(autoincrement())
+  descricao String
+  valor     Float
+  data      DateTime
+
+  @@map("gastos_diarios")
 }
 
 

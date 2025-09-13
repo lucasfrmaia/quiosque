@@ -1,28 +1,38 @@
-import { User } from './interfaces';
-import { Produto } from './interfaces';
-import { ItemEstoque } from './interfaces';
+import { User, Produto, Estoque, Cardapio } from './interfaces';
 
 export interface IUserRepository {
   create(user: Omit<User, 'id'>): Promise<User>;
   findById(id: number): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   findAll(): Promise<User[]>;
+  findPerPage(page: number, limit: number): Promise<User[]>;
   update(id: number, user: Partial<User>): Promise<User>;
   delete(id: number): Promise<void>;
 }
 
 export interface IProdutoRepository {
-  create(produto: Omit<Produto, 'id'>): Promise<Produto>;
+  create(produto: Omit<Produto, 'id' | 'notaFiscals' | 'estoques' | 'cardapios'>): Promise<Produto>;
   findById(id: number): Promise<Produto | null>;
   findAll(): Promise<Produto[]>;
-  update(id: number, produto: Partial<Produto>): Promise<Produto>;
+  findPerPage(page: number, limit: number): Promise<Produto[]>;
+  update(id: number, produto: Partial<Omit<Produto, 'id' | 'notaFiscals' | 'estoques' | 'cardapios'>>): Promise<Produto>;
   delete(id: number): Promise<void>;
 }
 
 export interface IEstoqueRepository {
-  create(estoque: Omit<ItemEstoque, 'id'>): Promise<ItemEstoque>;
-  findById(id: number): Promise<ItemEstoque | null>;
-  findAll(): Promise<ItemEstoque[]>;
-  update(id: number, estoque: Partial<ItemEstoque>): Promise<ItemEstoque>;
+  create(estoque: Omit<Estoque, 'id' | 'produto'>): Promise<Estoque>;
+  findById(id: number): Promise<Estoque | null>;
+  findAll(): Promise<Estoque[]>;
+  findPerPage(page: number, limit: number): Promise<Estoque[]>;
+  update(id: number, estoque: Partial<Omit<Estoque, 'id' | 'produto'>>): Promise<Estoque>;
+  delete(id: number): Promise<void>;
+}
+
+export interface ICardapioRepository {
+  create(cardapio: Omit<Cardapio, 'id' | 'produto'>): Promise<Cardapio>;
+  findById(id: number): Promise<Cardapio | null>;
+  findAll(): Promise<Cardapio[]>;
+  findPerPage(page: number, limit: number): Promise<Cardapio[]>;
+  update(id: number, cardapio: Partial<Omit<Cardapio, 'id' | 'produto'>>): Promise<Cardapio>;
   delete(id: number): Promise<void>;
 }

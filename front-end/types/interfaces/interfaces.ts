@@ -2,31 +2,37 @@ export interface Produto {
   id: number;
   nome: string;
   preco: number;
-  descricao: string;
+  descricao: string | null;
+  notaFiscals?: NotaFiscal[];
+  estoques?: Estoque[];
+  cardapios?: Cardapio[];
 }
 
 export interface NotaFiscal {
   id: number;
   produtoId: number;
   quantidade: number;
-  data: string;
+  data: Date;
   total: number;
+  produtos?: Produto[];
 }
 
 export interface GastoDiario {
   id: number;
   descricao: string;
   valor: number;
-  data: string;
+  data: Date;
 }
 
-export interface ItemEstoque {
+export interface Estoque {
   id: number;
   nome: string;
   quantidade: number;
   precoUnitario: number;
   categoria: string;
-  dataValidade?: string;
+  dataValidade: string;
+  produtoId: number;
+  produto?: Produto;
 }
 
 export interface EstoqueItem {
@@ -34,6 +40,12 @@ export interface EstoqueItem {
   nome: string;
   quantidade: number;
   preco: number;
+}
+
+export interface Cardapio {
+  id: number;
+  produtoId: number;
+  produto?: Produto;
 }
 
 export type SortDirection = 'asc' | 'desc';
