@@ -40,11 +40,6 @@ const Sidebar: FC = () => {
       href: '/' 
     },
     { 
-      icon: <FaUtensils size={20} className="text-green-600" />, 
-      text: 'Cardápio', 
-      href: '/cardapio' 
-    },
-    { 
       icon: <FaMoneyBillWave size={20} className="text-red-600" />, 
       text: 'Gastos', 
       href: '/gastos' 

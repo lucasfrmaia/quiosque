@@ -31,16 +31,6 @@ export const NotasTable: FC<NotasTableProps> = ({
                 />
               </div>
             </th>
-            <th onClick={() => onSort('quantidade')}>
-              <div className="flex items-center space-x-1">
-                <span>Quantidade</span>
-                <SortIcon
-                  field="quantidade"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
-                />
-              </div>
-            </th>
             <th onClick={() => onSort('total')}>
               <div className="flex items-center space-x-1">
                 <span>Total</span>
@@ -67,7 +57,6 @@ export const NotasTable: FC<NotasTableProps> = ({
           {items.map((nota) => (
             <tr key={nota.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap text-gray-900">{nota.produtoId}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">{nota.quantidade}</td>
               <td className="px-6 py-4 whitespace-nowrap text-gray-900">R$ {nota.total.toFixed(2)}</td>
               <td className="px-6 py-4 whitespace-nowrap text-gray-900">{new Date(nota.data).toLocaleDateString()}</td>
             </tr>

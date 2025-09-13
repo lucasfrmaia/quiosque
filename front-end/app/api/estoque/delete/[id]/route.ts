@@ -10,7 +10,7 @@ export async function DELETE(
     if (isNaN(id)) {
       return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 });
     }
-    await repositoryFactory.estoqueRepository.delete(id);
+    await repositoryFactory.produtoEstoqueRepository.delete(id);
     return NextResponse.json({ success: true, message: 'Estoque deleted successfully' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });

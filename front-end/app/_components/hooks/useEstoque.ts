@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Estoque } from '@/types/interfaces/entities';
+import { ProdutoEstoque } from '@/types/interfaces/entities';
 
 type FilterState = {
   search: string;
@@ -15,14 +15,14 @@ type FilterState = {
 };
 
 interface UseEstoqueReturn {
-  estoque: Estoque[];
-  filteredEstoque: Estoque[];
-  paginatedEstoque: Estoque[];
+  estoque: ProdutoEstoque[];
+  filteredEstoque: ProdutoEstoque[];
+  paginatedEstoque: ProdutoEstoque[];
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
-  handleCreate: (item: Omit<Estoque, 'id'>) => void;
-  handleEdit: (id: number, updates: Partial<Estoque>) => void;
+  handleCreate: (estoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>) => void;
+  handleEdit: (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>>) => void;
   handleDelete: (id: number) => void;
   setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
@@ -30,7 +30,7 @@ interface UseEstoqueReturn {
 export const useEstoque = (): UseEstoqueReturn => {
   const queryClient = useQueryClient();
 
-  const { data: estoque = [], isLoading, error } = useQuery<Estoque[]>({
+  const { data: estoque = [], isLoading, error } = useQuery<ProdutoEstoque[]>({
     queryKey: ['estoque'],
     queryFn: async () => {
       const response = await fetch('/api/estoque/findAll');
@@ -53,7 +53,7 @@ export const useEstoque = (): UseEstoqueReturn => {
     precoMax: '',
     currentPage: 1,
     itemsPerPage: 10,
-    sortField: 'nome',
+    sortField: 'produtoId',
     sortDirection: 'asc',
   });
 
@@ -74,11 +74,11 @@ export const useEstoque = (): UseEstoqueReturn => {
   };
 
   const createMutation = useMutation({
-    mutationFn: async (item: Omit<Estoque, 'id'>) => {
+    mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>) => {
       const response = await fetch('/api/estoque/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
+        body: JSON.stringify(estoque),
       });
       if (!response.ok) {
         throw new Error('Failed to create estoque');
@@ -94,12 +94,12 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
-  const handleCreate = (item: Omit<Estoque, 'id'>) => {
-    createMutation.mutate(item);
+  const handleCreate = (estoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>) => {
+    createMutation.mutate(estoque);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Estoque> }) => {
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>> }) => {
       const response = await fetch(`/api/estoque/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -119,7 +119,7 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Estoque>) => {
+  const handleEdit = (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>>) => {
     editMutation.mutate({ id, updates });
   };
 
@@ -147,30 +147,31 @@ export const useEstoque = (): UseEstoqueReturn => {
   };
 
   const filteredEstoque = estoque.filter(item => {
-    return (
-      item.nome.toLowerCase().includes(appliedFilters.search.toLowerCase()) &&
-      (appliedFilters.quantidadeMin === '' || item.quantidade >= Number(appliedFilters.quantidadeMin)) &&
-      (appliedFilters.quantidadeMax === '' || item.quantidade <= Number(appliedFilters.quantidadeMax)) &&
-      (appliedFilters.precoMin === '' || item.precoUnitario >= Number(appliedFilters.precoMin)) &&
-      (appliedFilters.precoMax === '' || item.precoUnitario <= Number(appliedFilters.precoMax))
-    );
+    const matchesSearch = item.produtoId.toString().includes(appliedFilters.search);
+    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || item.quantidade >= Number(appliedFilters.quantidadeMin);
+    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || item.quantidade <= Number(appliedFilters.quantidadeMax);
+    const matchesPrecoMin = !appliedFilters.precoMin || item.preco >= Number(appliedFilters.precoMin);
+    const matchesPrecoMax = !appliedFilters.precoMax || item.preco <= Number(appliedFilters.precoMax);
+
+    return matchesSearch && matchesQuantidadeMin && matchesQuantidadeMax && matchesPrecoMin && matchesPrecoMax;
+  }).sort((a, b) => {
+    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    if (appliedFilters.sortField === 'preco') {
+      return (a.preco - b.preco) * direction;
+    }
+    if (appliedFilters.sortField === 'quantidade') {
+      return (a.quantidade - b.quantidade) * direction;
+    }
+    if (appliedFilters.sortField === 'produtoId') {
+      return (a.produtoId - b.produtoId) * direction;
+    }
+    return 0;
   });
 
   const paginatedEstoque = filteredEstoque.slice(
     (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
     appliedFilters.currentPage * appliedFilters.itemsPerPage
-  ).sort((a, b) => {
-    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
-    if (appliedFilters.sortField === 'preco') {
-      return (a.precoUnitario - b.precoUnitario) * direction;
-    }
-    if (appliedFilters.sortField === 'quantidade') {
-      return (a.quantidade - b.quantidade) * direction;
-    }
-    const aValue = a[appliedFilters.sortField as keyof Estoque] || '';
-    const bValue = b[appliedFilters.sortField as keyof Estoque] || '';
-    return (aValue < bValue ? -1 : 1) * direction;
-  });
+  );
 
   return {
     estoque,

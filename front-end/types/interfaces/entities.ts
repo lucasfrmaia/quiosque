@@ -1,3 +1,4 @@
+
 export interface User {
   id: number;
   name: string;
@@ -17,6 +18,7 @@ export interface Produto {
   categoriaId?: number | null;
   categoria?: Category;
   compras?: ProdutoCompra[];
+  notaFiscals?: ProdutoNotaFiscal[];
 }
 
 export interface ProdutoEstoque {
@@ -45,8 +47,18 @@ export interface NotaFiscal {
   id: number;
   data: string;
   total: number;
+  produtos?: ProdutoNotaFiscal[];
+}
+
+export interface ProdutoNotaFiscal {
+  id: number;
   produtoId: number;
-  produto?: ProdutoEstoque;
+  notaFiscalId: number;
+  quantidade: number;
+  unidade: string;
+  preco: number;
+  produto?: Produto;
+  notaFiscal?: NotaFiscal;
 }
 
 export type SortDirection = 'asc' | 'desc';
@@ -57,8 +69,5 @@ export interface FilterValues {
   quantidadeMax: string;
   precoMin: string;
   precoMax: string;
-  currentPage: number;
-  itemsPerPage: number;
-  sortField: string;
-  sortDirection: SortDirection;
+  currentPage: string
 }

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { GastoDiario } from '@/types/interfaces/entities';
+import { ProdutoCompra } from '@/types/interfaces/entities';
 
 type FilterState = {
   search: string;
-  valorMin: string;
-  valorMax: string;
+  precoMin: string;
+  precoMax: string;
+  quantidadeMin: string;
+  quantidadeMax: string;
   dataInicio: string;
   dataFim: string;
   currentPage: number;
@@ -15,14 +17,14 @@ type FilterState = {
 };
 
 interface UseGastosReturn {
-  gastos: GastoDiario[];
-  filteredGastos: GastoDiario[];
-  paginatedGastos: GastoDiario[];
+  gastos: ProdutoCompra[];
+  filteredGastos: ProdutoCompra[];
+  paginatedGastos: ProdutoCompra[];
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
-  handleCreate: (gasto: Omit<GastoDiario, 'id'>) => void;
-  handleEdit: (id: number, updates: Partial<GastoDiario>) => void;
+  handleCreate: (gasto: Omit<ProdutoCompra, 'id' | 'produto'>) => void;
+  handleEdit: (id: number, updates: Partial<Omit<ProdutoCompra, 'id' | 'produto'>>) => void;
   handleDelete: (id: number) => void;
   setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
@@ -30,7 +32,7 @@ interface UseGastosReturn {
 export const useGastos = (): UseGastosReturn => {
   const queryClient = useQueryClient();
 
-  const { data: gastos = [], isLoading, error } = useQuery<GastoDiario[]>({
+  const { data: gastos = [], isLoading, error } = useQuery<ProdutoCompra[]>({
     queryKey: ['gastos'],
     queryFn: async () => {
       const response = await fetch('/api/gastos/findAll');
@@ -47,8 +49,10 @@ export const useGastos = (): UseGastosReturn => {
 
   const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
-    valorMin: '',
-    valorMax: '',
+    precoMin: '',
+    precoMax: '',
+    quantidadeMin: '',
+    quantidadeMax: '',
     dataInicio: '',
     dataFim: '',
     currentPage: 1,
@@ -66,17 +70,15 @@ export const useGastos = (): UseGastosReturn => {
 
   const handleFilter = (updates: Partial<FilterState>) => {
     if ('currentPage' in updates) {
-      // Atualizações de paginação são aplicadas imediatamente
       setAppliedFilters(prev => ({ ...prev, ...updates }));
       setFilterValues(prev => ({ ...prev, ...updates }));
     } else {
-      // Outros filtros só são armazenados nos valores temporários
       setFilterValues(prev => ({ ...prev, ...updates }));
     }
   };
 
   const createMutation = useMutation({
-    mutationFn: async (gasto: Omit<GastoDiario, 'id'>) => {
+    mutationFn: async (gasto: Omit<ProdutoCompra, 'id' | 'produto'>) => {
       const response = await fetch('/api/gastos/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,12 +98,12 @@ export const useGastos = (): UseGastosReturn => {
     },
   });
 
-  const handleCreate = (gasto: Omit<GastoDiario, 'id'>) => {
+  const handleCreate = (gasto: Omit<ProdutoCompra, 'id' | 'produto'>) => {
     createMutation.mutate(gasto);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<GastoDiario> }) => {
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<ProdutoCompra, 'id' | 'produto'>> }) => {
       const response = await fetch(`/api/gastos/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -121,7 +123,7 @@ export const useGastos = (): UseGastosReturn => {
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<GastoDiario>) => {
+  const handleEdit = (id: number, updates: Partial<Omit<ProdutoCompra, 'id' | 'produto'>>) => {
     editMutation.mutate({ id, updates });
   };
 
@@ -149,22 +151,32 @@ export const useGastos = (): UseGastosReturn => {
   };
 
   const filteredGastos = gastos.filter(gasto => {
-    const matchesSearch = gasto.descricao.toLowerCase().includes(appliedFilters.search.toLowerCase());
-    const matchesValorMin = !appliedFilters.valorMin || gasto.valor >= Number(appliedFilters.valorMin);
-    const matchesValorMax = !appliedFilters.valorMax || gasto.valor <= Number(appliedFilters.valorMax);
+    const matchesSearch = gasto.produto?.nome?.toLowerCase().includes(appliedFilters.search.toLowerCase()) || false;
+    const matchesPrecoMin = !appliedFilters.precoMin || gasto.preco >= Number(appliedFilters.precoMin);
+    const matchesPrecoMax = !appliedFilters.precoMax || gasto.preco <= Number(appliedFilters.precoMax);
+    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || gasto.quantidade >= Number(appliedFilters.quantidadeMin);
+    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || gasto.quantidade <= Number(appliedFilters.quantidadeMax);
     const matchesDataInicio = !appliedFilters.dataInicio || gasto.data >= appliedFilters.dataInicio;
     const matchesDataFim = !appliedFilters.dataFim || gasto.data <= appliedFilters.dataFim;
 
-    return matchesSearch && matchesValorMin && matchesValorMax && matchesDataInicio && matchesDataFim;
+    return matchesSearch && matchesPrecoMin && matchesPrecoMax && matchesQuantidadeMin && matchesQuantidadeMax && matchesDataInicio && matchesDataFim;
   }).sort((a, b) => {
     const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
-    if (appliedFilters.sortField === 'valor') {
-      return (a.valor - b.valor) * direction;
+    if (appliedFilters.sortField === 'preco') {
+      return (a.preco - b.preco) * direction;
+    }
+    if (appliedFilters.sortField === 'quantidade') {
+      return (a.quantidade - b.quantidade) * direction;
+    }
+    if (appliedFilters.sortField === 'produto.nome') {
+      const aName = a.produto?.nome || '';
+      const bName = b.produto?.nome || '';
+      return (aName < bName ? -1 : 1) * direction;
     }
     if (appliedFilters.sortField === 'data') {
       return (a.data < b.data ? -1 : 1) * direction;
     }
-    return (a.descricao < b.descricao ? -1 : 1) * direction;
+    return (a.produtoId - b.produtoId) * direction;
   });
 
   const paginatedGastos = filteredGastos.slice(

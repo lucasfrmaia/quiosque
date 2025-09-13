@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { repositoryFactory } from '@/types/RepositoryFactory';
-import { GastoDiario } from '@/types/interfaces/entities';
+import { ProdutoCompra } from '@/types/interfaces/entities';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -8,7 +8,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     if (isNaN(id)) {
       return NextResponse.json({ success: false, error: 'Invalid id' }, { status: 400 });
     }
-    const body = await request.json() as Partial<Omit<GastoDiario, 'id'>>;
+    const body = await request.json() as Partial<Omit<ProdutoCompra, 'id' | 'produto'>>;
     const gasto = await repositoryFactory.gastoRepository.update(id, body);
     return NextResponse.json({ success: true, data: gasto });
   } catch (error: any) {

@@ -24,6 +24,7 @@ model Produto {
   nome        String
 
   compras    ProdutoCompra[]
+  notaFiscal ProdutoNotaFiscal[]
 
   categoriaId   Int?
   categoria   Category? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
@@ -41,8 +42,6 @@ model ProdutoEstoque {
   estoqueId Int
 
   tipo String @default("Insumo") 
-
-  NotaFiscals NotaFiscal[]
   
   @@map("produto_estoque")
   @@unique([produtoId, estoqueId])
@@ -77,7 +76,22 @@ model NotaFiscal {
   total     Float
 
   produtoId Int
-  produto   ProdutoEstoque @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  produtos   ProdutoNotaFiscal[]
 
   @@map("nota_fiscal")
+}
+
+model ProdutoNotaFiscal {
+  id          Int      @id @default(autoincrement())
+  produtoId   Int
+  notaFiscalId Int
+  quantidade  Int
+  unidade     String @default("Unidade")
+  preco       Float
+
+  produto     Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  notaFiscal  NotaFiscal @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)
+
+  @@map("produto_nota_fiscal")
+  @@unique([produtoId, notaFiscalId])
 }

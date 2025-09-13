@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { INotaFiscalRepository } from '../interfaces/repositories';
-import { NotaFiscal, ProdutoEstoque } from '../interfaces/entities';
+import { NotaFiscal, ProdutoNotaFiscal, Produto } from '../interfaces/entities';
 
 export class NotaFiscalRepositoryPrisma implements INotaFiscalRepository {
   private prisma: PrismaClient;
@@ -9,45 +9,54 @@ export class NotaFiscalRepositoryPrisma implements INotaFiscalRepository {
     this.prisma = prisma;
   }
 
-  private mapProdutoEstoque(produto: any): ProdutoEstoque {
+  private mapProdutoNotaFiscal(pnf: any): ProdutoNotaFiscal {
     return {
-      id: produto.id,
-      preco: produto.preco,
-      quantidade: produto.quantidade,
-      dataValidade: produto.dataValidade.toISOString(),
-      unidade: produto.unidade,
-      produtoId: produto.produtoId,
-      estoqueId: produto.estoqueId,
-      tipo: produto.tipo,
-      notaFiscals: produto.notaFiscals
+      id: pnf.id,
+      produtoId: pnf.produtoId,
+      notaFiscalId: pnf.notaFiscalId,
+      quantidade: pnf.quantidade,
+      unidade: pnf.unidade,
+      preco: pnf.preco,
+      produto: pnf.produto ? {
+        id: pnf.produto.id,
+        nome: pnf.produto.nome,
+        categoriaId: pnf.produto.categoriaId,
+        categoria: pnf.produto.categoria,
+        compras: pnf.produto.compras,
+        notaFiscals: pnf.produto.notaFiscals
+      } : undefined,
+      notaFiscal: pnf.notaFiscal ? {
+        id: pnf.notaFiscal.id,
+        data: pnf.notaFiscal.data.toISOString(),
+        total: pnf.notaFiscal.total,
+        produtos: pnf.notaFiscal.produtos
+      } : undefined
     };
   }
 
   async findById(id: number): Promise<NotaFiscal | null> {
     const nota = await this.prisma.notaFiscal.findUnique({
       where: { id },
-      include: { produto: true }
+      include: { produtos: { include: { produto: true } } }
     });
     if (!nota) return null;
     return {
       id: nota.id,
       data: nota.data.toISOString(),
       total: nota.total,
-      produtoId: nota.produtoId,
-      produto: this.mapProdutoEstoque(nota.produto)
+      produtos: nota.produtos ? nota.produtos.map(this.mapProdutoNotaFiscal) : []
     };
   }
 
   async findAll(): Promise<NotaFiscal[]> {
     const notas = await this.prisma.notaFiscal.findMany({
-      include: { produto: true }
+      include: { produtos: { include: { produto: true } } }
     });
     return notas.map(n => ({
       id: n.id,
       data: n.data.toISOString(),
       total: n.total,
-      produtoId: n.produtoId,
-      produto: this.mapProdutoEstoque(n.produto)
+      produtos: n.produtos ? n.produtos.map(this.mapProdutoNotaFiscal) : []
     }));
   }
 
@@ -56,14 +65,13 @@ export class NotaFiscalRepositoryPrisma implements INotaFiscalRepository {
     const notas = await this.prisma.notaFiscal.findMany({
       skip,
       take: limit,
-      include: { produto: true }
+      include: { produtos: { include: { produto: true } } }
     });
     return notas.map(n => ({
       id: n.id,
       data: n.data.toISOString(),
       total: n.total,
-      produtoId: n.produtoId,
-      produto: this.mapProdutoEstoque(n.produto)
+      produtos: n.produtos ? n.produtos.map(this.mapProdutoNotaFiscal) : []
     }));
   }
 }

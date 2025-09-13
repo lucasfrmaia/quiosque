@@ -10,7 +10,7 @@ export async function GET(
     if (isNaN(id)) {
       return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 });
     }
-    const estoque = await repositoryFactory.estoqueRepository.findById(id);
+    const estoque = await repositoryFactory.produtoEstoqueRepository.findById(id);
     if (!estoque) {
       return NextResponse.json({ success: false, error: 'Estoque not found' }, { status: 404 });
     }

@@ -1,16 +1,16 @@
 import { FC } from 'react';
-import { GastoDiario } from '@/types/interfaces/entities';
+import { ProdutoCompra } from '@/types/interfaces/entities';
 import { SortIcon } from '../SortIcon';
 import { ActionButton } from '../ActionButton';
 
 interface GastosTableProps {
-  items: GastoDiario[];
+  items: ProdutoCompra[];
   filterValues: {
     sortField: string;
     sortDirection: 'asc' | 'desc';
   };
   onSort: (field: string) => void;
-  onEdit: (item: GastoDiario) => void;
+  onEdit: (item: ProdutoCompra) => void;
   onDelete: (id: number) => void;
 }
 
@@ -26,21 +26,31 @@ export const GastosTable: FC<GastosTableProps> = ({
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th onClick={() => onSort('descricao')}>
+            <th onClick={() => onSort('produto.nome')}>
               <div className="flex items-center space-x-1">
-                <span>Descrição</span>
+                <span>Produto</span>
                 <SortIcon
-                  field="descricao"
+                  field="produto.nome"
                   currentSortField={filterValues.sortField}
                   currentSortDirection={filterValues.sortDirection}
                 />
               </div>
             </th>
-            <th onClick={() => onSort('valor')}>
+            <th onClick={() => onSort('preco')}>
               <div className="flex items-center space-x-1">
-                <span>Valor</span>
+                <span>Preço</span>
                 <SortIcon
-                  field="valor"
+                  field="preco"
+                  currentSortField={filterValues.sortField}
+                  currentSortDirection={filterValues.sortDirection}
+                />
+              </div>
+            </th>
+            <th onClick={() => onSort('quantidade')}>
+              <div className="flex items-center space-x-1">
+                <span>Quantidade</span>
+                <SortIcon
+                  field="quantidade"
                   currentSortField={filterValues.sortField}
                   currentSortDirection={filterValues.sortDirection}
                 />
@@ -63,10 +73,13 @@ export const GastosTable: FC<GastosTableProps> = ({
           {items.map(gasto => (
             <tr key={gasto.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
-                {gasto.descricao}
+                {gasto.produto?.nome || 'N/A'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                R$ {gasto.valor.toFixed(2)}
+                R$ {gasto.preco.toFixed(2)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                {gasto.quantidade} {gasto.unidade}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                 {new Date(gasto.data).toLocaleDateString()}

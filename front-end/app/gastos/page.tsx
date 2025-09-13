@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { GastoDiario } from '../../types/interfaces/entities';
+import { ProdutoCompra } from '../../types/interfaces/entities';
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';
@@ -32,42 +32,48 @@ const GastosPage: FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedGasto, setSelectedGasto] = useState<GastoDiario | null>(null);
-  const [formData, setFormData] = useState({ descricao: '', valor: '', data: '' });
+  const [selectedGasto, setSelectedGasto] = useState<ProdutoCompra | null>(null);
+  const [formData, setFormData] = useState({ produtoId: '', quantidade: '', preco: '', unidade: '', data: '' });
 
   const handleSubmitCreate = () => {
     handleCreate({
-      descricao: formData.descricao,
-      valor: Number(formData.valor),
+      produtoId: Number(formData.produtoId),
+      quantidade: Number(formData.quantidade),
+      preco: Number(formData.preco),
+      unidade: formData.unidade,
       data: formData.data,
     });
     setIsCreateModalOpen(false);
-    setFormData({ descricao: '', valor: '', data: '' });
+    setFormData({ produtoId: '', quantidade: '', preco: '', unidade: '', data: '' });
   };
 
   const handleSubmitEdit = () => {
     if (!selectedGasto) return;
     handleEdit(selectedGasto.id, {
-      descricao: formData.descricao,
-      valor: Number(formData.valor),
+      produtoId: Number(formData.produtoId),
+      quantidade: Number(formData.quantidade),
+      preco: Number(formData.preco),
+      unidade: formData.unidade,
       data: formData.data,
     });
     setIsEditModalOpen(false);
     setSelectedGasto(null);
-    setFormData({ descricao: '', valor: '', data: '' });
+    setFormData({ produtoId: '', quantidade: '', preco: '', unidade: '', data: '' });
   };
 
-  const openEditModal = (gasto: GastoDiario) => {
+  const openEditModal = (gasto: ProdutoCompra) => {
     setSelectedGasto(gasto);
     setFormData({
-      descricao: gasto.descricao,
-      valor: gasto.valor.toString(),
+      produtoId: gasto.produtoId.toString(),
+      quantidade: gasto.quantidade.toString(),
+      preco: gasto.preco.toString(),
+      unidade: gasto.unidade,
       data: gasto.data,
     });
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (gasto: GastoDiario) => {
+  const openDeleteModal = (gasto: ProdutoCompra) => {
     setSelectedGasto(gasto);
     setIsDeleteModalOpen(true);
   };
@@ -82,13 +88,19 @@ const GastosPage: FC = () => {
   const getActiveFilters = () => {
     const active = [];
     if (filterValues.search) {
-      active.push({ label: 'Descrição', value: filterValues.search });
+      active.push({ label: 'Produto', value: filterValues.search });
     }
-    if (filterValues.valorMin) {
-      active.push({ label: 'Valor Mínimo', value: `R$ ${filterValues.valorMin}` });
+    if (filterValues.precoMin) {
+      active.push({ label: 'Preço Mínimo', value: `R$ ${filterValues.precoMin}` });
     }
-    if (filterValues.valorMax) {
-      active.push({ label: 'Valor Máximo', value: `R$ ${filterValues.valorMax}` });
+    if (filterValues.precoMax) {
+      active.push({ label: 'Preço Máximo', value: `R$ ${filterValues.precoMax}` });
+    }
+    if (filterValues.quantidadeMin) {
+      active.push({ label: 'Quantidade Mínima', value: filterValues.quantidadeMin });
+    }
+    if (filterValues.quantidadeMax) {
+      active.push({ label: 'Quantidade Máxima', value: filterValues.quantidadeMax });
     }
     if (filterValues.dataInicio) {
       active.push({ 
@@ -110,14 +122,20 @@ const GastosPage: FC = () => {
     const filterToRemove = activeFilters[index];
     
     switch (filterToRemove.label) {
-      case 'Descrição':
+      case 'Produto':
         handleFilter({ search: '' });
         break;
-      case 'Valor Mínimo':
-        handleFilter({ valorMin: '' });
+      case 'Preço Mínimo':
+        handleFilter({ precoMin: '' });
         break;
-      case 'Valor Máximo':
-        handleFilter({ valorMax: '' });
+      case 'Preço Máximo':
+        handleFilter({ precoMax: '' });
+        break;
+      case 'Quantidade Mínima':
+        handleFilter({ quantidadeMin: '' });
+        break;
+      case 'Quantidade Máxima':
+        handleFilter({ quantidadeMax: '' });
         break;
       case 'Data Inicial':
         handleFilter({ dataInicio: '' });
@@ -131,19 +149,21 @@ const GastosPage: FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Gastos Diários"
+        title="Compras de Produtos"
         onCreateClick={() => setIsCreateModalOpen(true)}
-        createButtonLabel="Novo Gasto"
+        createButtonLabel="Nova Compra"
       />
 
       <FilterContainer
-        title="Filtros de Gastos"
-        description="Filtre os gastos por descrição, valor ou período"
+        title="Filtros de Compras"
+        description="Filtre as compras por produto, preço, quantidade ou período"
         onReset={() => {
           setAppliedFilters({
             search: '',
-            valorMin: '',
-            valorMax: '',
+            precoMin: '',
+            precoMax: '',
+            quantidadeMin: '',
+            quantidadeMax: '',
             dataInicio: '',
             dataFim: '',
             currentPage: 1,
@@ -153,8 +173,10 @@ const GastosPage: FC = () => {
           });
           handleFilter({
             search: '',
-            valorMin: '',
-            valorMax: '',
+            precoMin: '',
+            precoMax: '',
+            quantidadeMin: '',
+            quantidadeMax: '',
             dataInicio: '',
             dataFim: '',
             currentPage: 1
@@ -165,29 +187,40 @@ const GastosPage: FC = () => {
         <TextFilter
           value={filterValues.search}
           onChange={(search) => handleFilter({ search })}
-          placeholder="Pesquisar por descrição..."
-          label="Busca por Descrição"
-          description="Digite a descrição do gasto que deseja encontrar"
+          placeholder="Pesquisar por produto..."
+          label="Busca por Produto"
+          description="Digite o nome do produto que deseja encontrar"
         />
           
         <NumberRangeFilter
-          minValue={filterValues.valorMin}
-          maxValue={filterValues.valorMax}
-          onMinChange={(valorMin) => handleFilter({ valorMin })}
-          onMaxChange={(valorMax) => handleFilter({ valorMax })}
-          minPlaceholder="Valor mínimo"
-          maxPlaceholder="Valor máximo"
-          label="Faixa de Valor"
-          description="Filtre gastos por faixa de valor"
+          minValue={filterValues.precoMin}
+          maxValue={filterValues.precoMax}
+          onMinChange={(precoMin) => handleFilter({ precoMin })}
+          onMaxChange={(precoMax) => handleFilter({ precoMax })}
+          minPlaceholder="Preço mínimo"
+          maxPlaceholder="Preço máximo"
+          label="Faixa de Preço"
+          description="Filtre compras por faixa de preço"
         />
         
+        <NumberRangeFilter
+          minValue={filterValues.quantidadeMin}
+          maxValue={filterValues.quantidadeMax}
+          onMinChange={(quantidadeMin) => handleFilter({ quantidadeMin })}
+          onMaxChange={(quantidadeMax) => handleFilter({ quantidadeMax })}
+          minPlaceholder="Quantidade mínima"
+          maxPlaceholder="Quantidade máxima"
+          label="Faixa de Quantidade"
+          description="Filtre por faixa de quantidade comprada"
+        />
+
         <DateRangeFilter
           startDate={filterValues.dataInicio}
           endDate={filterValues.dataFim}
           onStartDateChange={(dataInicio) => handleFilter({ dataInicio })}
           onEndDateChange={(dataFim) => handleFilter({ dataFim })}
           label="Período"
-          description="Selecione o intervalo de datas dos gastos"
+          description="Selecione o intervalo de datas das compras"
         />
       </FilterContainer>
 
@@ -196,8 +229,10 @@ const GastosPage: FC = () => {
         onRemoveFilter={handleRemoveFilter}
         onClearAll={() => handleFilter({
           search: '',
-          valorMin: '',
-          valorMax: '',
+          precoMin: '',
+          precoMax: '',
+          quantidadeMin: '',
+          quantidadeMax: '',
           dataInicio: '',
           dataFim: '',
           currentPage: 1,
@@ -227,7 +262,7 @@ const GastosPage: FC = () => {
         />
       </div>
 
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Novo Gasto">
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Nova Compra">
         <div className="space-y-4">
           <GastosForm formData={formData} onChange={setFormData} />
           <ModalActions
@@ -238,7 +273,7 @@ const GastosPage: FC = () => {
         </div>
       </Modal>
 
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Editar Gasto">
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Editar Compra">
         <div className="space-y-4">
           <GastosForm formData={formData} onChange={setFormData} />
           <ModalActions
@@ -253,8 +288,8 @@ const GastosPage: FC = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        itemName={selectedGasto?.descricao || ''}
-        itemType="Gasto"
+        itemName={selectedGasto?.produto?.nome || ''}
+        itemType="Compra"
       />
     </div>
   );
