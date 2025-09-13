@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Cardapio } from '@/types/interfaces/interfaces';
+import { Produto } from '@/types/interfaces/interfaces';
 
 type FilterState = {
   search: string;
@@ -13,14 +13,14 @@ type FilterState = {
 };
 
 interface UseCardapioReturn {
-  cardapios: Cardapio[];
-  filteredCardapios: Cardapio[];
-  paginatedCardapios: Cardapio[];
+  produtos: Produto[];
+  filteredProdutos: Produto[];
+  paginatedProdutos: Produto[];
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
-  handleCreate: (cardapio: Omit<Cardapio, 'id'>) => void;
-  handleEdit: (id: number, updates: Partial<Cardapio>) => void;
+  handleCreate: (produto: Omit<Produto, 'id'>) => void;
+  handleEdit: (id: number, updates: Partial<Produto>) => void;
   handleDelete: (id: number) => void;
   setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
@@ -28,16 +28,16 @@ interface UseCardapioReturn {
 export const useCardapio = (): UseCardapioReturn => {
   const queryClient = useQueryClient();
 
-  const { data: cardapios = [], isLoading, error } = useQuery<Cardapio[]>({
-    queryKey: ['cardapios'],
+  const { data: produtos = [], isLoading, error } = useQuery<Produto[]>({
+    queryKey: ['produtos'],
     queryFn: async () => {
-      const response = await fetch('/api/cardapio/findAll');
+      const response = await fetch('/api/produto/findAll');
       if (!response.ok) {
-        throw new Error('Failed to fetch cardapios');
+        throw new Error('Failed to fetch produtos');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch cardapios');
+        throw new Error(result.error || 'Failed to fetch produtos');
       }
       return result.data;
     },
@@ -49,7 +49,7 @@ export const useCardapio = (): UseCardapioReturn => {
     precoMax: '',
     currentPage: 1,
     itemsPerPage: 10,
-    sortField: 'produto.nome',
+    sortField: 'nome',
     sortDirection: 'asc',
   });
   
@@ -70,71 +70,71 @@ export const useCardapio = (): UseCardapioReturn => {
   };
 
   const createMutation = useMutation({
-    mutationFn: async (cardapio: Omit<Cardapio, 'id'>) => {
-      const response = await fetch('/api/cardapio/create', {
+    mutationFn: async (produto: Omit<Produto, 'id'>) => {
+      const response = await fetch('/api/produto/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cardapio),
+        body: JSON.stringify(produto),
       });
       if (!response.ok) {
-        throw new Error('Failed to create cardapio');
+        throw new Error('Failed to create produto');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to create cardapio');
+        throw new Error(result.error || 'Failed to create produto');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cardapios'] });
+      queryClient.invalidateQueries({ queryKey: ['produtos'] });
     },
   });
 
-  const handleCreate = (cardapio: Omit<Cardapio, 'id'>) => {
-    createMutation.mutate(cardapio);
+  const handleCreate = (produto: Omit<Produto, 'id'>) => {
+    createMutation.mutate(produto);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Cardapio> }) => {
-      const response = await fetch(`/api/cardapio/update/${id}`, {
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Produto> }) => {
+      const response = await fetch(`/api/produto/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
       if (!response.ok) {
-        throw new Error('Failed to update cardapio');
+        throw new Error('Failed to update produto');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to update cardapio');
+        throw new Error(result.error || 'Failed to update produto');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cardapios'] });
+      queryClient.invalidateQueries({ queryKey: ['produtos'] });
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Cardapio>) => {
+  const handleEdit = (id: number, updates: Partial<Produto>) => {
     editMutation.mutate({ id, updates });
   };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/cardapio/delete/${id}`, {
+      const response = await fetch(`/api/produto/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
-        throw new Error('Failed to delete cardapio');
+        throw new Error('Failed to delete produto');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to delete cardapio');
+        throw new Error(result.error || 'Failed to delete produto');
       }
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cardapios'] });
+      queryClient.invalidateQueries({ queryKey: ['produtos'] });
     },
   });
 
@@ -142,9 +142,7 @@ export const useCardapio = (): UseCardapioReturn => {
     deleteMutation.mutate(id);
   };
 
-  const filteredCardapios = cardapios.filter(cardapio => {
-    const produto = cardapio.produto;
-    if (!produto) return false;
+  const filteredProdutos = produtos.filter(produto => {
     const matchesSearch = produto.nome.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
                          produto.descricao?.toLowerCase().includes(appliedFilters.search.toLowerCase());
     const matchesPrecoMin = !appliedFilters.precoMin || produto.preco >= Number(appliedFilters.precoMin);
@@ -153,26 +151,23 @@ export const useCardapio = (): UseCardapioReturn => {
     return matchesSearch && matchesPrecoMin && matchesPrecoMax;
   }).sort((a, b) => {
     const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
-    const aProduto = a.produto;
-    const bProduto = b.produto;
-    if (!aProduto || !bProduto) return 0;
     if (appliedFilters.sortField === 'preco') {
-      return (aProduto.preco - bProduto.preco) * direction;
+      return (a.preco - b.preco) * direction;
     }
-    const aValue = aProduto[appliedFilters.sortField.replace('produto.', '') as keyof typeof aProduto] || '';
-    const bValue = bProduto[appliedFilters.sortField.replace('produto.', '') as keyof typeof bProduto] || '';
+    const aValue = a[appliedFilters.sortField as keyof Produto] || '';
+    const bValue = b[appliedFilters.sortField as keyof Produto] || '';
     return (aValue < bValue ? -1 : 1) * direction;
   });
 
-  const paginatedCardapios = filteredCardapios.slice(
+  const paginatedProdutos = filteredProdutos.slice(
     (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
     appliedFilters.currentPage * appliedFilters.itemsPerPage
   );
 
   return {
-    cardapios,
-    filteredCardapios,
-    paginatedCardapios,
+    produtos,
+    filteredProdutos,
+    paginatedProdutos,
     filterValues,
     handleSort,
     handleFilter,

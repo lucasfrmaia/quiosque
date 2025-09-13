@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { EstoqueItem } from '../../types/interfaces/interfaces';
+import { Estoque } from '../../types/interfaces/interfaces';
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';
@@ -31,17 +31,20 @@ const EstoquePage: FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<EstoqueItem | null>(null);
-  const [formData, setFormData] = useState({ nome: '', quantidade: '', preco: '' });
+  const [selectedItem, setSelectedItem] = useState<Estoque | null>(null);
+  const [formData, setFormData] = useState({ nome: '', quantidade: '', precoUnitario: '', categoria: '', dataValidade: '', produtoId: '' });
 
   const handleSubmitCreate = () => {
     handleCreate({
       nome: formData.nome,
       quantidade: Number(formData.quantidade),
-      preco: Number(formData.preco),
+      precoUnitario: Number(formData.precoUnitario),
+      categoria: formData.categoria,
+      dataValidade: formData.dataValidade,
+      produtoId: Number(formData.produtoId),
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', quantidade: '', preco: '' });
+    setFormData({ nome: '', quantidade: '', precoUnitario: '', categoria: '', dataValidade: '', produtoId: '' });
   };
 
   const handleSubmitEdit = () => {
@@ -49,24 +52,30 @@ const EstoquePage: FC = () => {
     handleEdit(selectedItem.id, {
       nome: formData.nome,
       quantidade: Number(formData.quantidade),
-      preco: Number(formData.preco),
+      precoUnitario: Number(formData.precoUnitario),
+      categoria: formData.categoria,
+      dataValidade: formData.dataValidade,
+      produtoId: Number(formData.produtoId),
     });
     setIsEditModalOpen(false);
     setSelectedItem(null);
-    setFormData({ nome: '', quantidade: '', preco: '' });
+    setFormData({ nome: '', quantidade: '', precoUnitario: '', categoria: '', dataValidade: '', produtoId: '' });
   };
 
-  const openEditModal = (item: EstoqueItem) => {
+  const openEditModal = (item: Estoque) => {
     setSelectedItem(item);
     setFormData({
       nome: item.nome,
       quantidade: item.quantidade.toString(),
-      preco: item.preco.toString(),
+      precoUnitario: item.precoUnitario.toString(),
+      categoria: item.categoria,
+      dataValidade: item.dataValidade,
+      produtoId: item.produtoId.toString(),
     });
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (item: EstoqueItem) => {
+  const openDeleteModal = (item: Estoque) => {
     setSelectedItem(item);
     setIsDeleteModalOpen(true);
   };
