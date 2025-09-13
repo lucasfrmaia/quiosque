@@ -11,7 +11,7 @@ import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { DeleteModal } from '@/app/_components/common/DeleteModal';
 import { EstoqueForm } from '@/app/_components/estoque/EstoqueForm';
 import { EstoqueTable } from '@/app/_components/estoque/EstoqueTable';
-import { useEstoque } from '@/app/_components/estoque/useEstoque';
+import { useEstoque } from '@/app/_components/hooks/useEstoque';
 import { ModalActions } from '@/app/_components/common/ModalActions';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 

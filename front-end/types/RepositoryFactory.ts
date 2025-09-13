@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
-import { ICardapioRepository, IEstoqueRepository, IProdutoRepository, IUserRepository } from "./interfaces/repositories";
+import { ICardapioRepository, IEstoqueRepository, IProdutoRepository, IUserRepository, IGastoRepository, INotaFiscalRepository } from "./interfaces/repositories";
 import { UserRepositoryPrisma } from './classes/UserRepositoryPrisma';
 import { EstoqueRepositoryPrisma } from './classes/EstoqueRepositoryPrisma';
 import { ProdutoRepositoryPrisma } from './classes/ProdutoRepositoryPrisma';
 import { CardapioRepositoryPrisma } from './classes/CardapioRepositoryPrisma';
+import { GastoRepositoryPrisma } from './classes/GastoRepositoryPrisma';
+import { NotaFiscalRepositoryPrisma } from './classes/NotaFiscalRepositoryPrisma';
 
 class RepositoryFactory {
 
@@ -11,7 +13,9 @@ class RepositoryFactory {
         public readonly userRepository: IUserRepository,
         public readonly estoqueRepository: IEstoqueRepository,
         public readonly cardapioRepository: ICardapioRepository,
-        public readonly produtoRepository: IProdutoRepository
+        public readonly produtoRepository: IProdutoRepository,
+        public readonly gastoRepository: IGastoRepository,
+        public readonly notaFiscalRepository: INotaFiscalRepository
     ) {
 
     }
@@ -23,5 +27,7 @@ export const repositoryFactory = new RepositoryFactory(
     new UserRepositoryPrisma(prisma),
     new EstoqueRepositoryPrisma(prisma),
     new CardapioRepositoryPrisma(prisma),
-    new ProdutoRepositoryPrisma(prisma)
+    new ProdutoRepositoryPrisma(prisma),
+    new GastoRepositoryPrisma(prisma),
+    new NotaFiscalRepositoryPrisma(prisma)
 );

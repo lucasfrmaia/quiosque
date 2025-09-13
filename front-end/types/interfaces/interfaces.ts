@@ -12,7 +12,7 @@ export interface NotaFiscal {
   id: number;
   produtoId: number;
   quantidade: number;
-  data: Date;
+  data: string;
   total: number;
   produtos?: Produto[];
 }
@@ -21,7 +21,7 @@ export interface GastoDiario {
   id: number;
   descricao: string;
   valor: number;
-  data: Date;
+  data: string;
 }
 
 export interface Estoque {

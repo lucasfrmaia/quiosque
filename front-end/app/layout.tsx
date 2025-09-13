@@ -6,6 +6,7 @@ import Sidebar from './_components/Sidebar';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import "./globals.css";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const LayoutContent: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -24,11 +25,15 @@ const LayoutContent: FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient();
+
   return (
     <html lang="pt-BR">
       <body>
         <AuthProvider>
-          <LayoutContent>{children}</LayoutContent>
+          <QueryClientProvider client={queryClient}>
+            <LayoutContent>{children}</LayoutContent>
+          </QueryClientProvider>
         </AuthProvider>
       </body>
     </html>

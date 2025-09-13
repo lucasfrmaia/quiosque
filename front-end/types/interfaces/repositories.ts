@@ -1,4 +1,4 @@
-import { User, Produto, Estoque, Cardapio } from './interfaces';
+import { User, Produto, Estoque, Cardapio, GastoDiario, NotaFiscal } from './interfaces';
 
 export interface IUserRepository {
   create(user: Omit<User, 'id'>): Promise<User>;
@@ -35,4 +35,19 @@ export interface ICardapioRepository {
   findPerPage(page: number, limit: number): Promise<Cardapio[]>;
   update(id: number, cardapio: Partial<Omit<Cardapio, 'id' | 'produto'>>): Promise<Cardapio>;
   delete(id: number): Promise<void>;
+}
+
+export interface IGastoRepository {
+  create(gasto: Omit<GastoDiario, 'id'>): Promise<GastoDiario>;
+  findById(id: number): Promise<GastoDiario | null>;
+  findAll(): Promise<GastoDiario[]>;
+  findPerPage(page: number, limit: number): Promise<GastoDiario[]>;
+  update(id: number, gasto: Partial<Omit<GastoDiario, 'id'>>): Promise<GastoDiario>;
+  delete(id: number): Promise<void>;
+}
+
+export interface INotaFiscalRepository {
+  findById(id: number): Promise<NotaFiscal | null>;
+  findAll(): Promise<NotaFiscal[]>;
+  findPerPage(page: number, limit: number): Promise<NotaFiscal[]>;
 }

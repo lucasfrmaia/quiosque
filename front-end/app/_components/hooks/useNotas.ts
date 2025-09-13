@@ -1,13 +1,6 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { NotaFiscal } from '@/types/interfaces/interfaces';
-
-const notasIniciais: NotaFiscal[] = [
-  { id: 1, produtoId: 1, quantidade: 10, data: '2023-10-01', total: 100 },
-  { id: 2, produtoId: 2, quantidade: 5, data: '2023-10-02', total: 100 },
-  { id: 3, produtoId: 3, quantidade: 8, data: '2023-10-03', total: 40 },
-  { id: 4, produtoId: 4, quantidade: 3, data: '2023-10-04', total: 24 },
-  { id: 5, produtoId: 5, quantidade: 2, data: '2023-10-05', total: 30 },
-];
 
 type FilterState = {
   search: string;
@@ -34,7 +27,21 @@ interface UseNotasReturn {
 }
 
 export const useNotas = (): UseNotasReturn => {
-  const [notas] = useState<NotaFiscal[]>(notasIniciais);
+  const { data: notas = [], isLoading, error } = useQuery<NotaFiscal[]>({
+    queryKey: ['notas'],
+    queryFn: async () => {
+      const response = await fetch('/api/notas/findAll');
+      if (!response.ok) {
+        throw new Error('Failed to fetch notas');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch notas');
+      }
+      return result.data;
+    },
+  });
+
   const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     quantidadeMin: '',

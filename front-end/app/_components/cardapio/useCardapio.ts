@@ -1,11 +1,6 @@
 import { useState } from 'react';
-import { Produto } from '@/types/interfaces/interfaces';
-
-const produtosIniciais: Produto[] = [
-  { id: 1, nome: 'Produto 1', preco: 10, descricao: 'Descrição do Produto 1' },
-  { id: 2, nome: 'Produto 2', preco: 20, descricao: 'Descrição do Produto 2' },
-  { id: 3, nome: 'Café', preco: 5, descricao: 'Café quente' },
-];
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Cardapio } from '@/types/interfaces/interfaces';
 
 type FilterState = {
   search: string;
@@ -18,27 +13,43 @@ type FilterState = {
 };
 
 interface UseCardapioReturn {
-  produtos: Produto[];
-  filteredProdutos: Produto[];
-  paginatedProdutos: Produto[];
+  cardapios: Cardapio[];
+  filteredCardapios: Cardapio[];
+  paginatedCardapios: Cardapio[];
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
-  handleCreate: (produto: Omit<Produto, 'id'>) => void;
-  handleEdit: (id: number, updates: Partial<Produto>) => void;
+  handleCreate: (cardapio: Omit<Cardapio, 'id'>) => void;
+  handleEdit: (id: number, updates: Partial<Cardapio>) => void;
   handleDelete: (id: number) => void;
   setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useCardapio = (): UseCardapioReturn => {
-  const [produtos, setProdutos] = useState<Produto[]>(produtosIniciais);
+  const queryClient = useQueryClient();
+
+  const { data: cardapios = [], isLoading, error } = useQuery<Cardapio[]>({
+    queryKey: ['cardapios'],
+    queryFn: async () => {
+      const response = await fetch('/api/cardapio/findAll');
+      if (!response.ok) {
+        throw new Error('Failed to fetch cardapios');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch cardapios');
+      }
+      return result.data;
+    },
+  });
+
   const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     precoMin: '',
     precoMax: '',
     currentPage: 1,
     itemsPerPage: 10,
-    sortField: 'nome',
+    sortField: 'produto.nome',
     sortDirection: 'asc',
   });
   
@@ -58,48 +69,110 @@ export const useCardapio = (): UseCardapioReturn => {
     }
   };
 
-  const handleCreate = (produto: Omit<Produto, 'id'>) => {
-    const newProduto = {
-      id: Math.max(...produtos.map(p => p.id)) + 1,
-      ...produto,
-    };
-    setProdutos(prev => [...prev, newProduto]);
+  const createMutation = useMutation({
+    mutationFn: async (cardapio: Omit<Cardapio, 'id'>) => {
+      const response = await fetch('/api/cardapio/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cardapio),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create cardapio');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create cardapio');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cardapios'] });
+    },
+  });
+
+  const handleCreate = (cardapio: Omit<Cardapio, 'id'>) => {
+    createMutation.mutate(cardapio);
   };
 
-  const handleEdit = (id: number, updates: Partial<Produto>) => {
-    setProdutos(prev => prev.map(produto => 
-      produto.id === id ? { ...produto, ...updates } : produto
-    ));
+  const editMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Cardapio> }) => {
+      const response = await fetch(`/api/cardapio/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update cardapio');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update cardapio');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cardapios'] });
+    },
+  });
+
+  const handleEdit = (id: number, updates: Partial<Cardapio>) => {
+    editMutation.mutate({ id, updates });
   };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/cardapio/delete/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete cardapio');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to delete cardapio');
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cardapios'] });
+    },
+  });
 
   const handleDelete = (id: number) => {
-    setProdutos(prev => prev.filter(produto => produto.id !== id));
+    deleteMutation.mutate(id);
   };
 
-  const filteredProdutos = produtos.filter(produto => {
+  const filteredCardapios = cardapios.filter(cardapio => {
+    const produto = cardapio.produto;
+    if (!produto) return false;
     const matchesSearch = produto.nome.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
-                         produto.descricao.toLowerCase().includes(appliedFilters.search.toLowerCase());
+                         produto.descricao?.toLowerCase().includes(appliedFilters.search.toLowerCase());
     const matchesPrecoMin = !appliedFilters.precoMin || produto.preco >= Number(appliedFilters.precoMin);
     const matchesPrecoMax = !appliedFilters.precoMax || produto.preco <= Number(appliedFilters.precoMax);
 
     return matchesSearch && matchesPrecoMin && matchesPrecoMax;
   }).sort((a, b) => {
     const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    const aProduto = a.produto;
+    const bProduto = b.produto;
+    if (!aProduto || !bProduto) return 0;
     if (appliedFilters.sortField === 'preco') {
-      return (a.preco - b.preco) * direction;
+      return (aProduto.preco - bProduto.preco) * direction;
     }
-    return (a[appliedFilters.sortField as keyof Produto] < b[appliedFilters.sortField as keyof Produto] ? -1 : 1) * direction;
+    const aValue = aProduto[appliedFilters.sortField.replace('produto.', '') as keyof typeof aProduto] || '';
+    const bValue = bProduto[appliedFilters.sortField.replace('produto.', '') as keyof typeof bProduto] || '';
+    return (aValue < bValue ? -1 : 1) * direction;
   });
 
-  const paginatedProdutos = filteredProdutos.slice(
+  const paginatedCardapios = filteredCardapios.slice(
     (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
     appliedFilters.currentPage * appliedFilters.itemsPerPage
   );
 
   return {
-    produtos,
-    filteredProdutos,
-    paginatedProdutos,
+    cardapios,
+    filteredCardapios,
+    paginatedCardapios,
     filterValues,
     handleSort,
     handleFilter,

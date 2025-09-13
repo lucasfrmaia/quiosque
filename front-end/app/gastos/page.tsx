@@ -12,7 +12,7 @@ import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { DeleteModal } from '@/app/_components/common/DeleteModal';
 import { GastosForm } from '@/app/_components/gastos/GastosForm';
 import { GastosTable } from '@/app/_components/gastos/GastosTable';
-import { useGastos } from '@/app/_components/gastos/useGastos';
+import { useGastos } from '@/app/_components/hooks/useGastos';
 import { ModalActions } from '@/app/_components/common/ModalActions';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 

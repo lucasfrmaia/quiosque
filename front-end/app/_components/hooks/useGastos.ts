@@ -1,10 +1,6 @@
 import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GastoDiario } from '@/types/interfaces/interfaces';
-
-const gastosIniciais: GastoDiario[] = [
-  { id: 1, descricao: 'Compra de materiais', valor: 100, data: '2023-10-01' },
-  { id: 2, descricao: 'Pagamento de funcionários', valor: 200, data: '2023-10-02' },
-];
 
 type FilterState = {
   search: string;
@@ -32,7 +28,23 @@ interface UseGastosReturn {
 }
 
 export const useGastos = (): UseGastosReturn => {
-  const [gastos, setGastos] = useState<GastoDiario[]>(gastosIniciais);
+  const queryClient = useQueryClient();
+
+  const { data: gastos = [], isLoading, error } = useQuery<GastoDiario[]>({
+    queryKey: ['gastos'],
+    queryFn: async () => {
+      const response = await fetch('/api/gastos/findAll');
+      if (!response.ok) {
+        throw new Error('Failed to fetch gastos');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch gastos');
+      }
+      return result.data;
+    },
+  });
+
   const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     valorMin: '',
@@ -63,22 +75,77 @@ export const useGastos = (): UseGastosReturn => {
     }
   };
 
+  const createMutation = useMutation({
+    mutationFn: async (gasto: Omit<GastoDiario, 'id'>) => {
+      const response = await fetch('/api/gastos/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(gasto),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create gasto');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create gasto');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['gastos'] });
+    },
+  });
+
   const handleCreate = (gasto: Omit<GastoDiario, 'id'>) => {
-    const newGasto = {
-      id: Math.max(...gastos.map(g => g.id)) + 1,
-      ...gasto,
-    };
-    setGastos(prev => [...prev, newGasto]);
+    createMutation.mutate(gasto);
   };
+
+  const editMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<GastoDiario> }) => {
+      const response = await fetch(`/api/gastos/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update gasto');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update gasto');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['gastos'] });
+    },
+  });
 
   const handleEdit = (id: number, updates: Partial<GastoDiario>) => {
-    setGastos(prev => prev.map(gasto => 
-      gasto.id === id ? { ...gasto, ...updates } : gasto
-    ));
+    editMutation.mutate({ id, updates });
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/gastos/delete/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete gasto');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to delete gasto');
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['gastos'] });
+    },
+  });
+
   const handleDelete = (id: number) => {
-    setGastos(prev => prev.filter(gasto => gasto.id !== id));
+    deleteMutation.mutate(id);
   };
 
   const filteredGastos = gastos.filter(gasto => {

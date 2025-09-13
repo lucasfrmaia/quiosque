@@ -8,7 +8,7 @@ import { DateRangeFilter } from '@/app/_components/filtros/DateRangeFilter';
 import { PageHeader } from '@/app/_components/common/PageHeader';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { NotasTable } from '@/app/_components/notas/NotasTable';
-import { useNotas } from '@/app/_components/notas/useNotas';
+import { useNotas } from '@/app/_components/hooks/useNotas';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
 const NotasPage: FC = () => {
