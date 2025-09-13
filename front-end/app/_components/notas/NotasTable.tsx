@@ -1,4 +1,12 @@
 import { FC } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { NotaFiscal } from '@/types/interfaces/entities';
 import { SortIcon } from '../SortIcon';
 
@@ -16,53 +24,88 @@ export const NotasTable: FC<NotasTableProps> = ({
   filterValues,
   onSort,
 }) => {
+  if (items.length === 0) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">ID</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Produtos</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={4} className="h-24 text-center">
+                Nenhuma nota fiscal encontrada.
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   return (
-    <div className="table-modern">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th onClick={() => onSort('produtoId')}>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('id')}
+            >
               <div className="flex items-center space-x-1">
-                <span>Produto ID</span>
-                <SortIcon
-                  field="produtoId"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <span>ID</span>
+                <SortIcon 
+                  field="id" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-            <th onClick={() => onSort('total')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('total')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Total</span>
-                <SortIcon
-                  field="total"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <SortIcon 
+                  field="total" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-            <th onClick={() => onSort('data')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('data')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Data</span>
-                <SortIcon
-                  field="data"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <SortIcon 
+                  field="data" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
+            </TableHead>
+            <TableHead>Produtos</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {items.map((nota) => (
-            <tr key={nota.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">{nota.produtoId}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">R$ {nota.total.toFixed(2)}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">{new Date(nota.data).toLocaleDateString()}</td>
-            </tr>
+            <TableRow key={nota.id} className="hover:bg-accent/50">
+              <TableCell className="font-medium">{nota.id}</TableCell>
+              <TableCell>R$ {nota.total.toFixed(2)}</TableCell>
+              <TableCell>{new Date(nota.data).toLocaleDateString('pt-BR')}</TableCell>
+              <TableCell>{nota.produtos?.length || 0}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

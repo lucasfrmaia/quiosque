@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface GastosFormData {
   produtoId: string;
@@ -19,65 +21,74 @@ export const GastosForm: FC<GastosFormProps> = ({ formData, onChange }) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="produtoId" className="text-right">
           Produto ID
-        </label>
-        <input
+        </Label>
+        <Input
+          id="produtoId"
           type="number"
           value={formData.produtoId}
           onChange={handleChange('produtoId')}
-          className="filter-input"
+          className="col-span-3"
           placeholder="ID do produto"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="quantidade" className="text-right">
           Quantidade
-        </label>
-        <input
+        </Label>
+        <Input
+          id="quantidade"
           type="number"
           value={formData.quantidade}
           onChange={handleChange('quantidade')}
-          className="filter-input"
+          className="col-span-3"
           placeholder="Quantidade comprada"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="preco" className="text-right">
           Preço
-        </label>
-        <input
+        </Label>
+        <Input
+          id="preco"
           type="number"
           value={formData.preco}
           onChange={handleChange('preco')}
-          className="filter-input"
+          className="col-span-3"
           placeholder="Preço unitário"
           step="0.01"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="unidade" className="text-right">
           Unidade
-        </label>
-        <input
+        </Label>
+        <Input
+          id="unidade"
           type="text"
           value={formData.unidade}
           onChange={handleChange('unidade')}
-          className="filter-input"
+          className="col-span-3"
           placeholder="Unidade (ex: Unidade)"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="data" className="text-right">
           Data
-        </label>
-        <input
+        </Label>
+        <Input
+          id="data"
           type="date"
           value={formData.data}
           onChange={handleChange('data')}
-          className="filter-input"
+          className="col-span-3"
         />
       </div>
     </div>

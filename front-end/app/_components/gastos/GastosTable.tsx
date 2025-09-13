@@ -1,7 +1,16 @@
 import { FC } from 'react';
-import { ProdutoCompra } from '@/types/interfaces/entities';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit, Trash2 } from 'lucide-react';
 import { SortIcon } from '../SortIcon';
-import { ActionButton } from '../ActionButton';
+import { ProdutoCompra } from '@/types/interfaces/entities';
 
 interface GastosTableProps {
   items: ProdutoCompra[];
@@ -21,77 +30,112 @@ export const GastosTable: FC<GastosTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  if (items.length === 0) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Produto</TableHead>
+              <TableHead>Preço</TableHead>
+              <TableHead>Quantidade</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={5} className="h-24 text-center">
+                Nenhuma compra encontrada.
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   return (
-    <div className="table-modern">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th onClick={() => onSort('produto.nome')}>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('produto.nome')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Produto</span>
-                <SortIcon
-                  field="produto.nome"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <SortIcon 
+                  field="produto.nome" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-            <th onClick={() => onSort('preco')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('preco')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Preço</span>
-                <SortIcon
-                  field="preco"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <SortIcon 
+                  field="preco" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-            <th onClick={() => onSort('quantidade')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('quantidade')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Quantidade</span>
-                <SortIcon
-                  field="quantidade"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <SortIcon 
+                  field="quantidade" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-            <th onClick={() => onSort('data')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('data')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Data</span>
-                <SortIcon
-                  field="data"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
+                <SortIcon 
+                  field="data" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
                 />
               </div>
-            </th>
-            <th className="w-20">Ações</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
+            </TableHead>
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {items.map(gasto => (
-            <tr key={gasto.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
-                {gasto.produto?.nome || 'N/A'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                R$ {gasto.preco.toFixed(2)}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                {gasto.quantidade} {gasto.unidade}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                {new Date(gasto.data).toLocaleDateString()}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                <ActionButton variant="edit" onClick={() => onEdit(gasto)} />
-                <ActionButton variant="delete" onClick={() => onDelete(gasto.id)} />
-              </td>
-            </tr>
+            <TableRow key={gasto.id} className="hover:bg-accent/50">
+              <TableCell className="font-medium">{gasto.produto?.nome || 'N/A'}</TableCell>
+              <TableCell>R$ {gasto.preco.toFixed(2)}</TableCell>
+              <TableCell>{gasto.quantidade} {gasto.unidade}</TableCell>
+              <TableCell>{new Date(gasto.data).toLocaleDateString('pt-BR')}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" size="sm" onClick={() => onEdit(gasto)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => onDelete(gasto.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
