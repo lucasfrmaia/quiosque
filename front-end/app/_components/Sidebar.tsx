@@ -3,7 +3,7 @@
 import { FC, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine, FaSignOutAlt, FaProductHunt } from 'react-icons/fa';
+import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine, FaSignOutAlt, FaProductHunt, FaBook } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarItemProps {
@@ -43,6 +43,11 @@ const Sidebar: FC = () => {
       icon: <FaProductHunt size={20} className="text-blue-600" />, 
       text: 'Produtos', 
       href: '/produto' 
+    },
+    { 
+      icon: <FaBook size={20} className="text-blue-600" />, 
+      text: 'Categorias', 
+      href: '/categoria' 
     },
     { 
       icon: <FaMoneyBillWave size={20} className="text-red-600" />, 
