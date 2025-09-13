@@ -1,7 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { Estoque } from '../../types/interfaces/interfaces';
+import { Estoque } from '../../types/interfaces/entities';
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';

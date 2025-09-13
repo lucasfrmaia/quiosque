@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { repositoryFactory } from '@/types/RepositoryFactory';
-import { Produto } from '@/types/interfaces/interfaces';
+import { Produto } from '@/types/interfaces/entities';
 
 export async function POST(request: NextRequest) {
   try {

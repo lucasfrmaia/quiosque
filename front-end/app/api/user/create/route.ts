@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { repositoryFactory } from '@/types/RepositoryFactory';
-import { User } from '@/types/interfaces/interfaces';
+import { User } from '@/types/interfaces/entities';
 
 export async function POST(request: NextRequest) {
   try {

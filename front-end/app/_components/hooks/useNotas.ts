@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { NotaFiscal } from '@/types/interfaces/interfaces';
+import { NotaFiscal } from '@/types/interfaces/entities';
 
 type FilterState = {
   search: string;

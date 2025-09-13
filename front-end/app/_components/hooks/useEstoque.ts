@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Estoque } from '@/types/interfaces/interfaces';
+import { Estoque } from '@/types/interfaces/entities';
 
 type FilterState = {
   search: string;

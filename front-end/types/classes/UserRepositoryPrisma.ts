@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserRepository } from '../interfaces/repositories';
-import { User } from '../interfaces/interfaces';
+import { User } from '../interfaces/entities';
 
 export class UserRepositoryPrisma implements IUserRepository {
   private prisma: PrismaClient;
@@ -8,9 +8,19 @@ export class UserRepositoryPrisma implements IUserRepository {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
-  
-  findPerPage(page: number, limit: number): Promise<User[]> {
-    throw new Error('Method not implemented.');
+
+  async findPerPage(page: number, limit: number): Promise<User[]> {
+    const skip = (page - 1) * limit;
+    const users = await this.prisma.user.findMany({
+      skip,
+      take: limit
+    });
+    return users.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      password: u.password
+    }));
   }
 
   async create(user: Omit<User, 'id'>): Promise<User> {
@@ -19,7 +29,9 @@ export class UserRepositoryPrisma implements IUserRepository {
     });
     return {
       id: createdUser.id,
-      ...user,
+      name: createdUser.name,
+      email: createdUser.email,
+      password: createdUser.password
     };
   }
 
@@ -32,8 +44,7 @@ export class UserRepositoryPrisma implements IUserRepository {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
-      password: user.password,
+      password: user.password
     };
   }
 
@@ -46,19 +57,17 @@ export class UserRepositoryPrisma implements IUserRepository {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
-      password: user.password,
+      password: user.password
     };
   }
 
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany();
-    return users.map((user: User) => ({
+    return users.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
-      password: user.password,
+      password: user.password
     }));
   }
 
@@ -71,8 +80,7 @@ export class UserRepositoryPrisma implements IUserRepository {
       id: updatedUser.id,
       name: updatedUser.name,
       email: updatedUser.email,
-      role: updatedUser.role,
-      password: updatedUser.password,
+      password: updatedUser.password
     };
   }
 

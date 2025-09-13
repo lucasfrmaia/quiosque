@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Estoque, FilterValues } from '@/types/interfaces/interfaces';
+import { Estoque, FilterValues } from '@/types/interfaces/entities';
 import { SortIcon } from '../SortIcon';
 import { ActionButton } from '../ActionButton';
 

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IProdutoRepository } from '../interfaces/repositories';
-import { Produto } from '../interfaces/interfaces';
+import { Produto, ProdutoCompra, Category } from '../interfaces/entities';
 
 export class ProdutoRepositoryPrisma implements IProdutoRepository {
   private prisma: PrismaClient;
@@ -8,37 +8,59 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+
+  private mapCategoria(categoria: any): Category | undefined {
+    return categoria ? {
+      id: categoria.id,
+      name: categoria.name
+    } : undefined;
+  }
+
+  private mapCompras(compras: any[]): ProdutoCompra[] {
+    return compras.map(c => ({
+      id: c.id,
+      produtoId: c.produtoId,
+      quantidade: c.quantidade,
+      unidade: c.unidade,
+      preco: c.preco,
+      data: c.data.toISOString(),
+      produto: c.produto
+    }));
+  }
+
   async findPerPage(page: number, limit: number): Promise<Produto[]> {
     const skip = (page - 1) * limit;
-    return this.prisma.produto.findMany({
+    const produtos = await this.prisma.produto.findMany({
       skip,
       take: limit,
       include: {
-        notaFiscals: true,
-        estoques: true,
-        cardapios: true
+        categoria: true,
+        compras: true
       }
     });
+    return produtos.map(p => ({
+      id: p.id,
+      nome: p.nome,
+      categoriaId: p.categoriaId,
+      categoria: this.mapCategoria(p.categoria),
+      compras: this.mapCompras(p.compras)
+    }));
   }
 
-  async create(produto: Omit<Produto, 'id' | 'notaFiscals' | 'estoques' | 'cardapios'>): Promise<Produto> {
+  async create(produto: Omit<Produto, 'id' | 'categoria' | 'compras'>): Promise<Produto> {
     const createdProduto = await this.prisma.produto.create({
       data: produto,
       include: {
-        notaFiscals: true,
-        estoques: true,
-        cardapios: true
+        categoria: true,
+        compras: true
       }
     });
-
     return {
       id: createdProduto.id,
       nome: createdProduto.nome,
-      preco: createdProduto.preco,
-      descricao: createdProduto.descricao,
-      notaFiscals: createdProduto.notaFiscals,
-      estoques: createdProduto.estoques,
-      cardapios: createdProduto.cardapios
+      categoriaId: createdProduto.categoriaId,
+      categoria: this.mapCategoria(createdProduto.categoria),
+      compras: this.mapCompras(createdProduto.compras)
     };
   }
 
@@ -46,51 +68,51 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     const produto = await this.prisma.produto.findUnique({
       where: { id },
       include: {
-        notaFiscals: true,
-        estoques: true,
-        cardapios: true
+        categoria: true,
+        compras: true
       }
     });
     if (!produto) return null;
     return {
       id: produto.id,
       nome: produto.nome,
-      preco: produto.preco,
-      descricao: produto.descricao,
-      notaFiscals: produto.notaFiscals,
-      estoques: produto.estoques,
-      cardapios: produto.cardapios
+      categoriaId: produto.categoriaId,
+      categoria: this.mapCategoria(produto.categoria),
+      compras: this.mapCompras(produto.compras)
     };
   }
 
   async findAll(): Promise<Produto[]> {
-    return this.prisma.produto.findMany({
+    const produtos = await this.prisma.produto.findMany({
       include: {
-        notaFiscals: true,
-        estoques: true,
-        cardapios: true
+        categoria: true,
+        compras: true
       }
     });
+    return produtos.map(p => ({
+      id: p.id,
+      nome: p.nome,
+      categoriaId: p.categoriaId,
+      categoria: this.mapCategoria(p.categoria),
+      compras: this.mapCompras(p.compras)
+    }));
   }
 
-  async update(id: number, produto: Partial<Omit<Produto, 'id' | 'notaFiscals' | 'estoques' | 'cardapios'>>): Promise<Produto> {
+  async update(id: number, produto: Partial<Omit<Produto, 'id' | 'categoria' | 'compras'>>): Promise<Produto> {
     const updatedProduto = await this.prisma.produto.update({
       where: { id },
       data: produto,
       include: {
-        notaFiscals: true,
-        estoques: true,
-        cardapios: true
+        categoria: true,
+        compras: true
       }
     });
     return {
       id: updatedProduto.id,
       nome: updatedProduto.nome,
-      preco: updatedProduto.preco,
-      descricao: updatedProduto.descricao,
-      notaFiscals: updatedProduto.notaFiscals,
-      estoques: updatedProduto.estoques,
-      cardapios: updatedProduto.cardapios
+      categoriaId: updatedProduto.categoriaId,
+      categoria: this.mapCategoria(updatedProduto.categoria),
+      compras: this.mapCompras(updatedProduto.compras)
     };
   }
 

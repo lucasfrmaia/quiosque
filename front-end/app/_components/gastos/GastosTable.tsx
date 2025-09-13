@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { GastoDiario } from '@/types/interfaces/interfaces';
+import { GastoDiario } from '@/types/interfaces/entities';
 import { SortIcon } from '../SortIcon';
 import { ActionButton } from '../ActionButton';
 

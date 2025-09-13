@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { NotaFiscal } from '@/types/interfaces/interfaces';
+import { NotaFiscal } from '@/types/interfaces/entities';
 import { SortIcon } from '../SortIcon';
 
 interface NotasTableProps {
