@@ -1,81 +1,107 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { Estoque } from '../../types/interfaces/entities';
+import { ProdutoEstoque, FilterValues } from '@/types/interfaces/entities';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';
-import { Modal } from '@/app/_components/Modal';
 import { PageHeader } from '@/app/_components/common/PageHeader';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
-import { DeleteModal } from '@/app/_components/common/DeleteModal';
 import { EstoqueForm } from '@/app/_components/estoque/EstoqueForm';
 import { EstoqueTable } from '@/app/_components/estoque/EstoqueTable';
 import { useEstoque } from '@/app/_components/hooks/useEstoque';
-import { ModalActions } from '@/app/_components/common/ModalActions';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
 const EstoquePage: FC = () => {
   const {
-    paginatedEstoque,
+    estoque,
+    produtos,
     filteredEstoque,
+    paginatedEstoque,
     filterValues,
     handleSort,
     handleFilter,
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters
+    setAppliedFilters,
   } = useEstoque();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Estoque | null>(null);
-  const [formData, setFormData] = useState({ nome: '', quantidade: '', precoUnitario: '', categoria: '', dataValidade: '', produtoId: '' });
+  const [selectedItem, setSelectedItem] = useState<ProdutoEstoque | null>(null);
+  const [formData, setFormData] = useState({
+    preco: '',
+    quantidade: '',
+    dataValidade: '',
+    unidade: '',
+    produtoId: '',
+    estoqueId: '',
+    tipo: 'Insumo',
+  });
 
   const handleSubmitCreate = () => {
     handleCreate({
-      nome: formData.nome,
+      preco: Number(formData.preco),
       quantidade: Number(formData.quantidade),
-      precoUnitario: Number(formData.precoUnitario),
-      categoria: formData.categoria,
       dataValidade: formData.dataValidade,
+      unidade: formData.unidade,
       produtoId: Number(formData.produtoId),
+      estoqueId: Number(formData.estoqueId),
+      tipo: formData.tipo,
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', quantidade: '', precoUnitario: '', categoria: '', dataValidade: '', produtoId: '' });
+    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '', estoqueId: '', tipo: 'Insumo' });
   };
 
   const handleSubmitEdit = () => {
     if (!selectedItem) return;
     handleEdit(selectedItem.id, {
-      nome: formData.nome,
+      preco: Number(formData.preco),
       quantidade: Number(formData.quantidade),
-      precoUnitario: Number(formData.precoUnitario),
-      categoria: formData.categoria,
       dataValidade: formData.dataValidade,
+      unidade: formData.unidade,
       produtoId: Number(formData.produtoId),
+      estoqueId: Number(formData.estoqueId),
+      tipo: formData.tipo,
     });
     setIsEditModalOpen(false);
     setSelectedItem(null);
-    setFormData({ nome: '', quantidade: '', precoUnitario: '', categoria: '', dataValidade: '', produtoId: '' });
+    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '', estoqueId: '', tipo: 'Insumo' });
   };
 
-  const openEditModal = (item: Estoque) => {
+  const openEditModal = (item: ProdutoEstoque) => {
     setSelectedItem(item);
     setFormData({
-      nome: item.nome,
+      preco: item.preco.toString(),
       quantidade: item.quantidade.toString(),
-      precoUnitario: item.precoUnitario.toString(),
-      categoria: item.categoria,
       dataValidade: item.dataValidade,
+      unidade: item.unidade,
       produtoId: item.produtoId.toString(),
+      estoqueId: item.estoqueId.toString(),
+      tipo: item.tipo,
     });
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (item: Estoque) => {
+  const openDeleteModal = (item: ProdutoEstoque) => {
     setSelectedItem(item);
     setIsDeleteModalOpen(true);
   };
@@ -130,134 +156,167 @@ const EstoquePage: FC = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Estoque"
-        onCreateClick={() => setIsCreateModalOpen(true)}
-        createButtonLabel="Novo Item"
-      />
+  const resetFilters = () => {
+    const resetFilters: FilterValues = {
+      search: '',
+      quantidadeMin: '',
+      quantidadeMax: '',
+      precoMin: '',
+      precoMax: '',
+      currentPage: 1,
+      itemsPerPage: 10,
+      sortField: 'nome',
+      sortDirection: 'asc'
+    };
+    setAppliedFilters(resetFilters);
+    handleFilter(resetFilters);
+  };
 
-      <FilterContainer
-        title="Filtros do Estoque"
-        description="Filtre os itens do estoque por nome, quantidade ou preço"
-        onReset={() => {
-          setAppliedFilters({
-            search: '',
-            quantidadeMin: '',
-            quantidadeMax: '',
-            precoMin: '',
-            precoMax: '',
-            currentPage: 1,
-            itemsPerPage: 10,
-            sortField: 'nome',
-            sortDirection: 'asc'
-          });
-          handleFilter({
-            search: '',
-            quantidadeMin: '',
-            quantidadeMax: '',
-            precoMin: '',
-            precoMax: '',
-            currentPage: 1
-          });
-        }}
-        onApply={() => setAppliedFilters(filterValues)}
-      >
-        <TextFilter
-          value={filterValues.search}
-          onChange={(search) => handleFilter({ search })}
-          placeholder="Pesquisar itens..."
-          label="Busca por Nome"
-          description="Digite o nome do item que deseja encontrar"
-        />
-        <NumberRangeFilter
-          minValue={filterValues.quantidadeMin}
-          maxValue={filterValues.quantidadeMax}
-          onMinChange={(quantidadeMin) => handleFilter({ quantidadeMin })}
-          onMaxChange={(quantidadeMax) => handleFilter({ quantidadeMax })}
-          minPlaceholder="Quantidade mínima"
-          maxPlaceholder="Quantidade máxima"
-          label="Quantidade em Estoque"
-          description="Filtre por faixa de quantidade disponível"
-        />
-        <NumberRangeFilter
-          minValue={filterValues.precoMin}
-          maxValue={filterValues.precoMax}
-          onMinChange={(precoMin) => handleFilter({ precoMin })}
-          onMaxChange={(precoMax) => handleFilter({ precoMax })}
-          minPlaceholder="Preço mínimo"
-          maxPlaceholder="Preço máximo"
-          label="Faixa de Preço"
-          description="Filtre por faixa de preço dos itens"
-        />
-      </FilterContainer>
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-2xl font-bold">Estoque</CardTitle>
+            <CardDescription>Gerencie os itens do seu estoque</CardDescription>
+          </div>
+          <Button onClick={() => setIsCreateModalOpen(true)}>Novo Item</Button>
+        </CardHeader>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros</CardTitle>
+          <CardDescription>Filtre os itens do estoque por nome, quantidade ou preço</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <FilterContainer
+            title=""
+            description=""
+            onReset={resetFilters}
+            onApply={() => setAppliedFilters(filterValues)}
+          >
+            <TextFilter
+              value={filterValues.search}
+              onChange={(search) => handleFilter({ search })}
+              placeholder="Pesquisar itens..."
+              label="Busca por Nome"
+              description="Digite o nome do produto que deseja encontrar"
+            />
+            <NumberRangeFilter
+              minValue={filterValues.quantidadeMin}
+              maxValue={filterValues.quantidadeMax}
+              onMinChange={(quantidadeMin) => handleFilter({ quantidadeMin })}
+              onMaxChange={(quantidadeMax) => handleFilter({ quantidadeMax })}
+              minPlaceholder="Quantidade mínima"
+              maxPlaceholder="Quantidade máxima"
+              label="Quantidade em Estoque"
+              description="Filtre por faixa de quantidade disponível"
+            />
+            <NumberRangeFilter
+              minValue={filterValues.precoMin}
+              maxValue={filterValues.precoMax}
+              onMinChange={(precoMin) => handleFilter({ precoMin })}
+              onMaxChange={(precoMax) => handleFilter({ precoMax })}
+              minPlaceholder="Preço mínimo"
+              maxPlaceholder="Preço máximo"
+              label="Faixa de Preço"
+              description="Filtre por faixa de preço dos itens"
+            />
+          </FilterContainer>
+        </CardContent>
+      </Card>
 
       <ActiveFilters
         filters={getActiveFilters()}
         onRemoveFilter={handleRemoveFilter}
-        onClearAll={() => handleFilter({
-          search: '',
-          quantidadeMin: '',
-          quantidadeMax: '',
-          precoMin: '',
-          precoMax: '',
-          currentPage: 1,
-        })}
+        onClearAll={resetFilters}
       />
 
-      <div className="bg-white p-4 rounded-lg shadow">
-        <EstoqueTable
-          items={paginatedEstoque}
-          filterValues={filterValues}
-          onSort={handleSort}
-          onEdit={openEditModal}
-          onDelete={(id) => {
-            const item = paginatedEstoque.find(i => i.id === id);
-            if (item) openDeleteModal(item);
-          }}
-        />
-
-        <Pagination
-          currentPage={filterValues.currentPage}
-          totalPages={Math.ceil(filteredEstoque.length / filterValues.itemsPerPage)}
-          itemsPerPage={filterValues.itemsPerPage}
-          totalItems={filteredEstoque.length}
-          startIndex={(filterValues.currentPage - 1) * filterValues.itemsPerPage}
-          onPageChange={(page) => handleFilter({ currentPage: page })}
-          onItemsPerPageChange={(itemsPerPage) => handleFilter({ itemsPerPage, currentPage: 1 })}
-        />
-      </div>
-
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Novo Item">
-        <div className="space-y-4">
-          <EstoqueForm formData={formData} onChange={setFormData} />
-          <ModalActions
-            onCancel={() => setIsCreateModalOpen(false)}
-            onConfirm={handleSubmitCreate}
-            confirmLabel="Criar"
+      <Card>
+        <CardContent className="pt-6">
+          <EstoqueTable
+            items={paginatedEstoque}
+            filterValues={filterValues}
+            onSort={handleSort}
+            onEdit={openEditModal}
+            onDelete={(id) => {
+              const item = paginatedEstoque.find(i => i.id === id);
+              if (item) openDeleteModal(item);
+            }}
           />
-        </div>
-      </Modal>
 
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Editar Item">
-        <div className="space-y-4">
-          <EstoqueForm formData={formData} onChange={setFormData} />
-          <ModalActions
-            onCancel={() => setIsEditModalOpen(false)}
-            onConfirm={handleSubmitEdit}
-            confirmLabel="Salvar"
-          />
-        </div>
-      </Modal>
+          <div className="mt-6">
+            <Pagination
+              currentPage={filterValues.currentPage}
+              totalPages={Math.ceil(filteredEstoque.length / filterValues.itemsPerPage)}
+              itemsPerPage={filterValues.itemsPerPage}
+              totalItems={filteredEstoque.length}
+              startIndex={(filterValues.currentPage - 1) * filterValues.itemsPerPage}
+              onPageChange={(page) => handleFilter({ currentPage: page })}
+              onItemsPerPageChange={(itemsPerPage) => handleFilter({ itemsPerPage, currentPage: 1 })}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-      <DeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        itemName={selectedItem?.nome || ''}
-        itemType="Item"
-      />
+      {/* Create Dialog */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Novo Item de Estoque</DialogTitle>
+            <DialogDescription>Crie um novo item de estoque.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <EstoqueForm 
+              formData={formData} 
+              onChange={setFormData} 
+              produtos={produtos}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
+            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Editar Item de Estoque</DialogTitle>
+            <DialogDescription>Edite o item de estoque.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <EstoqueForm 
+              formData={formData} 
+              onChange={setFormData} 
+              produtos={produtos}
+            />
+          </div>
+          <DialogFooter>
+            <Button onClick={handleSubmitEdit}>Salvar</Button>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o item "{selectedItem?.produto?.nome}"? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

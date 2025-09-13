@@ -1,28 +1,19 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProdutoEstoque } from '@/types/interfaces/entities';
+import { ProdutoEstoque, FilterValues, Produto } from '@/types/interfaces/entities';
 
-type FilterState = {
-  search: string;
-  quantidadeMin: string;
-  quantidadeMax: string;
-  precoMin: string;
-  precoMax: string;
-  currentPage: number;
-  itemsPerPage: number;
-  sortField: string;
-  sortDirection: 'asc' | 'desc';
-};
+type FilterState = FilterValues;
 
 interface UseEstoqueReturn {
   estoque: ProdutoEstoque[];
+  produtos: Produto[];
   filteredEstoque: ProdutoEstoque[];
   paginatedEstoque: ProdutoEstoque[];
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
-  handleCreate: (estoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>) => void;
-  handleEdit: (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>>) => void;
+  handleCreate: (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => void;
+  handleEdit: (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>) => void;
   handleDelete: (id: number) => void;
   setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
@@ -45,6 +36,21 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
+  const { data: produtos = [] } = useQuery<Produto[]>({
+    queryKey: ['produtos'],
+    queryFn: async () => {
+      const response = await fetch('/api/produto/findAll');
+      if (!response.ok) {
+        throw new Error('Failed to fetch produtos');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch produtos');
+      }
+      return result.data;
+    },
+  });
+
   const [filterValues, setFilterValues] = useState<FilterState>({
     search: '',
     quantidadeMin: '',
@@ -53,7 +59,7 @@ export const useEstoque = (): UseEstoqueReturn => {
     precoMax: '',
     currentPage: 1,
     itemsPerPage: 10,
-    sortField: 'produtoId',
+    sortField: 'nome',
     sortDirection: 'asc',
   });
 
@@ -65,7 +71,7 @@ export const useEstoque = (): UseEstoqueReturn => {
   };
 
   const handleFilter = (updates: Partial<FilterState>) => {
-    if ('currentPage' in updates) {
+    if ('currentPage' in updates || 'itemsPerPage' in updates) {
       setAppliedFilters(prev => ({ ...prev, ...updates }));
       setFilterValues(prev => ({ ...prev, ...updates }));
     } else {
@@ -74,7 +80,7 @@ export const useEstoque = (): UseEstoqueReturn => {
   };
 
   const createMutation = useMutation({
-    mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>) => {
+    mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
       const response = await fetch('/api/estoque/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,12 +100,12 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
-  const handleCreate = (estoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>) => {
+  const handleCreate = (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
     createMutation.mutate(estoque);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>> }) => {
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>> }) => {
       const response = await fetch(`/api/estoque/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -119,7 +125,7 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>>) => {
+  const handleEdit = (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>) => {
     editMutation.mutate({ id, updates });
   };
 
@@ -147,7 +153,8 @@ export const useEstoque = (): UseEstoqueReturn => {
   };
 
   const filteredEstoque = estoque.filter(item => {
-    const matchesSearch = item.produtoId.toString().includes(appliedFilters.search);
+    const nome = item.produto?.nome || '';
+    const matchesSearch = nome.toLowerCase().includes(appliedFilters.search.toLowerCase());
     const matchesQuantidadeMin = !appliedFilters.quantidadeMin || item.quantidade >= Number(appliedFilters.quantidadeMin);
     const matchesQuantidadeMax = !appliedFilters.quantidadeMax || item.quantidade <= Number(appliedFilters.quantidadeMax);
     const matchesPrecoMin = !appliedFilters.precoMin || item.preco >= Number(appliedFilters.precoMin);
@@ -156,6 +163,11 @@ export const useEstoque = (): UseEstoqueReturn => {
     return matchesSearch && matchesQuantidadeMin && matchesQuantidadeMax && matchesPrecoMin && matchesPrecoMax;
   }).sort((a, b) => {
     const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    if (appliedFilters.sortField === 'nome') {
+      const nomeA = a.produto?.nome || '';
+      const nomeB = b.produto?.nome || '';
+      return nomeA.localeCompare(nomeB) * direction;
+    }
     if (appliedFilters.sortField === 'preco') {
       return (a.preco - b.preco) * direction;
     }
@@ -175,6 +187,7 @@ export const useEstoque = (): UseEstoqueReturn => {
 
   return {
     estoque,
+    produtos,
     filteredEstoque,
     paginatedEstoque,
     filterValues,

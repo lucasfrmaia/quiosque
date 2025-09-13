@@ -1,11 +1,24 @@
 import { FC } from 'react';
-import { ProdutoEstoque, FilterValues } from '@/types/interfaces/entities';
-import { SortIcon } from '../SortIcon';
-import { ActionButton } from '../ActionButton';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit, Trash2 } from 'lucide-react';
+import { SortIcon } from '@/app/_components/SortIcon';
+import { ProdutoEstoque } from '@/types/interfaces/entities';
 
 interface EstoqueTableProps {
   items: ProdutoEstoque[];
-  filterValues: FilterValues;
+  filterValues: {
+    sortField: string;
+    sortDirection: 'asc' | 'desc';
+  };
   onSort: (field: string) => void;
   onEdit: (item: ProdutoEstoque) => void;
   onDelete: (id: number) => void;
@@ -18,46 +31,110 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  if (items.length === 0) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Nome</TableHead>
+              <TableHead>Quantidade</TableHead>
+              <TableHead>Preço</TableHead>
+              <TableHead>Data Validade</TableHead>
+              <TableHead>Unidade</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7} className="h-24 text-center">
+                Nenhum item encontrado.
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   return (
-    <div className="table-modern">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th onClick={() => onSort('produtoId')}>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('nome')}
+            >
               <div className="flex items-center space-x-1">
-                <span>Produto ID</span>
-                <SortIcon field="produtoId" currentSortField={filterValues.sortField} currentSortDirection={filterValues.sortDirection} />
+                <span>Nome</span>
+                <SortIcon 
+                  field="nome" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
+                />
               </div>
-            </th>
-            <th onClick={() => onSort('quantidade')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('quantidade')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Quantidade</span>
-                <SortIcon field="quantidade" currentSortField={filterValues.sortField} currentSortDirection={filterValues.sortDirection} />
+                <SortIcon 
+                  field="quantidade" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
+                />
               </div>
-            </th>
-            <th onClick={() => onSort('preco')}>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer" 
+              onClick={() => onSort('preco')}
+            >
               <div className="flex items-center space-x-1">
                 <span>Preço</span>
-                <SortIcon field="preco" currentSortField={filterValues.sortField} currentSortDirection={filterValues.sortDirection} />
+                <SortIcon 
+                  field="preco" 
+                  currentSortField={filterValues.sortField} 
+                  currentSortDirection={filterValues.sortDirection} 
+                />
               </div>
-            </th>
-            <th className="w-20">Ações</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {items.map(item => (
-            <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{item.produtoId}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">{item.quantidade} {item.unidade}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-gray-900">R$ {item.preco.toFixed(2)}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                <ActionButton variant="edit" onClick={() => onEdit(item)} />
-                <ActionButton variant="delete" onClick={() => onDelete(item.id)} />
-              </td>
-            </tr>
+            </TableHead>
+            <TableHead>Data Validade</TableHead>
+            <TableHead>Unidade</TableHead>
+            <TableHead>Tipo</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {items.map((item) => (
+            <TableRow key={item.id} className="hover:bg-accent/50">
+              <TableCell className="font-medium">{item.produto?.nome || 'N/A'}</TableCell>
+              <TableCell>{item.quantidade} {item.unidade}</TableCell>
+              <TableCell>R$ {item.preco.toFixed(2)}</TableCell>
+              <TableCell>{new Date(item.dataValidade).toLocaleDateString('pt-BR')}</TableCell>
+              <TableCell>{item.unidade}</TableCell>
+              <TableCell>
+                <Badge variant={item.tipo === 'Insumo' ? 'secondary' : 'default'}>
+                  {item.tipo}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                  <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };

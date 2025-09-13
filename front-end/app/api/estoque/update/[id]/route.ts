@@ -11,7 +11,7 @@ export async function PUT(
     if (isNaN(id)) {
       return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 });
     }
-    const body = await request.json() as Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>>;
+    const body = await request.json() as Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>;
     const estoque = await repositoryFactory.produtoEstoqueRepository.update(id, body);
     return NextResponse.json({ success: true, data: estoque });
   } catch (error: any) {

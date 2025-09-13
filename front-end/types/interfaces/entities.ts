@@ -1,4 +1,3 @@
-
 export interface User {
   id: number;
   name: string;
@@ -30,7 +29,7 @@ export interface ProdutoEstoque {
   produtoId: number;
   estoqueId: number;
   tipo: string;
-  notaFiscals?: NotaFiscal[];
+  produto?: Produto;
 }
 
 export interface ProdutoCompra {
@@ -69,5 +68,8 @@ export interface FilterValues {
   quantidadeMax: string;
   precoMin: string;
   precoMax: string;
-  currentPage: string
+  currentPage: number;
+  itemsPerPage: number;
+  sortField: string;
+  sortDirection: SortDirection;
 }

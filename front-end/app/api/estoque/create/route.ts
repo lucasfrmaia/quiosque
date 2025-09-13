@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { repositoryFactory } from '@/types/RepositoryFactory';
-import { Estoque } from '@/types/interfaces/entities';
+import { ProdutoEstoque } from '@/types/interfaces/entities';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as Omit<Estoque, 'id' | 'produto'>;
+    const body = await request.json() as Omit<ProdutoEstoque, 'id' | 'produto'>;
     const estoque = await repositoryFactory.produtoEstoqueRepository.create(body);
     return NextResponse.json({ success: true, data: estoque }, { status: 201 });
   } catch (error: any) {

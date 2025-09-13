@@ -1,4 +1,14 @@
 import { FC } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Produto } from '@/types/interfaces/entities';
 
 interface EstoqueFormData {
   preco: string;
@@ -13,99 +23,121 @@ interface EstoqueFormData {
 interface EstoqueFormProps {
   formData: EstoqueFormData;
   onChange: (formData: EstoqueFormData) => void;
+  produtos: Produto[];
 }
 
-export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange }) => {
-  const handleChange = (field: keyof EstoqueFormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos }) => {
+  const handleInputChange = (field: keyof EstoqueFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...formData, [field]: e.target.value });
   };
 
+  const handleSelectChange = (field: keyof EstoqueFormData) => (value: string) => {
+    onChange({ ...formData, [field]: value });
+  };
+
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Produto ID
-        </label>
-        <input
-          type="number"
-          value={formData.produtoId}
-          onChange={handleChange('produtoId')}
-          className="filter-input"
-          placeholder="ID do produto"
-        />
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="produtoId" className="text-right">
+          Produto
+        </Label>
+        <Select value={formData.produtoId} onValueChange={handleSelectChange('produtoId')}>
+          <SelectTrigger id="produtoId" className="col-span-3">
+            <SelectValue placeholder="Selecione um produto" />
+          </SelectTrigger>
+          <SelectContent>
+            {produtos.map((produto) => (
+              <SelectItem key={produto.id} value={produto.id.toString()}>
+                {produto.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="estoqueId" className="text-right">
           Estoque ID
-        </label>
-        <input
+        </Label>
+        <Input
+          id="estoqueId"
           type="number"
           value={formData.estoqueId}
-          onChange={handleChange('estoqueId')}
-          className="filter-input"
+          onChange={handleInputChange('estoqueId')}
+          className="col-span-3"
           placeholder="ID do estoque"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="preco" className="text-right">
           Preço
-        </label>
-        <input
+        </Label>
+        <Input
+          id="preco"
           type="number"
           value={formData.preco}
-          onChange={handleChange('preco')}
-          className="filter-input"
+          onChange={handleInputChange('preco')}
+          className="col-span-3"
           placeholder="Preço unitário"
           step="0.01"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="quantidade" className="text-right">
           Quantidade
-        </label>
-        <input
+        </Label>
+        <Input
+          id="quantidade"
           type="number"
           value={formData.quantidade}
-          onChange={handleChange('quantidade')}
-          className="filter-input"
+          onChange={handleInputChange('quantidade')}
+          className="col-span-3"
           placeholder="Quantidade em estoque"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="dataValidade" className="text-right">
           Data de Validade
-        </label>
-        <input
+        </Label>
+        <Input
+          id="dataValidade"
           type="date"
           value={formData.dataValidade}
-          onChange={handleChange('dataValidade')}
-          className="filter-input"
+          onChange={handleInputChange('dataValidade')}
+          className="col-span-3"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="unidade" className="text-right">
           Unidade
-        </label>
-        <input
+        </Label>
+        <Input
+          id="unidade"
           type="text"
           value={formData.unidade}
-          onChange={handleChange('unidade')}
-          className="filter-input"
+          onChange={handleInputChange('unidade')}
+          className="col-span-3"
           placeholder="Unidade (ex: Unidade, Kg)"
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="tipo" className="text-right">
           Tipo
-        </label>
-        <select
-          value={formData.tipo}
-          onChange={handleChange('tipo')}
-          className="filter-input"
-        >
-          <option value="Insumo">Insumo</option>
-          <option value="Produto">Produto</option>
-        </select>
+        </Label>
+        <Select value={formData.tipo} onValueChange={handleSelectChange('tipo')}>
+          <SelectTrigger id="tipo" className="col-span-3">
+            <SelectValue placeholder="Selecione o tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Insumo">Insumo</SelectItem>
+            <SelectItem value="Produto">Produto</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

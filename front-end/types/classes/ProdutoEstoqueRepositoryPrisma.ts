@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IProdutoEstoqueRepository } from '../interfaces/repositories';
-import { ProdutoEstoque, NotaFiscal } from '../interfaces/entities';
+import { ProdutoEstoque } from '../interfaces/entities';
 
 export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository {
   private prisma: PrismaClient;
@@ -9,22 +9,13 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
     this.prisma = prisma;
   }
 
-  private mapNotaFiscals(notaFiscals: any[]): NotaFiscal[] {
-    return notaFiscals.map(nf => ({
-      id: nf.id,
-      data: nf.data.toISOString(),
-      total: nf.total,
-      produtoId: nf.produtoId,
-      produto: nf.produto
-    }));
-  }
 
   async findPerPage(page: number, limit: number): Promise<ProdutoEstoque[]> {
     const skip = (page - 1) * limit;
     const produtoEstoques = await this.prisma.produtoEstoque.findMany({
       skip,
       take: limit,
-      include: { NotaFiscals: true }
+      include: { produto: true }
     });
     return produtoEstoques.map(pe => ({
       id: pe.id,
@@ -35,35 +26,39 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produtoId: pe.produtoId,
       estoqueId: pe.estoqueId,
       tipo: pe.tipo,
-      notaFiscals: this.mapNotaFiscals(pe.NotaFiscals)
+      produto: pe.produto
     }));
   }
 
-  async create(produtoEstoque: Omit<ProdutoEstoque, 'id' | 'notaFiscals'>): Promise<ProdutoEstoque> {
+  async create(produtoEstoque: Omit<ProdutoEstoque, 'id' | 'produto'>): Promise<ProdutoEstoque> {
     const createdProdutoEstoque = await this.prisma.produtoEstoque.create({
       data: {
         ...produtoEstoque,
         dataValidade: new Date(produtoEstoque.dataValidade)
-      },
-      include: { NotaFiscals: true }
+      }
     });
+    const fullEstoque = await this.prisma.produtoEstoque.findUnique({
+      where: { id: createdProdutoEstoque.id },
+      include: { produto: true }
+    });
+    if (!fullEstoque) throw new Error('Created item not found');
     return {
-      id: createdProdutoEstoque.id,
-      preco: createdProdutoEstoque.preco,
-      quantidade: createdProdutoEstoque.quantidade,
-      dataValidade: createdProdutoEstoque.dataValidade.toISOString(),
-      unidade: createdProdutoEstoque.unidade,
-      produtoId: createdProdutoEstoque.produtoId,
-      estoqueId: createdProdutoEstoque.estoqueId,
-      tipo: createdProdutoEstoque.tipo,
-      notaFiscals: this.mapNotaFiscals(createdProdutoEstoque.NotaFiscals)
+      id: fullEstoque.id,
+      preco: fullEstoque.preco,
+      quantidade: fullEstoque.quantidade,
+      dataValidade: fullEstoque.dataValidade.toISOString(),
+      unidade: fullEstoque.unidade,
+      produtoId: fullEstoque.produtoId,
+      estoqueId: fullEstoque.estoqueId,
+      tipo: fullEstoque.tipo,
+      produto: fullEstoque.produto
     };
   }
 
   async findById(id: number): Promise<ProdutoEstoque | null> {
     const produtoEstoque = await this.prisma.produtoEstoque.findUnique({
       where: { id },
-      include: { NotaFiscals: true }
+      include: { produto: true }
     });
     if (!produtoEstoque) return null;
     return {
@@ -75,13 +70,13 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produtoId: produtoEstoque.produtoId,
       estoqueId: produtoEstoque.estoqueId,
       tipo: produtoEstoque.tipo,
-      notaFiscals: this.mapNotaFiscals(produtoEstoque.NotaFiscals)
+      produto: produtoEstoque.produto
     };
   }
 
   async findAll(): Promise<ProdutoEstoque[]> {
     const produtoEstoques = await this.prisma.produtoEstoque.findMany({
-      include: { NotaFiscals: true }
+      include: { produto: true }
     });
     return produtoEstoques.map((pe) => ({
       id: pe.id,
@@ -92,19 +87,23 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produtoId: pe.produtoId,
       estoqueId: pe.estoqueId,
       tipo: pe.tipo,
-      notaFiscals: this.mapNotaFiscals(pe.NotaFiscals)
+      produto: pe.produto
     }));
   }
 
-  async update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'notaFiscals'>>): Promise<ProdutoEstoque> {
-    const updatedProdutoEstoque = await this.prisma.produtoEstoque.update({
+  async update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>): Promise<ProdutoEstoque> {
+    await this.prisma.produtoEstoque.update({
       where: { id },
       data: {
         ...produtoEstoque,
         dataValidade: produtoEstoque.dataValidade ? new Date(produtoEstoque.dataValidade) : undefined
-      },
-      include: { NotaFiscals: true }
+      }
     });
+    const updatedProdutoEstoque = await this.prisma.produtoEstoque.findUnique({
+      where: { id },
+      include: { produto: true }
+    });
+    if (!updatedProdutoEstoque) throw new Error('Updated item not found');
     return {
       id: updatedProdutoEstoque.id,
       preco: updatedProdutoEstoque.preco,
@@ -114,7 +113,7 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produtoId: updatedProdutoEstoque.produtoId,
       estoqueId: updatedProdutoEstoque.estoqueId,
       tipo: updatedProdutoEstoque.tipo,
-      notaFiscals: this.mapNotaFiscals(updatedProdutoEstoque.NotaFiscals)
+      produto: updatedProdutoEstoque.produto
     };
   }
 

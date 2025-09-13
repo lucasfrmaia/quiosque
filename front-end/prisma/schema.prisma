@@ -29,6 +29,8 @@ model Produto {
   categoriaId   Int?
   categoria   Category? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
 
+  estoques    ProdutoEstoque[]
+
   @@map("produto")
 }
 
@@ -41,7 +43,9 @@ model ProdutoEstoque {
   produtoId Int
   estoqueId Int
 
-  tipo String @default("Insumo") 
+  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  tipo String @default("Insumo")
   
   @@map("produto_estoque")
   @@unique([produtoId, estoqueId])
