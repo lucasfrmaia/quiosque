@@ -14,65 +14,70 @@ model User {
   id       Int      @id @default(autoincrement())
   name     String
   email    String   @unique
-  role     String
   password String
 
-  @@map("users")
+  @@map("user")
 }
 
 model Produto {
   id          Int         @id @default(autoincrement())
   nome        String
-  preco       Float
-  descricao   String?
 
-  notaFiscals NotaFiscal[]
-  estoques   Estoque[]
-  cardapios  Cardapio[]
+  compras    ProdutoCompra[]
 
-  @@map("produtos")
+  categoriaId   Int?
+  categoria   Category? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+
+  @@map("produto")
 }
 
-model Estoque {
-  id            Int      @id @default(autoincrement())
-  nome          String
-  quantidade    Int
-  precoUnitario Float
-  categoria     String
-  dataValidade  String
-
-  produtoId     Int
-  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-
-  @@map("estoques")
-}
-
-model Cardapio {
-  id            Int      @id @default(autoincrement())
-  produtoId     Int
-  produto       Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-
-  @@map("cardapio")
-}
-
-model GastoDiario {
+model ProdutoEstoque {
   id        Int      @id @default(autoincrement())
-  descricao String
-  valor     Float
-  data      DateTime
+  preco     Float
+  quantidade Int
+  dataValidade DateTime
+  unidade    String @default("Unidade")
+  produtoId Int
+  estoqueId Int
 
-  @@map("gastos_diarios")
+  tipo String @default("Insumo") 
+
+  NotaFiscals NotaFiscal[]
+  
+  @@map("produto_estoque")
+  @@unique([produtoId, estoqueId])
+}
+
+model ProdutoCompra {
+  id         Int      @id @default(autoincrement())
+  produtoId  Int
+  quantidade Int
+  unidade    String @default("Unidade")
+  preco  Float
+  data DateTime @default(now())
+
+  produto    Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@map("produto_compra")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+
+  produtos Produto[]
+
+  @@map("categoria")
 }
 
 
 model NotaFiscal {
   id        Int      @id @default(autoincrement())
-  produtoId Int
-  quantidade Int
   data      DateTime
   total     Float
 
-  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  produtoId Int
+  produto   ProdutoEstoque @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
-  @@map("nota_fiscals")
+  @@map("nota_fiscal")
 }

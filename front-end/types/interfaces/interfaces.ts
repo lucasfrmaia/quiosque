@@ -5,7 +5,6 @@ export interface Produto {
   descricao: string | null;
   notaFiscals?: NotaFiscal[];
   estoques?: Estoque[];
-  cardapios?: Cardapio[];
 }
 
 export interface NotaFiscal {
@@ -40,12 +39,6 @@ export interface EstoqueItem {
   nome: string;
   quantidade: number;
   preco: number;
-}
-
-export interface Cardapio {
-  id: number;
-  produtoId: number;
-  produto?: Produto;
 }
 
 export type SortDirection = 'asc' | 'desc';
