@@ -14,6 +14,8 @@ import { Category } from '@/types/interfaces/entities';
 interface ProdutoFormData {
   nome: string;
   categoriaId: string;
+  ativo: string;
+  tipo: string;
 }
 
 interface ProdutoFormProps {
@@ -46,7 +48,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
           placeholder="Nome do produto"
         />
       </div>
-
+  
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="categoriaId" className="text-right">
           Categoria
@@ -61,6 +63,36 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
                 {category.name}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+      </div>
+  
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="ativo" className="text-right">
+          Ativo
+        </Label>
+        <Select value={formData.ativo} onValueChange={(value) => onChange({ ...formData, ativo: value })}>
+          <SelectTrigger id="ativo" className="col-span-3">
+            <SelectValue placeholder="Selecione se está ativo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">Sim</SelectItem>
+            <SelectItem value="false">Não</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+  
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="tipo" className="text-right">
+          Tipo
+        </Label>
+        <Select value={formData.tipo} onValueChange={(value) => onChange({ ...formData, tipo: value })}>
+          <SelectTrigger id="tipo" className="col-span-3">
+            <SelectValue placeholder="Selecione o tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="INSUMO">Insumo</SelectItem>
+            <SelectItem value="CARDAPIO">Cardápio</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -36,7 +36,6 @@ const CategoriaPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters,
   } = useCategory();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -103,7 +102,7 @@ const CategoriaPage: FC = () => {
   };
 
   const resetFilters = () => {
-    const resetFilters = {
+    handleFilter({
       search: '',
       quantidadeMin: '',
       quantidadeMax: '',
@@ -112,10 +111,8 @@ const CategoriaPage: FC = () => {
       currentPage: 1,
       itemsPerPage: 10,
       sortField: 'name',
-      sortDirection: 'asc' as const,
-    };
-    setAppliedFilters(resetFilters);
-    handleFilter(resetFilters);
+      sortDirection: 'asc'
+    });
   };
 
   return (
@@ -140,7 +137,7 @@ const CategoriaPage: FC = () => {
             title=""
             description=""
             onReset={resetFilters}
-            onApply={() => setAppliedFilters(filterValues)}
+            onApply={() => {}}
           >
             <TextFilter
               value={filterValues.search}

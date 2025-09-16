@@ -16,8 +16,6 @@ interface EstoqueFormData {
   dataValidade: string;
   unidade: string;
   produtoId: string;
-  estoqueId: string;
-  tipo: string;
 }
 
 interface EstoqueFormProps {
@@ -53,20 +51,6 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
             ))}
           </SelectContent>
         </Select>
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="estoqueId" className="text-right">
-          Estoque ID
-        </Label>
-        <Input
-          id="estoqueId"
-          type="number"
-          value={formData.estoqueId}
-          onChange={handleInputChange('estoqueId')}
-          className="col-span-3"
-          placeholder="ID do estoque"
-        />
       </div>
 
       <div className="grid grid-cols-4 items-center gap-4">
@@ -125,20 +109,6 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
         />
       </div>
 
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="tipo" className="text-right">
-          Tipo
-        </Label>
-        <Select value={formData.tipo} onValueChange={handleSelectChange('tipo')}>
-          <SelectTrigger id="tipo" className="col-span-3">
-            <SelectValue placeholder="Selecione o tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Insumo">Insumo</SelectItem>
-            <SelectItem value="Produto">Produto</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
     </div>
   );
 };

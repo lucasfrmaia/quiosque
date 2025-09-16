@@ -23,8 +23,7 @@ const NotasPage: FC = () => {
     filteredNotas,
     filterValues,
     handleSort,
-    handleFilter,
-    setAppliedFilters
+    handleFilter
   } = useNotas();
 
   const getActiveFilters = () => {
@@ -89,7 +88,7 @@ const NotasPage: FC = () => {
   };
 
   const handleResetFilters = () => {
-    const resetValues = {
+    handleFilter({
       search: '',
       quantidadeMin: '',
       quantidadeMax: '',
@@ -100,18 +99,7 @@ const NotasPage: FC = () => {
       currentPage: 1,
       itemsPerPage: 5,
       sortField: 'data',
-      sortDirection: 'desc' as const
-    };
-    setAppliedFilters(resetValues);
-    handleFilter({
-      search: '',
-      quantidadeMin: '',
-      quantidadeMax: '',
-      totalMin: '',
-      totalMax: '',
-      dataInicio: '',
-      dataFim: '',
-      currentPage: 1
+      sortDirection: 'desc'
     });
   };
 
@@ -134,7 +122,7 @@ const NotasPage: FC = () => {
             title=""
             description=""
             onReset={handleResetFilters}
-            onApply={() => setAppliedFilters(filterValues)}
+            onApply={() => {}}
           >
             <TextFilter
               value={filterValues.search}

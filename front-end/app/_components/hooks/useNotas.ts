@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { NotaFiscal } from '@/types/interfaces/entities';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { NotaFiscalVenda } from '@/types/interfaces/entities';
 
 type FilterState = {
   search: string;
@@ -17,17 +18,34 @@ type FilterState = {
 };
 
 interface UseNotasReturn {
-  notas: NotaFiscal[];
-  filteredNotas: NotaFiscal[];
-  paginatedNotas: NotaFiscal[];
+  notas: NotaFiscalVenda[];
+  filteredNotas: NotaFiscalVenda[];
+  paginatedNotas: NotaFiscalVenda[];
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
-  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useNotas = (): UseNotasReturn => {
-  const { data: notas = [], isLoading, error } = useQuery<NotaFiscal[]>({
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const appliedFilters = useMemo<FilterState>(() => ({
+    search: searchParams.get('search') || '',
+    quantidadeMin: searchParams.get('quantidadeMin') || '',
+    quantidadeMax: searchParams.get('quantidadeMax') || '',
+    totalMin: searchParams.get('totalMin') || '',
+    totalMax: searchParams.get('totalMax') || '',
+    dataInicio: searchParams.get('dataInicio') || '',
+    dataFim: searchParams.get('dataFim') || '',
+    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
+    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '5', 10),
+    sortField: searchParams.get('sortField') || 'data',
+    sortDirection: (searchParams.get('sortDirection') || 'desc') as 'asc' | 'desc',
+  }), [searchParams]);
+
+  const { data: notas = [], isLoading, error } = useQuery<NotaFiscalVenda[]>({
     queryKey: ['notas'],
     queryFn: async () => {
       const response = await fetch('/api/notas/findAll');
@@ -42,40 +60,35 @@ export const useNotas = (): UseNotasReturn => {
     },
   });
 
-  const [filterValues, setFilterValues] = useState<FilterState>({
-    search: '',
-    quantidadeMin: '',
-    quantidadeMax: '',
-    totalMin: '',
-    totalMax: '',
-    dataInicio: '',
-    dataFim: '',
-    currentPage: 1,
-    itemsPerPage: 5,
-    sortField: 'data',
-    sortDirection: 'desc',
-  });
+  const handleFilter = useCallback((updates: Partial<FilterState>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const isPaginationChange = 'currentPage' in updates || 'itemsPerPage' in updates;
 
-  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === '' || value === undefined || value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
 
-  const handleSort = (field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
-  };
-
-  const handleFilter = (updates: Partial<FilterState>) => {
-    if ('currentPage' in updates) {
-      setAppliedFilters(prev => ({ ...prev, ...updates }));
-      setFilterValues(prev => ({ ...prev, ...updates }));
-    } else {
-      setFilterValues(prev => ({ ...prev, ...updates }));
+    if (!isPaginationChange) {
+      params.set('currentPage', '1');
     }
-  };
 
-  const filteredNotas = notas.filter(nota => {
-    const matchesSearch = nota.produtoId.toString().includes(appliedFilters.search);
-    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || nota.quantidade >= Number(appliedFilters.quantidadeMin);
-    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || nota.quantidade <= Number(appliedFilters.quantidadeMax);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchParams, router, pathname]);
+
+  const handleSort = useCallback((field: string) => {
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    handleFilter({ sortField: field, sortDirection: newDirection, currentPage: 1 });
+  }, [appliedFilters.sortField, appliedFilters.sortDirection, handleFilter]);
+
+  const filteredNotas = useMemo(() => notas.filter(nota => {
+    const totalQuantidade = nota.produtos?.reduce((sum, p) => sum + p.quantidade, 0) || 0;
+    const matchesSearch = nota.id.toString().includes(appliedFilters.search);
+    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || totalQuantidade >= Number(appliedFilters.quantidadeMin);
+    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || totalQuantidade <= Number(appliedFilters.quantidadeMax);
     const matchesTotalMin = !appliedFilters.totalMin || nota.total >= Number(appliedFilters.totalMin);
     const matchesTotalMax = !appliedFilters.totalMax || nota.total <= Number(appliedFilters.totalMax);
     const matchesDataInicio = !appliedFilters.dataInicio || nota.data >= appliedFilters.dataInicio;
@@ -85,8 +98,10 @@ export const useNotas = (): UseNotasReturn => {
            matchesTotalMin && matchesTotalMax && matchesDataInicio && matchesDataFim;
   }).sort((a, b) => {
     const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
+    const aTotalQuantidade = a.produtos?.reduce((sum, p) => sum + p.quantidade, 0) || 0;
+    const bTotalQuantidade = b.produtos?.reduce((sum, p) => sum + p.quantidade, 0) || 0;
     if (appliedFilters.sortField === 'quantidade') {
-      return (a.quantidade - b.quantidade) * direction;
+      return (aTotalQuantidade - bTotalQuantidade) * direction;
     }
     if (appliedFilters.sortField === 'total') {
       return (a.total - b.total) * direction;
@@ -94,21 +109,20 @@ export const useNotas = (): UseNotasReturn => {
     if (appliedFilters.sortField === 'data') {
       return (a.data < b.data ? -1 : 1) * direction;
     }
-    return (a.produtoId - b.produtoId) * direction;
-  });
+    return (a.id - b.id) * direction;
+  }), [notas, appliedFilters]);
 
-  const paginatedNotas = filteredNotas.slice(
+  const paginatedNotas = useMemo(() => filteredNotas.slice(
     (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
     appliedFilters.currentPage * appliedFilters.itemsPerPage
-  );
+  ), [filteredNotas, appliedFilters]);
 
   return {
     notas,
     filteredNotas,
     paginatedNotas,
-    filterValues,
+    filterValues: appliedFilters,
     handleSort,
     handleFilter,
-    setAppliedFilters,
   };
 };

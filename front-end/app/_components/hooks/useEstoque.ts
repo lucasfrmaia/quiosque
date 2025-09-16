@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProdutoEstoque, FilterValues, Produto } from '@/types/interfaces/entities';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useMemo, useCallback } from 'react';
+import { ProdutoEstoque, FilterValues, SortDirection, Produto } from '@/types/interfaces/entities';
 
 type FilterState = FilterValues;
 
@@ -15,11 +17,25 @@ interface UseEstoqueReturn {
   handleCreate: (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => void;
   handleEdit: (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>) => void;
   handleDelete: (id: number) => void;
-  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useEstoque = (): UseEstoqueReturn => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const appliedFilters = useMemo<FilterState>(() => ({
+    search: searchParams.get('search') || '',
+    quantidadeMin: searchParams.get('quantidadeMin') || '',
+    quantidadeMax: searchParams.get('quantidadeMax') || '',
+    precoMin: searchParams.get('precoMin') || '',
+    precoMax: searchParams.get('precoMax') || '',
+    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
+    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
+    sortField: searchParams.get('sortField') || 'nome',
+    sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
+  }), [searchParams]);
 
   const { data: estoque = [], isLoading, error } = useQuery<ProdutoEstoque[]>({
     queryKey: ['estoque'],
@@ -51,33 +67,29 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
-  const [filterValues, setFilterValues] = useState<FilterState>({
-    search: '',
-    quantidadeMin: '',
-    quantidadeMax: '',
-    precoMin: '',
-    precoMax: '',
-    currentPage: 1,
-    itemsPerPage: 10,
-    sortField: 'nome',
-    sortDirection: 'asc',
-  });
-
-  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
-
-  const handleSort = (field: string) => {
+  const handleSort = useCallback((field: string) => {
     const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
-  };
+    handleFilter({ sortField: field, sortDirection: newDirection, currentPage: 1 });
+  }, [appliedFilters.sortField, appliedFilters.sortDirection]);
 
-  const handleFilter = (updates: Partial<FilterState>) => {
-    if ('currentPage' in updates || 'itemsPerPage' in updates) {
-      setAppliedFilters(prev => ({ ...prev, ...updates }));
-      setFilterValues(prev => ({ ...prev, ...updates }));
-    } else {
-      setFilterValues(prev => ({ ...prev, ...updates }));
+  const handleFilter = useCallback((updates: Partial<FilterState>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const isPaginationChange = 'currentPage' in updates || 'itemsPerPage' in updates;
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === '' || value === undefined || value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+
+    if (!isPaginationChange) {
+      params.set('currentPage', '1');
     }
-  };
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchParams, router, pathname]);
 
   const createMutation = useMutation({
     mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
@@ -152,7 +164,7 @@ export const useEstoque = (): UseEstoqueReturn => {
     deleteMutation.mutate(id);
   };
 
-  const filteredEstoque = estoque.filter(item => {
+  const filteredEstoque = useMemo(() => estoque.filter(item => {
     const nome = item.produto?.nome || '';
     const matchesSearch = nome.toLowerCase().includes(appliedFilters.search.toLowerCase());
     const matchesQuantidadeMin = !appliedFilters.quantidadeMin || item.quantidade >= Number(appliedFilters.quantidadeMin);
@@ -178,24 +190,23 @@ export const useEstoque = (): UseEstoqueReturn => {
       return (a.produtoId - b.produtoId) * direction;
     }
     return 0;
-  });
+  }), [estoque, appliedFilters]);
 
-  const paginatedEstoque = filteredEstoque.slice(
+  const paginatedEstoque = useMemo(() => filteredEstoque.slice(
     (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
     appliedFilters.currentPage * appliedFilters.itemsPerPage
-  );
+  ), [filteredEstoque, appliedFilters]);
 
   return {
     estoque,
     produtos,
     filteredEstoque,
     paginatedEstoque,
-    filterValues,
+    filterValues: appliedFilters,
     handleSort,
     handleFilter,
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters,
   };
 };

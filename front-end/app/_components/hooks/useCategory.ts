@@ -1,31 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Category } from '@/types/interfaces/entities';
-import { FilterValues } from '@/types/interfaces/entities';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { Category, FilterValues, SortDirection } from '@/types/interfaces/entities';
 
 export const useCategory = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
-  const [paginatedCategories, setPaginatedCategories] = useState<Category[]>([]);
-  const [filterValues, setFilterValues] = useState<FilterValues>({
-    search: '',
-    quantidadeMin: '',
-    quantidadeMax: '',
-    precoMin: '',
-    precoMax: '',
-    currentPage: 1,
-    itemsPerPage: 10,
-    sortField: 'name',
-    sortDirection: 'asc',
-  });
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(filterValues);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const appliedFilters = useMemo<FilterValues>(() => ({
+    search: searchParams.get('search') || '',
+    quantidadeMin: searchParams.get('quantidadeMin') || '',
+    quantidadeMax: searchParams.get('quantidadeMax') || '',
+    precoMin: searchParams.get('precoMin') || '',
+    precoMax: searchParams.get('precoMax') || '',
+    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
+    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
+    sortField: searchParams.get('sortField') || 'name',
+    sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
+  }), [searchParams]);
 
   useEffect(() => {
     fetchAllCategories();
   }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [categories, appliedFilters]);
 
   const fetchAllCategories = async () => {
     try {
@@ -42,7 +40,7 @@ export const useCategory = () => {
     }
   };
 
-  const applyFilters = () => {
+  const filteredCategories = useMemo(() => {
     let filtered = [...(Array.isArray(categories) ? categories : [])];
 
     if (appliedFilters.search) {
@@ -58,27 +56,38 @@ export const useCategory = () => {
       return 0;
     });
 
-    // Pagination
+    return filtered;
+  }, [categories, appliedFilters]);
+
+  const paginatedCategories = useMemo(() => {
     const startIndex = (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage;
     const endIndex = startIndex + appliedFilters.itemsPerPage;
-    const paginated = filtered.slice(startIndex, endIndex);
+    return filteredCategories.slice(startIndex, endIndex);
+  }, [filteredCategories, appliedFilters]);
 
-    setFilteredCategories(filtered);
-    setPaginatedCategories(paginated);
-  };
+  const handleFilter = useCallback((newFilters: Partial<FilterValues>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const isPaginationChange = 'currentPage' in newFilters || 'itemsPerPage' in newFilters;
 
-  const handleFilter = (newFilters: Partial<FilterValues>) => {
-    setFilterValues(prev => ({ ...prev, ...newFilters, currentPage: 1 }));
-  };
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value === '' || value === undefined || value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
 
-  const handleSort = (field: string) => {
+    if (!isPaginationChange) {
+      params.set('currentPage', '1');
+    }
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchParams, router, pathname]);
+
+  const handleSort = useCallback((field: string) => {
     const direction = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    handleFilter({ sortField: field, sortDirection: direction });
-  };
-
-  useEffect(() => {
-    setAppliedFilters(filterValues);
-  }, [filterValues]);
+    handleFilter({ sortField: field, sortDirection: direction, currentPage: 1 });
+  }, [appliedFilters.sortField, appliedFilters.sortDirection, handleFilter]);
 
   const handleCreate = async (category: Omit<Category, 'id' | 'produtos'>) => {
     try {
@@ -124,7 +133,7 @@ export const useCategory = () => {
   };
 
   return {
-    categories: categories,
+    categories,
     paginatedCategories,
     filteredCategories,
     filterValues: appliedFilters,
@@ -133,6 +142,5 @@ export const useCategory = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters,
   };
 };

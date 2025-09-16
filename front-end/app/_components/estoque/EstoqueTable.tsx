@@ -104,7 +104,6 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
             </TableHead>
             <TableHead>Data Validade</TableHead>
             <TableHead>Unidade</TableHead>
-            <TableHead>Tipo</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -114,13 +113,8 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
               <TableCell className="font-medium">{item.produto?.nome || 'N/A'}</TableCell>
               <TableCell>{item.quantidade} {item.unidade}</TableCell>
               <TableCell>R$ {item.preco.toFixed(2)}</TableCell>
-              <TableCell>{new Date(item.dataValidade).toLocaleDateString('pt-BR')}</TableCell>
+              <TableCell>{item.dataValidade ? new Date(item.dataValidade).toLocaleDateString('pt-BR') : 'N/A'}</TableCell>
               <TableCell>{item.unidade}</TableCell>
-              <TableCell>
-                <Badge variant={item.tipo === 'Insumo' ? 'secondary' : 'default'}>
-                  {item.tipo}
-                </Badge>
-              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
                   <Button variant="outline" size="sm" onClick={() => onEdit(item)}>

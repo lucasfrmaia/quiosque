@@ -40,7 +40,6 @@ const EstoquePage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters,
   } = useEstoque();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -157,7 +156,7 @@ const EstoquePage: FC = () => {
   };
 
   const resetFilters = () => {
-    const resetFilters: FilterValues = {
+    handleFilter({
       search: '',
       quantidadeMin: '',
       quantidadeMax: '',
@@ -167,9 +166,7 @@ const EstoquePage: FC = () => {
       itemsPerPage: 10,
       sortField: 'nome',
       sortDirection: 'asc'
-    };
-    setAppliedFilters(resetFilters);
-    handleFilter(resetFilters);
+    });
   };
 
   return (
@@ -194,7 +191,7 @@ const EstoquePage: FC = () => {
             title=""
             description=""
             onReset={resetFilters}
-            onApply={() => setAppliedFilters(filterValues)}
+            onApply={() => {}}
           >
             <TextFilter
               value={filterValues.search}

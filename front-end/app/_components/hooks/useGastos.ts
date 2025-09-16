@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProdutoCompra } from '@/types/interfaces/entities';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { ProdutoCompra, SortDirection } from '@/types/interfaces/entities';
 
 type FilterState = {
   search: string;
@@ -26,11 +27,27 @@ interface UseGastosReturn {
   handleCreate: (gasto: Omit<ProdutoCompra, 'id' | 'produto'>) => void;
   handleEdit: (id: number, updates: Partial<Omit<ProdutoCompra, 'id' | 'produto'>>) => void;
   handleDelete: (id: number) => void;
-  setAppliedFilters: (filters: FilterState | ((prev: FilterState) => FilterState)) => void;
 }
 
 export const useGastos = (): UseGastosReturn => {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const appliedFilters = useMemo<FilterState>(() => ({
+    search: searchParams.get('search') || '',
+    precoMin: searchParams.get('precoMin') || '',
+    precoMax: searchParams.get('precoMax') || '',
+    quantidadeMin: searchParams.get('quantidadeMin') || '',
+    quantidadeMax: searchParams.get('quantidadeMax') || '',
+    dataInicio: searchParams.get('dataInicio') || '',
+    dataFim: searchParams.get('dataFim') || '',
+    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
+    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
+    sortField: searchParams.get('sortField') || 'data',
+    sortDirection: (searchParams.get('sortDirection') || 'desc') as 'asc' | 'desc',
+  }), [searchParams]);
 
   const { data: gastos = [], isLoading, error } = useQuery<ProdutoCompra[]>({
     queryKey: ['gastos'],
@@ -47,35 +64,29 @@ export const useGastos = (): UseGastosReturn => {
     },
   });
 
-  const [filterValues, setFilterValues] = useState<FilterState>({
-    search: '',
-    precoMin: '',
-    precoMax: '',
-    quantidadeMin: '',
-    quantidadeMax: '',
-    dataInicio: '',
-    dataFim: '',
-    currentPage: 1,
-    itemsPerPage: 10,
-    sortField: 'data',
-    sortDirection: 'desc',
-  });
+  const handleFilter = useCallback((updates: Partial<FilterState>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const isPaginationChange = 'currentPage' in updates || 'itemsPerPage' in updates;
 
-  const [appliedFilters, setAppliedFilters] = useState<FilterState>(filterValues);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === '' || value === undefined || value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
 
-  const handleSort = (field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    setAppliedFilters(prev => ({ ...prev, sortField: field, sortDirection: newDirection }));
-  };
-
-  const handleFilter = (updates: Partial<FilterState>) => {
-    if ('currentPage' in updates) {
-      setAppliedFilters(prev => ({ ...prev, ...updates }));
-      setFilterValues(prev => ({ ...prev, ...updates }));
-    } else {
-      setFilterValues(prev => ({ ...prev, ...updates }));
+    if (!isPaginationChange) {
+      params.set('currentPage', '1');
     }
-  };
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchParams, router, pathname]);
+
+  const handleSort = useCallback((field: string) => {
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    handleFilter({ sortField: field, sortDirection: newDirection, currentPage: 1 });
+  }, [appliedFilters.sortField, appliedFilters.sortDirection, handleFilter]);
 
   const createMutation = useMutation({
     mutationFn: async (gasto: Omit<ProdutoCompra, 'id' | 'produto'>) => {
@@ -150,20 +161,20 @@ export const useGastos = (): UseGastosReturn => {
     deleteMutation.mutate(id);
   };
 
-  const filteredGastos = gastos.filter(gasto => {
+  const filteredGastos = useMemo(() => gastos.filter(gasto => {
     const matchesSearch = gasto.produto?.nome?.toLowerCase().includes(appliedFilters.search.toLowerCase()) || false;
-    const matchesPrecoMin = !appliedFilters.precoMin || gasto.preco >= Number(appliedFilters.precoMin);
-    const matchesPrecoMax = !appliedFilters.precoMax || gasto.preco <= Number(appliedFilters.precoMax);
+    const matchesPrecoMin = !appliedFilters.precoMin || gasto.precoUnitario >= Number(appliedFilters.precoMin);
+    const matchesPrecoMax = !appliedFilters.precoMax || gasto.precoUnitario <= Number(appliedFilters.precoMax);
     const matchesQuantidadeMin = !appliedFilters.quantidadeMin || gasto.quantidade >= Number(appliedFilters.quantidadeMin);
     const matchesQuantidadeMax = !appliedFilters.quantidadeMax || gasto.quantidade <= Number(appliedFilters.quantidadeMax);
-    const matchesDataInicio = !appliedFilters.dataInicio || gasto.data >= appliedFilters.dataInicio;
-    const matchesDataFim = !appliedFilters.dataFim || gasto.data <= appliedFilters.dataFim;
+    const matchesDataInicio = !appliedFilters.dataInicio || (gasto.notaFiscal && gasto.notaFiscal.data >= appliedFilters.dataInicio);
+    const matchesDataFim = !appliedFilters.dataFim || (gasto.notaFiscal && gasto.notaFiscal.data <= appliedFilters.dataFim);
 
     return matchesSearch && matchesPrecoMin && matchesPrecoMax && matchesQuantidadeMin && matchesQuantidadeMax && matchesDataInicio && matchesDataFim;
   }).sort((a, b) => {
     const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
     if (appliedFilters.sortField === 'preco') {
-      return (a.preco - b.preco) * direction;
+      return (a.precoUnitario - b.precoUnitario) * direction;
     }
     if (appliedFilters.sortField === 'quantidade') {
       return (a.quantidade - b.quantidade) * direction;
@@ -174,26 +185,27 @@ export const useGastos = (): UseGastosReturn => {
       return (aName < bName ? -1 : 1) * direction;
     }
     if (appliedFilters.sortField === 'data') {
-      return (a.data < b.data ? -1 : 1) * direction;
+      const aData = a.notaFiscal?.data || '';
+      const bData = b.notaFiscal?.data || '';
+      return (aData < bData ? -1 : 1) * direction;
     }
     return (a.produtoId - b.produtoId) * direction;
-  });
+  }), [gastos, appliedFilters]);
 
-  const paginatedGastos = filteredGastos.slice(
+  const paginatedGastos = useMemo(() => filteredGastos.slice(
     (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
     appliedFilters.currentPage * appliedFilters.itemsPerPage
-  );
+  ), [filteredGastos, appliedFilters]);
 
   return {
     gastos,
     filteredGastos,
     paginatedGastos,
-    filterValues,
+    filterValues: appliedFilters,
     handleSort,
     handleFilter,
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters,
   };
 };

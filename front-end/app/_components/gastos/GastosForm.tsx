@@ -5,9 +5,9 @@ import { Label } from '@/components/ui/label';
 interface GastosFormData {
   produtoId: string;
   quantidade: string;
-  preco: string;
+  precoUnitario: string;
   unidade: string;
-  data: string;
+  notaFiscalId: string;
 }
 
 interface GastosFormProps {
@@ -35,7 +35,7 @@ export const GastosForm: FC<GastosFormProps> = ({ formData, onChange }) => {
           placeholder="ID do produto"
         />
       </div>
-
+  
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="quantidade" className="text-right">
           Quantidade
@@ -49,19 +49,33 @@ export const GastosForm: FC<GastosFormProps> = ({ formData, onChange }) => {
           placeholder="Quantidade comprada"
         />
       </div>
-
+  
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="preco" className="text-right">
-          Preço
+        <Label htmlFor="precoUnitario" className="text-right">
+          Preço Unitário
         </Label>
         <Input
-          id="preco"
+          id="precoUnitario"
           type="number"
-          value={formData.preco}
-          onChange={handleChange('preco')}
+          value={formData.precoUnitario}
+          onChange={handleChange('precoUnitario')}
           className="col-span-3"
           placeholder="Preço unitário"
           step="0.01"
+        />
+      </div>
+  
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="notaFiscalId" className="text-right">
+          Nota Fiscal ID
+        </Label>
+        <Input
+          id="notaFiscalId"
+          type="number"
+          value={formData.notaFiscalId}
+          onChange={handleChange('notaFiscalId')}
+          className="col-span-3"
+          placeholder="ID da nota fiscal"
         />
       </div>
 
@@ -76,19 +90,6 @@ export const GastosForm: FC<GastosFormProps> = ({ formData, onChange }) => {
           onChange={handleChange('unidade')}
           className="col-span-3"
           placeholder="Unidade (ex: Unidade)"
-        />
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="data" className="text-right">
-          Data
-        </Label>
-        <Input
-          id="data"
-          type="date"
-          value={formData.data}
-          onChange={handleChange('data')}
-          className="col-span-3"
         />
       </div>
     </div>

@@ -38,25 +38,24 @@ const GastosPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters
   } = useGastos();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedGasto, setSelectedGasto] = useState<ProdutoCompra | null>(null);
-  const [formData, setFormData] = useState({ produtoId: '', quantidade: '', preco: '', unidade: '', data: '' });
+  const [formData, setFormData] = useState({ produtoId: '', quantidade: '', precoUnitario: '', unidade: '', notaFiscalId: '' });
 
   const handleSubmitCreate = () => {
     handleCreate({
       produtoId: Number(formData.produtoId),
       quantidade: Number(formData.quantidade),
-      preco: Number(formData.preco),
+      precoUnitario: Number(formData.precoUnitario),
       unidade: formData.unidade,
-      data: formData.data,
+      notaFiscalId: Number(formData.notaFiscalId),
     });
     setIsCreateModalOpen(false);
-    setFormData({ produtoId: '', quantidade: '', preco: '', unidade: '', data: '' });
+    setFormData({ produtoId: '', quantidade: '', precoUnitario: '', unidade: '', notaFiscalId: '' });
   };
 
   const handleSubmitEdit = () => {
@@ -64,13 +63,13 @@ const GastosPage: FC = () => {
     handleEdit(selectedGasto.id, {
       produtoId: Number(formData.produtoId),
       quantidade: Number(formData.quantidade),
-      preco: Number(formData.preco),
+      precoUnitario: Number(formData.precoUnitario),
       unidade: formData.unidade,
-      data: formData.data,
+      notaFiscalId: Number(formData.notaFiscalId),
     });
     setIsEditModalOpen(false);
     setSelectedGasto(null);
-    setFormData({ produtoId: '', quantidade: '', preco: '', unidade: '', data: '' });
+    setFormData({ produtoId: '', quantidade: '', precoUnitario: '', unidade: '', notaFiscalId: '' });
   };
 
   const openEditModal = (gasto: ProdutoCompra) => {
@@ -78,9 +77,9 @@ const GastosPage: FC = () => {
     setFormData({
       produtoId: gasto.produtoId.toString(),
       quantidade: gasto.quantidade.toString(),
-      preco: gasto.preco.toString(),
+      precoUnitario: gasto.precoUnitario.toString(),
       unidade: gasto.unidade,
-      data: gasto.data,
+      notaFiscalId: gasto.notaFiscalId.toString(),
     });
     setIsEditModalOpen(true);
   };
@@ -159,7 +158,7 @@ const GastosPage: FC = () => {
   };
 
   const handleResetFilters = () => {
-    const resetValues = {
+    handleFilter({
       search: '',
       precoMin: '',
       precoMax: '',
@@ -170,18 +169,7 @@ const GastosPage: FC = () => {
       currentPage: 1,
       itemsPerPage: 10,
       sortField: 'data',
-      sortDirection: 'desc' as const
-    };
-    setAppliedFilters(resetValues);
-    handleFilter({
-      search: '',
-      precoMin: '',
-      precoMax: '',
-      quantidadeMin: '',
-      quantidadeMax: '',
-      dataInicio: '',
-      dataFim: '',
-      currentPage: 1
+      sortDirection: 'desc'
     });
   };
 
@@ -207,7 +195,7 @@ const GastosPage: FC = () => {
             title=""
             description=""
             onReset={handleResetFilters}
-            onApply={() => setAppliedFilters(filterValues)}
+            onApply={() => {}}
           >
             <TextFilter
               value={filterValues.search}

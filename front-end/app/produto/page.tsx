@@ -38,7 +38,6 @@ const ProdutoPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    setAppliedFilters,
   } = useProduto();
 
   const { categories } = useCategory();
@@ -46,15 +45,17 @@ const ProdutoPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
-  const [formData, setFormData] = useState({ nome: '', categoriaId: '' });
+  const [formData, setFormData] = useState({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO' });
 
   const handleSubmitCreate = () => {
     handleCreate({
       nome: formData.nome,
       categoriaId: Number(formData.categoriaId),
+      ativo: formData.ativo === 'true',
+      tipo: formData.tipo as any,
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', categoriaId: '' });
+    setFormData({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO' });
   };
 
   const handleSubmitEdit = () => {
@@ -62,10 +63,12 @@ const ProdutoPage: FC = () => {
     handleEdit(selectedProduto.id, {
       nome: formData.nome,
       categoriaId: Number(formData.categoriaId),
+      ativo: formData.ativo === 'true',
+      tipo: formData.tipo as any,
     });
     setIsEditModalOpen(false);
     setSelectedProduto(null);
-    setFormData({ nome: '', categoriaId: '' });
+    setFormData({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO' });
   };
 
   const openEditModal = (produto: Produto) => {
@@ -73,6 +76,8 @@ const ProdutoPage: FC = () => {
     setFormData({
       nome: produto.nome,
       categoriaId: produto.categoriaId?.toString() || '',
+      ativo: produto.ativo.toString(),
+      tipo: produto.tipo,
     });
     setIsEditModalOpen(true);
   };
@@ -109,7 +114,7 @@ const ProdutoPage: FC = () => {
   };
 
   const resetFilters = () => {
-    const resetFilters = {
+    handleFilter({
       search: '',
       quantidadeMin: '',
       quantidadeMax: '',
@@ -118,10 +123,8 @@ const ProdutoPage: FC = () => {
       currentPage: 1,
       itemsPerPage: 10,
       sortField: 'nome',
-      sortDirection: 'asc' as const,
-    };
-    setAppliedFilters(resetFilters);
-    handleFilter(resetFilters);
+      sortDirection: 'asc'
+    });
   };
 
   return (
@@ -146,7 +149,7 @@ const ProdutoPage: FC = () => {
             title=""
             description=""
             onReset={resetFilters}
-            onApply={() => setAppliedFilters(filterValues)}
+            onApply={() => {}}
           >
             <TextFilter
               value={filterValues.search}

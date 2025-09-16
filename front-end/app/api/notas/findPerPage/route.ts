@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
       return NextResponse.json({ success: false, error: 'Invalid page or limit' }, { status: 400 });
     }
-    const notas = await repositoryFactory.notaFiscalRepository.findPerPage(page, limit);
+    const notas = await repositoryFactory.notaFiscalVendaRepository.findPerPage(page, limit);
     return NextResponse.json({ success: true, data: notas });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
