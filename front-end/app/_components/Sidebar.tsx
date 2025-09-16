@@ -3,7 +3,7 @@
 import { FC, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine, FaSignOutAlt, FaProductHunt, FaBook } from 'react-icons/fa';
+import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine, FaSignOutAlt, FaProductHunt, FaBook, FaTruck } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarItemProps {
@@ -34,35 +34,45 @@ const Sidebar: FC = () => {
   const { logout } = useAuth();
 
   const menuItems = [
-    { 
-      icon: <FaChartLine size={20} className="text-blue-600" />, 
-      text: 'Dashboard', 
-      href: '/' 
+    {
+      icon: <FaChartLine size={20} className="text-blue-600" />,
+      text: 'Dashboard',
+      href: '/'
     },
-    { 
-      icon: <FaProductHunt size={20} className="text-blue-600" />, 
-      text: 'Produtos', 
-      href: '/produto' 
+    {
+      icon: <FaProductHunt size={20} className="text-blue-600" />,
+      text: 'Produtos',
+      href: '/produto'
     },
-    { 
-      icon: <FaBook size={20} className="text-blue-600" />, 
-      text: 'Categorias', 
-      href: '/categoria' 
+    {
+      icon: <FaBook size={20} className="text-blue-600" />,
+      text: 'Categorias',
+      href: '/categoria'
     },
-    { 
-      icon: <FaMoneyBillWave size={20} className="text-red-600" />, 
-      text: 'Gastos', 
-      href: '/gastos' 
+    {
+      icon: <FaTruck size={20} className="text-green-600" />,
+      text: 'Fornecedores',
+      href: '/fornecedores'
+    },
+    {
+      icon: <FaMoneyBillWave size={20} className="text-red-600" />,
+      text: 'Gastos',
+      href: '/gastos'
     },
     {
       icon: <FaUtensils size={20} className="text-purple-600" />,
       text: 'Estoque',
       href: '/estoque'
     },
-    { 
-      icon: <FaFileInvoice size={20} className="text-yellow-600" />, 
-      text: 'Notas Fiscais', 
-      href: '/notas' 
+    {
+      icon: <FaFileInvoice size={20} className="text-yellow-600" />,
+      text: 'Notas de Compra',
+      href: '/nota-fiscal-compra'
+    },
+    {
+      icon: <FaFileInvoice size={20} className="text-orange-600" />,
+      text: 'Notas de Venda',
+      href: '/notas'
     },
   ];
 
