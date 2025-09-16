@@ -1,9 +1,9 @@
 import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { Produto, FilterValues, SortDirection } from '@/types/interfaces/entities';
+import { Fornecedor, FilterValues, SortDirection } from '@/types/interfaces/entities';
 
-export const useProduto = () => {
+export const useFornecedor = () => {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -21,27 +21,26 @@ export const useProduto = () => {
     sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
   }), [searchParams]);
 
-  const { data: produtos = [] } = useQuery<Produto[]>({
-    queryKey: ['produtos'],
+  const { data: fornecedores = [] } = useQuery<Fornecedor[]>({
+    queryKey: ['fornecedores'],
     queryFn: async () => {
-      const response = await fetch('/api/produto/findAll');
+      const response = await fetch('/api/fornecedor/findAll');
       if (!response.ok) {
-        throw new Error('Failed to fetch produtos');
+        throw new Error('Failed to fetch fornecedores');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch produtos');
+        throw new Error(result.error || 'Failed to fetch fornecedores');
       }
       return result.data;
     },
   });
 
-
-  const filteredProdutos = useMemo(() => {
-    let filtered = [...(Array.isArray(produtos) ? produtos : [])];
+  const filteredFornecedores = useMemo(() => {
+    let filtered = [...(Array.isArray(fornecedores) ? fornecedores : [])];
 
     if (filterValues.search) {
-      filtered = filtered.filter(p => p.nome.toLowerCase().includes(filterValues.search.toLowerCase()));
+      filtered = filtered.filter(f => f.nome.toLowerCase().includes(filterValues.search.toLowerCase()));
     }
 
     // Sort
@@ -54,13 +53,13 @@ export const useProduto = () => {
     });
 
     return filtered;
-  }, [produtos, filterValues]);
+  }, [fornecedores, filterValues]);
 
-  const paginatedProdutos = useMemo(() => {
+  const paginatedFornecedores = useMemo(() => {
     const startIndex = (filterValues.currentPage - 1) * filterValues.itemsPerPage;
     const endIndex = startIndex + filterValues.itemsPerPage;
-    return filteredProdutos.slice(startIndex, endIndex);
-  }, [filteredProdutos, filterValues]);
+    return filteredFornecedores.slice(startIndex, endIndex);
+  }, [filteredFornecedores, filterValues]);
 
   const handleFilter = useCallback((newFilters: Partial<FilterValues>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -87,71 +86,71 @@ export const useProduto = () => {
   }, [filterValues.sortField, filterValues.sortDirection, handleFilter]);
 
   const createMutation = useMutation({
-    mutationFn: async (produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>) => {
-      const response = await fetch('/api/produto/create', {
+    mutationFn: async (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
+      const response = await fetch('/api/fornecedor/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(produto),
+        body: JSON.stringify(fornecedor),
       });
       if (!response.ok) {
-        throw new Error('Failed to create produto');
+        throw new Error('Failed to create fornecedor');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to create produto');
+        throw new Error(result.error || 'Failed to create fornecedor');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
     },
   });
 
-  const handleCreate = (produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>) => {
-    createMutation.mutate(produto);
+  const handleCreate = (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
+    createMutation.mutate(fornecedor);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>> }) => {
-      const response = await fetch(`/api/produto/update/${id}`, {
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Fornecedor, 'id' | 'compras'>> }) => {
+      const response = await fetch(`/api/fornecedor/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
       if (!response.ok) {
-        throw new Error('Failed to update produto');
+        throw new Error('Failed to update fornecedor');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to update produto');
+        throw new Error(result.error || 'Failed to update fornecedor');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>) => {
+  const handleEdit = (id: number, updates: Partial<Omit<Fornecedor, 'id' | 'compras'>>) => {
     editMutation.mutate({ id, updates });
   };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/produto/delete/${id}`, {
+      const response = await fetch(`/api/fornecedor/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
-        throw new Error('Failed to delete produto');
+        throw new Error('Failed to delete fornecedor');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to delete produto');
+        throw new Error(result.error || 'Failed to delete fornecedor');
       }
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
     },
   });
 
@@ -159,13 +158,23 @@ export const useProduto = () => {
     deleteMutation.mutate(id);
   };
 
+  const handleReset = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set('currentPage', '1');
+    params.set('itemsPerPage', '10');
+    params.set('sortField', 'nome');
+    params.set('sortDirection', 'asc');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [router, pathname]);
+
   return {
-    produtos,
-    paginatedProdutos,
-    filteredProdutos,
+    fornecedores,
+    paginatedFornecedores,
+    filteredFornecedores,
     filterValues,
     handleSort,
     handleFilter,
+    handleReset,
     handleCreate,
     handleEdit,
     handleDelete,

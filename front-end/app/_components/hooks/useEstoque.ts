@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useMemo, useCallback } from 'react';
 import { ProdutoEstoque, FilterValues, SortDirection, Produto } from '@/types/interfaces/entities';
 
 type FilterState = FilterValues;
@@ -14,6 +13,7 @@ interface UseEstoqueReturn {
   filterValues: FilterState;
   handleSort: (field: string) => void;
   handleFilter: (updates: Partial<FilterState>) => void;
+  handleReset: () => void;
   handleCreate: (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => void;
   handleEdit: (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>) => void;
   handleDelete: (id: number) => void;
@@ -25,7 +25,7 @@ export const useEstoque = (): UseEstoqueReturn => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const appliedFilters = useMemo<FilterState>(() => ({
+  const filterValues = useMemo<FilterState>(() => ({
     search: searchParams.get('search') || '',
     quantidadeMin: searchParams.get('quantidadeMin') || '',
     quantidadeMax: searchParams.get('quantidadeMax') || '',
@@ -67,11 +67,6 @@ export const useEstoque = (): UseEstoqueReturn => {
     },
   });
 
-  const handleSort = useCallback((field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    handleFilter({ sortField: field, sortDirection: newDirection, currentPage: 1 });
-  }, [appliedFilters.sortField, appliedFilters.sortDirection]);
-
   const handleFilter = useCallback((updates: Partial<FilterState>) => {
     const params = new URLSearchParams(searchParams.toString());
     const isPaginationChange = 'currentPage' in updates || 'itemsPerPage' in updates;
@@ -90,6 +85,25 @@ export const useEstoque = (): UseEstoqueReturn => {
 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, [searchParams, router, pathname]);
+
+
+  const handleReset = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set('currentPage', '1');
+    params.set('itemsPerPage', '10');
+    params.set('sortField', 'nome');
+    params.set('sortDirection', 'asc');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [router, pathname]);
+
+  const handleSort = useCallback((field: string) => {
+    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('sortField', field);
+    params.set('sortDirection', direction);
+    params.set('currentPage', '1');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [filterValues.sortField, filterValues.sortDirection, searchParams, router, pathname]);
 
   const createMutation = useMutation({
     mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
@@ -166,45 +180,46 @@ export const useEstoque = (): UseEstoqueReturn => {
 
   const filteredEstoque = useMemo(() => estoque.filter(item => {
     const nome = item.produto?.nome || '';
-    const matchesSearch = nome.toLowerCase().includes(appliedFilters.search.toLowerCase());
-    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || item.quantidade >= Number(appliedFilters.quantidadeMin);
-    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || item.quantidade <= Number(appliedFilters.quantidadeMax);
-    const matchesPrecoMin = !appliedFilters.precoMin || item.preco >= Number(appliedFilters.precoMin);
-    const matchesPrecoMax = !appliedFilters.precoMax || item.preco <= Number(appliedFilters.precoMax);
+    const matchesSearch = nome.toLowerCase().includes(filterValues.search.toLowerCase());
+    const matchesQuantidadeMin = !filterValues.quantidadeMin || item.quantidade >= Number(filterValues.quantidadeMin);
+    const matchesQuantidadeMax = !filterValues.quantidadeMax || item.quantidade <= Number(filterValues.quantidadeMax);
+    const matchesPrecoMin = !filterValues.precoMin || item.preco >= Number(filterValues.precoMin);
+    const matchesPrecoMax = !filterValues.precoMax || item.preco <= Number(filterValues.precoMax);
 
     return matchesSearch && matchesQuantidadeMin && matchesQuantidadeMax && matchesPrecoMin && matchesPrecoMax;
   }).sort((a, b) => {
-    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
-    if (appliedFilters.sortField === 'nome') {
+    const direction = filterValues.sortDirection === 'asc' ? 1 : -1;
+    if (filterValues.sortField === 'nome') {
       const nomeA = a.produto?.nome || '';
       const nomeB = b.produto?.nome || '';
       return nomeA.localeCompare(nomeB) * direction;
     }
-    if (appliedFilters.sortField === 'preco') {
+    if (filterValues.sortField === 'preco') {
       return (a.preco - b.preco) * direction;
     }
-    if (appliedFilters.sortField === 'quantidade') {
+    if (filterValues.sortField === 'quantidade') {
       return (a.quantidade - b.quantidade) * direction;
     }
-    if (appliedFilters.sortField === 'produtoId') {
+    if (filterValues.sortField === 'produtoId') {
       return (a.produtoId - b.produtoId) * direction;
     }
     return 0;
-  }), [estoque, appliedFilters]);
+  }), [estoque, filterValues]);
 
   const paginatedEstoque = useMemo(() => filteredEstoque.slice(
-    (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
-    appliedFilters.currentPage * appliedFilters.itemsPerPage
-  ), [filteredEstoque, appliedFilters]);
+    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
+    filterValues.currentPage * filterValues.itemsPerPage
+  ), [filteredEstoque, filterValues]);
 
   return {
     estoque,
     produtos,
     filteredEstoque,
     paginatedEstoque,
-    filterValues: appliedFilters,
+    filterValues,
     handleSort,
     handleFilter,
+    handleReset,
     handleCreate,
     handleEdit,
     handleDelete,

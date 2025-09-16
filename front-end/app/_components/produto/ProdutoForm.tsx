@@ -13,9 +13,11 @@ import { Category } from '@/types/interfaces/entities';
 
 interface ProdutoFormData {
   nome: string;
+  descricao: string;
+  imagemUrl: string;
   categoriaId: string;
   ativo: string;
-  tipo: string;
+  tipo: 'INSUMO' | 'CARDAPIO';
 }
 
 interface ProdutoFormProps {
@@ -46,6 +48,32 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
           onChange={handleInputChange('nome')}
           className="col-span-3"
           placeholder="Nome do produto"
+        />
+      </div>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="descricao" className="text-right">
+          Descrição
+        </Label>
+        <Input
+          id="descricao"
+          value={formData.descricao}
+          onChange={handleInputChange('descricao')}
+          className="col-span-3"
+          placeholder="Descrição do produto (opcional)"
+        />
+      </div>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="imagemUrl" className="text-right">
+          Imagem URL
+        </Label>
+        <Input
+          id="imagemUrl"
+          value={formData.imagemUrl}
+          onChange={handleInputChange('imagemUrl')}
+          className="col-span-3"
+          placeholder="URL da imagem (opcional)"
         />
       </div>
   
@@ -86,7 +114,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
         <Label htmlFor="tipo" className="text-right">
           Tipo
         </Label>
-        <Select value={formData.tipo} onValueChange={(value) => onChange({ ...formData, tipo: value })}>
+        <Select value={formData.tipo} onValueChange={(value) => onChange({ ...formData, tipo: value as 'INSUMO' | 'CARDAPIO' })}>
           <SelectTrigger id="tipo" className="col-span-3">
             <SelectValue placeholder="Selecione o tipo" />
           </SelectTrigger>

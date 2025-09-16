@@ -1,9 +1,9 @@
 import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { Produto, FilterValues, SortDirection } from '@/types/interfaces/entities';
+import { NotaFiscalCompra, ProdutoCompra, FilterValues, SortDirection } from '@/types/interfaces/entities';
 
-export const useProduto = () => {
+export const useNotaFiscalCompra = () => {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -17,31 +17,30 @@ export const useProduto = () => {
     precoMax: searchParams.get('precoMax') || '',
     currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
     itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
-    sortField: searchParams.get('sortField') || 'nome',
-    sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
+    sortField: searchParams.get('sortField') || 'data',
+    sortDirection: (searchParams.get('sortDirection') || 'desc') as SortDirection,
   }), [searchParams]);
 
-  const { data: produtos = [] } = useQuery<Produto[]>({
-    queryKey: ['produtos'],
+  const { data: notas = [] } = useQuery<NotaFiscalCompra[]>({
+    queryKey: ['notaFiscalCompra'],
     queryFn: async () => {
-      const response = await fetch('/api/produto/findAll');
+      const response = await fetch('/api/nota-fiscal-compra/findAll');
       if (!response.ok) {
-        throw new Error('Failed to fetch produtos');
+        throw new Error('Failed to fetch notas fiscais de compra');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch produtos');
+        throw new Error(result.error || 'Failed to fetch notas fiscais de compra');
       }
       return result.data;
     },
   });
 
-
-  const filteredProdutos = useMemo(() => {
-    let filtered = [...(Array.isArray(produtos) ? produtos : [])];
+  const filteredNotas = useMemo(() => {
+    let filtered = [...(Array.isArray(notas) ? notas : [])];
 
     if (filterValues.search) {
-      filtered = filtered.filter(p => p.nome.toLowerCase().includes(filterValues.search.toLowerCase()));
+      filtered = filtered.filter(n => n.id.toString().includes(filterValues.search));
     }
 
     // Sort
@@ -54,13 +53,13 @@ export const useProduto = () => {
     });
 
     return filtered;
-  }, [produtos, filterValues]);
+  }, [notas, filterValues]);
 
-  const paginatedProdutos = useMemo(() => {
+  const paginatedNotas = useMemo(() => {
     const startIndex = (filterValues.currentPage - 1) * filterValues.itemsPerPage;
     const endIndex = startIndex + filterValues.itemsPerPage;
-    return filteredProdutos.slice(startIndex, endIndex);
-  }, [filteredProdutos, filterValues]);
+    return filteredNotas.slice(startIndex, endIndex);
+  }, [filteredNotas, filterValues]);
 
   const handleFilter = useCallback((newFilters: Partial<FilterValues>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -87,71 +86,71 @@ export const useProduto = () => {
   }, [filterValues.sortField, filterValues.sortDirection, handleFilter]);
 
   const createMutation = useMutation({
-    mutationFn: async (produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>) => {
-      const response = await fetch('/api/produto/create', {
+    mutationFn: async (nota: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }) => {
+      const response = await fetch('/api/nota-fiscal-compra/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(produto),
+        body: JSON.stringify(nota),
       });
       if (!response.ok) {
-        throw new Error('Failed to create produto');
+        throw new Error('Failed to create nota fiscal de compra');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to create produto');
+        throw new Error(result.error || 'Failed to create nota fiscal de compra');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] });
     },
   });
 
-  const handleCreate = (produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>) => {
-    createMutation.mutate(produto);
+  const handleCreate = (nota: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }) => {
+    createMutation.mutate(nota);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>> }) => {
-      const response = await fetch(`/api/produto/update/${id}`, {
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>> }) => {
+      const response = await fetch(`/api/nota-fiscal-compra/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
       if (!response.ok) {
-        throw new Error('Failed to update produto');
+        throw new Error('Failed to update nota fiscal de compra');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to update produto');
+        throw new Error(result.error || 'Failed to update nota fiscal de compra');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] });
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>) => {
+  const handleEdit = (id: number, updates: Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>>) => {
     editMutation.mutate({ id, updates });
   };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/produto/delete/${id}`, {
+      const response = await fetch(`/api/nota-fiscal-compra/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
-        throw new Error('Failed to delete produto');
+        throw new Error('Failed to delete nota fiscal de compra');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || 'Failed to delete produto');
+        throw new Error(result.error || 'Failed to delete nota fiscal de compra');
       }
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] });
     },
   });
 
@@ -159,13 +158,23 @@ export const useProduto = () => {
     deleteMutation.mutate(id);
   };
 
+  const handleReset = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set('currentPage', '1');
+    params.set('itemsPerPage', '10');
+    params.set('sortField', 'data');
+    params.set('sortDirection', 'desc');
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [router, pathname]);
+
   return {
-    produtos,
-    paginatedProdutos,
-    filteredProdutos,
+    notas,
+    paginatedNotas,
+    filteredNotas,
     filterValues,
     handleSort,
     handleFilter,
+    handleReset,
     handleCreate,
     handleEdit,
     handleDelete,

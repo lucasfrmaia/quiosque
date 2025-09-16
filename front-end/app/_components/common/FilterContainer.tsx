@@ -3,7 +3,7 @@ import { FC, ReactNode, useState } from 'react';
 interface FilterContainerProps {
   children: ReactNode;
   onReset: () => void;
-  onApply: () => void;
+  onApply?: () => void;
   title?: string;
   description?: string;
 }
@@ -20,7 +20,9 @@ export const FilterContainer: FC<FilterContainerProps> = ({
   const handleApply = async () => {
     setIsApplying(true);
     try {
-      await onApply();
+      if (onApply) {
+        await onApply();
+      }
     } finally {
       setIsApplying(false);
     }

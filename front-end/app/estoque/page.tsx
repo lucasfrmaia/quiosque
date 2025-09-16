@@ -52,8 +52,6 @@ const EstoquePage: FC = () => {
     dataValidade: '',
     unidade: '',
     produtoId: '',
-    estoqueId: '',
-    tipo: 'Insumo',
   });
 
   const handleSubmitCreate = () => {
@@ -63,11 +61,9 @@ const EstoquePage: FC = () => {
       dataValidade: formData.dataValidade,
       unidade: formData.unidade,
       produtoId: Number(formData.produtoId),
-      estoqueId: Number(formData.estoqueId),
-      tipo: formData.tipo,
     });
     setIsCreateModalOpen(false);
-    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '', estoqueId: '', tipo: 'Insumo' });
+    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '' });
   };
 
   const handleSubmitEdit = () => {
@@ -78,12 +74,10 @@ const EstoquePage: FC = () => {
       dataValidade: formData.dataValidade,
       unidade: formData.unidade,
       produtoId: Number(formData.produtoId),
-      estoqueId: Number(formData.estoqueId),
-      tipo: formData.tipo,
     });
     setIsEditModalOpen(false);
     setSelectedItem(null);
-    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '', estoqueId: '', tipo: 'Insumo' });
+    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '' });
   };
 
   const openEditModal = (item: ProdutoEstoque) => {
@@ -91,11 +85,9 @@ const EstoquePage: FC = () => {
     setFormData({
       preco: item.preco.toString(),
       quantidade: item.quantidade.toString(),
-      dataValidade: item.dataValidade,
+      dataValidade: item.dataValidade || '',
       unidade: item.unidade,
       produtoId: item.produtoId.toString(),
-      estoqueId: item.estoqueId.toString(),
-      tipo: item.tipo,
     });
     setIsEditModalOpen(true);
   };

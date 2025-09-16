@@ -1,8 +1,7 @@
 'use client';
 
-import { FC, useState, useEffect } from 'react';
-import { Produto } from '@/types/interfaces/entities';
-import { Category } from '@/types/interfaces/entities';
+import { FC, useState } from 'react';
+import { Fornecedor } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,82 +21,75 @@ import {
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
-import { ProdutoTable } from '@/app/_components/produto/ProdutoTable';
-import { ProdutoForm } from '@/app/_components/produto/ProdutoForm';
-import { useProduto } from '@/app/_components/hooks/useProduto';
-import { useCategory } from '@/app/_components/hooks/useCategory';
+import { FornecedorForm } from '@/app/_components/fornecedor/FornecedorForm';
+import { FornecedorTable } from '@/app/_components/fornecedor/FornecedorTable';
+import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
-const ProdutoPage: FC = () => {
+const FornecedoresPage: FC = () => {
   const {
-    produtos,
-    filteredProdutos,
+    fornecedores,
+    filteredFornecedores,
     filterValues,
     handleSort,
     handleFilter,
     handleCreate,
     handleEdit,
     handleDelete,
-  } = useProduto();
+    handleReset,
+  } = useFornecedor();
 
-  const { categories } = useCategory();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
-  const [formData, setFormData] = useState({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO' as 'INSUMO' | 'CARDAPIO', descricao: '', imagemUrl: '' });
+  const [selectedFornecedor, setSelectedFornecedor] = useState<Fornecedor | null>(null);
+  const [formData, setFormData] = useState({ nome: '', cnpj: '', telefone: '', email: '' });
 
   const handleSubmitCreate = () => {
     handleCreate({
       nome: formData.nome,
-      descricao: formData.descricao || null,
-      imagemUrl: formData.imagemUrl || null,
-      ativo: formData.ativo === 'true',
-      tipo: formData.tipo,
-      categoriaId: Number(formData.categoriaId),
+      cnpj: formData.cnpj || null,
+      telefone: formData.telefone || null,
+      email: formData.email || null,
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' });
+    setFormData({ nome: '', cnpj: '', telefone: '', email: '' });
   };
 
   const handleSubmitEdit = () => {
-    if (!selectedProduto) return;
-    handleEdit(selectedProduto.id, {
+    if (!selectedFornecedor) return;
+    handleEdit(selectedFornecedor.id, {
       nome: formData.nome,
-      descricao: formData.descricao || null,
-      imagemUrl: formData.imagemUrl || null,
-      ativo: formData.ativo === 'true',
-      tipo: formData.tipo,
-      categoriaId: Number(formData.categoriaId),
+      cnpj: formData.cnpj || null,
+      telefone: formData.telefone || null,
+      email: formData.email || null,
     });
     setIsEditModalOpen(false);
-    setSelectedProduto(null);
-    setFormData({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' });
+    setSelectedFornecedor(null);
+    setFormData({ nome: '', cnpj: '', telefone: '', email: '' });
   };
 
-  const openEditModal = (produto: Produto) => {
-    setSelectedProduto(produto);
+  const openEditModal = (fornecedor: Fornecedor) => {
+    setSelectedFornecedor(fornecedor);
     setFormData({
-      nome: produto.nome,
-      categoriaId: produto.categoriaId?.toString() || '',
-      ativo: produto.ativo.toString(),
-      tipo: produto.tipo,
-      descricao: produto.descricao || '',
-      imagemUrl: produto.imagemUrl || '',
+      nome: fornecedor.nome,
+      cnpj: fornecedor.cnpj || '',
+      telefone: fornecedor.telefone || '',
+      email: fornecedor.email || '',
     });
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (produto: Produto) => {
-    setSelectedProduto(produto);
+  const openDeleteModal = (fornecedor: Fornecedor) => {
+    setSelectedFornecedor(fornecedor);
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = () => {
-    if (!selectedProduto) return;
-    handleDelete(selectedProduto.id);
+    if (!selectedFornecedor) return;
+    handleDelete(selectedFornecedor.id);
     setIsDeleteModalOpen(false);
-    setSelectedProduto(null);
+    setSelectedFornecedor(null);
   };
 
   const getActiveFilters = () => {
@@ -120,17 +112,7 @@ const ProdutoPage: FC = () => {
   };
 
   const resetFilters = () => {
-    handleFilter({
-      search: '',
-      quantidadeMin: '',
-      quantidadeMax: '',
-      precoMin: '',
-      precoMax: '',
-      currentPage: 1,
-      itemsPerPage: 10,
-      sortField: 'nome',
-      sortDirection: 'asc'
-    });
+    handleReset();
   };
 
   return (
@@ -138,17 +120,17 @@ const ProdutoPage: FC = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-2xl font-bold">Produtos</CardTitle>
-            <CardDescription>Gerencie os produtos do sistema</CardDescription>
+            <CardTitle className="text-2xl font-bold">Fornecedores</CardTitle>
+            <CardDescription>Gerencie os fornecedores do sistema</CardDescription>
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>Novo Produto</Button>
+          <Button onClick={() => setIsCreateModalOpen(true)}>Novo Fornecedor</Button>
         </CardHeader>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre os produtos por nome</CardDescription>
+          <CardDescription>Filtre os fornecedores por nome</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <FilterContainer
@@ -161,7 +143,7 @@ const ProdutoPage: FC = () => {
               onChange={(search) => handleFilter({ search })}
               placeholder="Pesquisar por nome..."
               label="Nome"
-              description="Digite o nome do produto"
+              description="Digite o nome do fornecedor"
             />
           </FilterContainer>
         </CardContent>
@@ -175,22 +157,22 @@ const ProdutoPage: FC = () => {
 
       <Card>
         <CardContent className="pt-6 space-y-6">
-          <ProdutoTable
-            items={produtos}
+          <FornecedorTable
+            items={filteredFornecedores}
             filterValues={filterValues}
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(id) => {
-              const produto = produtos.find(p => p.id === id);
-              if (produto) openDeleteModal(produto);
+              const fornecedor = filteredFornecedores.find(f => f.id === id);
+              if (fornecedor) openDeleteModal(fornecedor);
             }}
           />
 
           <Pagination
             currentPage={filterValues.currentPage}
-            totalPages={Math.ceil(filteredProdutos.length / filterValues.itemsPerPage)}
+            totalPages={Math.ceil(filteredFornecedores.length / filterValues.itemsPerPage)}
             itemsPerPage={filterValues.itemsPerPage}
-            totalItems={filteredProdutos.length}
+            totalItems={filteredFornecedores.length}
             startIndex={(filterValues.currentPage - 1) * filterValues.itemsPerPage}
             onPageChange={(page) => handleFilter({ currentPage: page })}
             onItemsPerPageChange={(itemsPerPage) => handleFilter({ itemsPerPage, currentPage: 1 })}
@@ -202,14 +184,13 @@ const ProdutoPage: FC = () => {
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Novo Produto</DialogTitle>
-            <DialogDescription>Crie um novo produto.</DialogDescription>
+            <DialogTitle>Novo Fornecedor</DialogTitle>
+            <DialogDescription>Crie um novo fornecedor.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <ProdutoForm 
+            <FornecedorForm 
               formData={formData} 
               onChange={setFormData} 
-              categories={categories}
             />
           </div>
           <DialogFooter>
@@ -223,14 +204,13 @@ const ProdutoPage: FC = () => {
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Editar Produto</DialogTitle>
-            <DialogDescription>Edite o produto.</DialogDescription>
+            <DialogTitle>Editar Fornecedor</DialogTitle>
+            <DialogDescription>Edite o fornecedor.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <ProdutoForm 
+            <FornecedorForm 
               formData={formData} 
               onChange={setFormData} 
-              categories={categories}
               editing={true}
             />
           </div>
@@ -247,7 +227,7 @@ const ProdutoPage: FC = () => {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir o produto "{selectedProduto?.nome}"? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir o fornecedor "{selectedFornecedor?.nome}"? Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -260,4 +240,4 @@ const ProdutoPage: FC = () => {
   );
 };
 
-export default ProdutoPage;
+export default FornecedoresPage;

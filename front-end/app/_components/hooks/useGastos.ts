@@ -35,7 +35,7 @@ export const useGastos = (): UseGastosReturn => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const appliedFilters = useMemo<FilterState>(() => ({
+  const filterValues = useMemo<FilterState>(() => ({
     search: searchParams.get('search') || '',
     precoMin: searchParams.get('precoMin') || '',
     precoMax: searchParams.get('precoMax') || '',
@@ -84,9 +84,9 @@ export const useGastos = (): UseGastosReturn => {
   }, [searchParams, router, pathname]);
 
   const handleSort = useCallback((field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    const newDirection = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
     handleFilter({ sortField: field, sortDirection: newDirection, currentPage: 1 });
-  }, [appliedFilters.sortField, appliedFilters.sortDirection, handleFilter]);
+  }, [filterValues.sortField, filterValues.sortDirection, handleFilter]);
 
   const createMutation = useMutation({
     mutationFn: async (gasto: Omit<ProdutoCompra, 'id' | 'produto'>) => {
@@ -162,46 +162,46 @@ export const useGastos = (): UseGastosReturn => {
   };
 
   const filteredGastos = useMemo(() => gastos.filter(gasto => {
-    const matchesSearch = gasto.produto?.nome?.toLowerCase().includes(appliedFilters.search.toLowerCase()) || false;
-    const matchesPrecoMin = !appliedFilters.precoMin || gasto.precoUnitario >= Number(appliedFilters.precoMin);
-    const matchesPrecoMax = !appliedFilters.precoMax || gasto.precoUnitario <= Number(appliedFilters.precoMax);
-    const matchesQuantidadeMin = !appliedFilters.quantidadeMin || gasto.quantidade >= Number(appliedFilters.quantidadeMin);
-    const matchesQuantidadeMax = !appliedFilters.quantidadeMax || gasto.quantidade <= Number(appliedFilters.quantidadeMax);
-    const matchesDataInicio = !appliedFilters.dataInicio || (gasto.notaFiscal && gasto.notaFiscal.data >= appliedFilters.dataInicio);
-    const matchesDataFim = !appliedFilters.dataFim || (gasto.notaFiscal && gasto.notaFiscal.data <= appliedFilters.dataFim);
+    const matchesSearch = gasto.produto?.nome?.toLowerCase().includes(filterValues.search.toLowerCase()) || false;
+    const matchesPrecoMin = !filterValues.precoMin || gasto.precoUnitario >= Number(filterValues.precoMin);
+    const matchesPrecoMax = !filterValues.precoMax || gasto.precoUnitario <= Number(filterValues.precoMax);
+    const matchesQuantidadeMin = !filterValues.quantidadeMin || gasto.quantidade >= Number(filterValues.quantidadeMin);
+    const matchesQuantidadeMax = !filterValues.quantidadeMax || gasto.quantidade <= Number(filterValues.quantidadeMax);
+    const matchesDataInicio = !filterValues.dataInicio || (gasto.notaFiscal && gasto.notaFiscal.data >= filterValues.dataInicio);
+    const matchesDataFim = !filterValues.dataFim || (gasto.notaFiscal && gasto.notaFiscal.data <= filterValues.dataFim);
 
     return matchesSearch && matchesPrecoMin && matchesPrecoMax && matchesQuantidadeMin && matchesQuantidadeMax && matchesDataInicio && matchesDataFim;
   }).sort((a, b) => {
-    const direction = appliedFilters.sortDirection === 'asc' ? 1 : -1;
-    if (appliedFilters.sortField === 'preco') {
+    const direction = filterValues.sortDirection === 'asc' ? 1 : -1;
+    if (filterValues.sortField === 'preco') {
       return (a.precoUnitario - b.precoUnitario) * direction;
     }
-    if (appliedFilters.sortField === 'quantidade') {
+    if (filterValues.sortField === 'quantidade') {
       return (a.quantidade - b.quantidade) * direction;
     }
-    if (appliedFilters.sortField === 'produto.nome') {
+    if (filterValues.sortField === 'produto.nome') {
       const aName = a.produto?.nome || '';
       const bName = b.produto?.nome || '';
       return (aName < bName ? -1 : 1) * direction;
     }
-    if (appliedFilters.sortField === 'data') {
+    if (filterValues.sortField === 'data') {
       const aData = a.notaFiscal?.data || '';
       const bData = b.notaFiscal?.data || '';
       return (aData < bData ? -1 : 1) * direction;
     }
     return (a.produtoId - b.produtoId) * direction;
-  }), [gastos, appliedFilters]);
+  }), [gastos, filterValues]);
 
   const paginatedGastos = useMemo(() => filteredGastos.slice(
-    (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage,
-    appliedFilters.currentPage * appliedFilters.itemsPerPage
-  ), [filteredGastos, appliedFilters]);
+    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
+    filterValues.currentPage * filterValues.itemsPerPage
+  ), [filteredGastos, filterValues]);
 
   return {
     gastos,
     filteredGastos,
     paginatedGastos,
-    filterValues: appliedFilters,
+    filterValues,
     handleSort,
     handleFilter,
     handleCreate,
