@@ -55,11 +55,6 @@ const Sidebar: FC = () => {
       href: '/fornecedores'
     },
     {
-      icon: <FaMoneyBillWave size={20} className="text-red-600" />,
-      text: 'Gastos',
-      href: '/gastos'
-    },
-    {
       icon: <FaUtensils size={20} className="text-purple-600" />,
       text: 'Estoque',
       href: '/estoque'
@@ -67,12 +62,12 @@ const Sidebar: FC = () => {
     {
       icon: <FaFileInvoice size={20} className="text-yellow-600" />,
       text: 'Notas de Compra',
-      href: '/nota-fiscal-compra'
+      href: '/notas-compra'
     },
     {
       icon: <FaFileInvoice size={20} className="text-orange-600" />,
       text: 'Notas de Venda',
-      href: '/notas'
+      href: '/notas-vendas'
     },
   ];
 
