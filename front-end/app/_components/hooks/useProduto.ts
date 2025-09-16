@@ -124,7 +124,7 @@ export const useProduto = () => {
   };
 
   return {
-    produtos: paginatedProdutos,
+    produtos: produtos,
     filteredProdutos,
     filterValues: appliedFilters,
     handleSort,

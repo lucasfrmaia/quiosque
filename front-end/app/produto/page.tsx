@@ -25,6 +25,7 @@ import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { ProdutoTable } from '@/app/_components/produto/ProdutoTable';
 import { ProdutoForm } from '@/app/_components/produto/ProdutoForm';
 import { useProduto } from '@/app/_components/hooks/useProduto';
+import { useCategory } from '@/app/_components/hooks/useCategory';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
 const ProdutoPage: FC = () => {
@@ -40,28 +41,12 @@ const ProdutoPage: FC = () => {
     setAppliedFilters,
   } = useProduto();
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories } = useCategory();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
   const [formData, setFormData] = useState({ nome: '', categoriaId: '' });
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/produto/findAllCategories'); // Assume an API endpoint for categories
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
 
   const handleSubmitCreate = () => {
     handleCreate({

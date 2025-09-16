@@ -124,7 +124,8 @@ export const useCategory = () => {
   };
 
   return {
-    categories: paginatedCategories,
+    categories: categories,
+    paginatedCategories,
     filteredCategories,
     filterValues: appliedFilters,
     handleSort,

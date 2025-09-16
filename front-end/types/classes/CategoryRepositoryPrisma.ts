@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ICategoryRepository } from '../interfaces/repositories';
-import { Category } from '../interfaces/entities';
+import { Category, Produto } from '../interfaces/entities';
 
 export class CategoryRepositoryPrisma implements ICategoryRepository {
   private prisma: PrismaClient;
@@ -9,16 +9,48 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
     this.prisma = prisma;
   }
 
-  private mapProdutos(produtos: any[]): any[] {
-    // Map produtos if needed, but for Category, produtos is optional
-    return produtos || [];
+  private mapProduto(produto: any): Produto {
+    return {
+      id: produto.id,
+      nome: produto.nome,
+      descricao: produto.descricao,
+      imagemUrl: produto.imagemUrl,
+      ativo: produto.ativo,
+      tipo: produto.tipo,
+      categoriaId: produto.categoriaId,
+      categoria: produto.categoria,
+      estoques: produto.estoques,
+      compras: produto.compras,
+      vendas: produto.vendas
+    };
+  }
+
+  private mapProdutos(produtos: any[]): Produto[] {
+    return produtos ? produtos.map(this.mapProduto) : [];
   }
 
   async create(category: Omit<Category, 'id' | 'produtos'>): Promise<Category> {
     const createdCategory = await this.prisma.category.create({
       data: category,
       include: {
-        produtos: true
+        produtos: {
+          include: {
+            categoria: true,
+            estoques: true,
+            compras: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            },
+            vendas: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            }
+          }
+        }
       }
     });
     return {
@@ -32,7 +64,24 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
     const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
-        produtos: true
+        produtos: {
+          include: {
+            categoria: true,
+            estoques: true,
+            compras: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            },
+            vendas: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            }
+          }
+        }
       }
     });
     if (!category) return null;
@@ -46,7 +95,24 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
   async findAll(): Promise<Category[]> {
     const categories = await this.prisma.category.findMany({
       include: {
-        produtos: true
+        produtos: {
+          include: {
+            categoria: true,
+            estoques: true,
+            compras: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            },
+            vendas: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            }
+          }
+        }
       }
     });
     return categories.map(c => ({
@@ -62,7 +128,24 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
       skip,
       take: limit,
       include: {
-        produtos: true
+        produtos: {
+          include: {
+            categoria: true,
+            estoques: true,
+            compras: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            },
+            vendas: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            }
+          }
+        }
       }
     });
     return categories.map(c => ({
@@ -77,7 +160,24 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
       where: { id },
       data: category,
       include: {
-        produtos: true
+        produtos: {
+          include: {
+            categoria: true,
+            estoques: true,
+            compras: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            },
+            vendas: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            }
+          }
+        }
       }
     });
     return {

@@ -10,60 +10,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// =====================
+// Usuários do Sistema
+// =====================
 model User {
   id       Int      @id @default(autoincrement())
   name     String
-  email    String   @unique
   password String
 
   @@map("user")
 }
 
-model Produto {
-  id          Int         @id @default(autoincrement())
-  nome        String
 
-  compras    ProdutoCompra[]
-  notaFiscal ProdutoNotaFiscal[]
+// =====================
+// Fornecedores de Insumos
+// =====================
+model Fornecedor {
+  id       Int      @id @default(autoincrement())
+  nome     String
+  cnpj     String?  @unique
+  telefone String?
+  email    String?
 
-  categoriaId   Int?
-  categoria   Category? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
+  compras  NotaFiscalCompra[]
 
-  estoques    ProdutoEstoque[]
-
-  @@map("produto")
+  @@map("fornecedor")
 }
 
-model ProdutoEstoque {
-  id        Int      @id @default(autoincrement())
-  preco     Float
-  quantidade Int
-  dataValidade DateTime
-  unidade    String @default("Unidade")
-  produtoId Int
-  estoqueId Int
-
-  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-
-  tipo String @default("Insumo")
-  
-  @@map("produto_estoque")
-  @@unique([produtoId, estoqueId])
-}
-
-model ProdutoCompra {
-  id         Int      @id @default(autoincrement())
-  produtoId  Int
-  quantidade Int
-  unidade    String @default("Unidade")
-  preco  Float
-  data DateTime @default(now())
-
-  produto    Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-
-  @@map("produto_compra")
-}
-
+// =====================
+// Categorias de Produto
+// =====================
 model Category {
   id    Int    @id @default(autoincrement())
   name  String @unique
@@ -73,29 +49,103 @@ model Category {
   @@map("categoria")
 }
 
+// =====================
+// Produtos (Insumos ou Cardápio)
+// =====================
+model Produto {
+  id          Int       @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  imagemUrl   String?
+  ativo       Boolean   @default(true)
+  tipo        TipoProduto
 
-model NotaFiscal {
-  id        Int      @id @default(autoincrement())
-  data      DateTime
-  total     Float
+  categoriaId Int?
+  categoria   Category? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
 
-  produtoId Int
-  produtos   ProdutoNotaFiscal[]
+  estoques    ProdutoEstoque[]
+  compras     ProdutoCompra[]
+  vendas      ProdutoVenda[]
 
-  @@map("nota_fiscal")
+  @@map("produto")
 }
 
-model ProdutoNotaFiscal {
+enum TipoProduto {
+  INSUMO
+  CARDAPIO
+}
+
+// =====================
+// Estoque
+// =====================
+model ProdutoEstoque {
+  id           Int      @id @default(autoincrement())
+  preco        Float
+  quantidade   Int
+  dataValidade DateTime?
+  unidade      String   @default("Unidade")
+
+  produtoId Int
+  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@map("produto_estoque")
+}
+
+// =====================
+// Nota Fiscal de Compras (entrada de estoque)
+// =====================
+model NotaFiscalCompra {
   id          Int      @id @default(autoincrement())
-  produtoId   Int
-  notaFiscalId Int
-  quantidade  Int
-  unidade     String @default("Unidade")
-  preco       Float
+  data        DateTime @default(now())
+  total       Float
 
-  produto     Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  notaFiscal  NotaFiscal @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)
+  fornecedorId Int
+  fornecedor   Fornecedor @relation(fields: [fornecedorId], references: [id], onDelete: Cascade)
 
-  @@map("produto_nota_fiscal")
-  @@unique([produtoId, notaFiscalId])
+  produtos ProdutoCompra[]
+
+  @@map("nota_fiscal_compra")
+}
+
+model ProdutoCompra {
+  id             Int      @id @default(autoincrement())
+  notaFiscalId   Int
+  produtoId      Int
+  quantidade     Int
+  unidade        String   @default("Unidade")
+  precoUnitario  Float
+
+  produto        Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  notaFiscal     NotaFiscalCompra @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)
+
+  @@map("produto_compra")
+  @@unique([notaFiscalId, produtoId])
+}
+
+// =====================
+// Nota Fiscal de Vendas (saída para cliente)
+// =====================
+model NotaFiscalVenda {
+  id        Int      @id @default(autoincrement())
+  data      DateTime @default(now())
+  total     Float
+
+  produtos  ProdutoVenda[]
+
+  @@map("nota_fiscal_venda")
+}
+
+model ProdutoVenda {
+  id             Int      @id @default(autoincrement())
+  notaFiscalId   Int
+  produtoId      Int
+  quantidade     Int
+  unidade        String   @default("Unidade")
+  precoUnitario  Float
+
+  produto        Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  notaFiscal     NotaFiscalVenda @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)
+
+  @@map("produto_venda")
+  @@unique([notaFiscalId, produtoId])
 }

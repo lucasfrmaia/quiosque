@@ -1,8 +1,16 @@
 export interface User {
   id: number;
   name: string;
-  email: string;
   password: string;
+}
+
+export interface Fornecedor {
+  id: number;
+  nome: string;
+  cnpj?: string | null;
+  telefone?: string | null;
+  email?: string | null;
+  compras?: NotaFiscalCompra[];
 }
 
 export interface Category {
@@ -11,53 +19,68 @@ export interface Category {
   produtos?: Produto[];
 }
 
+export type TipoProduto = 'INSUMO' | 'CARDAPIO';
+
 export interface Produto {
   id: number;
   nome: string;
+  descricao?: string | null;
+  imagemUrl?: string | null;
+  ativo: boolean;
+  tipo: TipoProduto;
   categoriaId?: number | null;
   categoria?: Category;
+  estoques?: ProdutoEstoque[];
   compras?: ProdutoCompra[];
-  notaFiscals?: ProdutoNotaFiscal[];
+  vendas?: ProdutoVenda[];
 }
 
 export interface ProdutoEstoque {
   id: number;
   preco: number;
   quantidade: number;
-  dataValidade: string;
+  dataValidade?: string | null;
   unidade: string;
   produtoId: number;
-  estoqueId: number;
-  tipo: string;
   produto?: Produto;
+}
+
+export interface NotaFiscalCompra {
+  id: number;
+  data: string;
+  total: number;
+  fornecedorId: number;
+  fornecedor?: Fornecedor;
+  produtos?: ProdutoCompra[];
 }
 
 export interface ProdutoCompra {
   id: number;
+  notaFiscalId: number;
   produtoId: number;
   quantidade: number;
   unidade: string;
-  preco: number;
-  data: string;
+  precoUnitario: number;
   produto?: Produto;
+  notaFiscal?: NotaFiscalCompra;
 }
 
-export interface NotaFiscal {
+export interface NotaFiscalVenda {
   id: number;
   data: string;
   total: number;
-  produtos?: ProdutoNotaFiscal[];
+  produtos?: ProdutoVenda[];
 }
 
-export interface ProdutoNotaFiscal {
+export interface ProdutoVenda {
   id: number;
-  produtoId: number;
   notaFiscalId: number;
+  produtoId: number;
   quantidade: number;
   unidade: string;
-  preco: number;
+  precoUnitario: number;
   produto?: Produto;
-  notaFiscal?: NotaFiscal;
+  notaFiscal?: NotaFiscalVenda;
 }
 
 export type SortDirection = 'asc' | 'desc';

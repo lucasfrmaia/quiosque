@@ -18,7 +18,6 @@ export class UserRepositoryPrisma implements IUserRepository {
     return users.map(u => ({
       id: u.id,
       name: u.name,
-      email: u.email,
       password: u.password
     }));
   }
@@ -30,7 +29,6 @@ export class UserRepositoryPrisma implements IUserRepository {
     return {
       id: createdUser.id,
       name: createdUser.name,
-      email: createdUser.email,
       password: createdUser.password
     };
   }
@@ -43,20 +41,6 @@ export class UserRepositoryPrisma implements IUserRepository {
     return {
       id: user.id,
       name: user.name,
-      email: user.email,
-      password: user.password
-    };
-  }
-
-  async findByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-    if (!user) return null;
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
       password: user.password
     };
   }
@@ -66,12 +50,11 @@ export class UserRepositoryPrisma implements IUserRepository {
     return users.map((user) => ({
       id: user.id,
       name: user.name,
-      email: user.email,
       password: user.password
     }));
   }
 
-  async update(id: number, user: Partial<User>): Promise<User> {
+  async update(id: number, user: Partial<Omit<User, 'id'>>): Promise<User> {
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data: user,
@@ -79,7 +62,6 @@ export class UserRepositoryPrisma implements IUserRepository {
     return {
       id: updatedUser.id,
       name: updatedUser.name,
-      email: updatedUser.email,
       password: updatedUser.password
     };
   }
