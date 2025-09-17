@@ -1,8 +1,8 @@
 'use client';
 
 import { FC, useState, useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { NotaFiscalCompra } from '@/types/interfaces/entities';
-import { Fornecedor } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -27,6 +27,7 @@ import { NotaFiscalCompraForm } from '@/app/_components/nota-fiscal-compra/NotaF
 import { useNotaFiscalCompra } from '@/app/_components/hooks/useNotaFiscalCompra';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { notaFiscalCompraSchema} from '../_components/validation'
 
 const NotasCompraPage: FC = () => {
   const {
@@ -45,24 +46,30 @@ const NotasCompraPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedNota, setSelectedNota] = useState<NotaFiscalCompra | null>(null);
-  const [formData, setFormData] = useState({
-    data: new Date().toISOString().split('T')[0],
-    fornecedorId: '',
-    total: '',
-    produtos: [] as Array<{
-      produtoId: string;
-      quantidade: string;
-      unidade: string;
-      precoUnitario: string;
-    }>,
+  const createForm = useForm<notaFiscalCompraSchema>({
+    defaultValues: {
+      data: new Date().toISOString().split('T')[0],
+      fornecedorId: '',
+      total: '',
+      produtos: [],
+    }
   });
 
-  const handleSubmitCreate = () => {
+  const editForm = useForm<notaFiscalCompraSchema>({
+    defaultValues: {
+      data: new Date().toISOString().split('T')[0],
+      fornecedorId: '',
+      total: '',
+      produtos: [],
+    }
+  });
+
+  const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      data: formData.data,
-      fornecedorId: Number(formData.fornecedorId),
-      total: Number(formData.total),
-      produtos: formData.produtos.map(p => ({
+      data: data.data,
+      fornecedorId: Number(data.fornecedorId),
+      total: Number(data.total),
+      produtos: data.produtos.map(p => ({
         notaFiscalId: 0,
         produtoId: Number(p.produtoId),
         quantidade: Number(p.quantidade),
@@ -71,44 +78,32 @@ const NotasCompraPage: FC = () => {
       })),
     });
     setIsCreateModalOpen(false);
-    setFormData({
-      data: new Date().toISOString().split('T')[0],
-      fornecedorId: '',
-      total: '',
-      produtos: [],
-    });
-  };
+    createForm.reset();
+  });
 
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedNota) return;
     handleEdit(selectedNota.id, {
-      data: formData.data,
-      fornecedorId: Number(formData.fornecedorId),
-      total: Number(formData.total),
+      data: data.data,
+      fornecedorId: Number(data.fornecedorId),
+      total: Number(data.total),
     });
     setIsEditModalOpen(false);
     setSelectedNota(null);
-    setFormData({
-      data: new Date().toISOString().split('T')[0],
-      fornecedorId: '',
-      total: '',
-      produtos: [],
-    });
-  };
+    editForm.reset();
+  });
 
   const openEditModal = (nota: NotaFiscalCompra) => {
     setSelectedNota(nota);
-    setFormData({
-      data: nota.data.split('T')[0],
-      fornecedorId: nota.fornecedorId.toString(),
-      total: nota.total.toString(),
-      produtos: nota.produtos?.map(p => ({
-        produtoId: p.produtoId.toString(),
-        quantidade: p.quantidade.toString(),
-        unidade: p.unidade,
-        precoUnitario: p.precoUnitario.toString(),
-      })) || [],
-    });
+    editForm.setValue('data', nota.data.split('T')[0]);
+    editForm.setValue('fornecedorId', nota.fornecedorId.toString());
+    editForm.setValue('total', nota.total.toString());
+    editForm.setValue('produtos', nota.produtos?.map(p => ({
+      produtoId: p.produtoId.toString(),
+      quantidade: p.quantidade.toString(),
+      unidade: p.unidade,
+      precoUnitario: p.precoUnitario.toString(),
+    })) || []);
     setIsEditModalOpen(true);
   };
 
@@ -222,16 +217,14 @@ const NotasCompraPage: FC = () => {
             <DialogTitle>Nova Nota Fiscal de Compra</DialogTitle>
             <DialogDescription>Crie uma nova nota fiscal de compra.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <NotaFiscalCompraForm 
-              formData={formData} 
-              onChange={setFormData} 
-              fornecedores={fornecedores}
-            />
-          </div>
+          <FormProvider {...createForm}>
+            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+              <NotaFiscalCompraForm fornecedores={fornecedores} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Criar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -243,17 +236,14 @@ const NotasCompraPage: FC = () => {
             <DialogTitle>Editar Nota Fiscal de Compra</DialogTitle>
             <DialogDescription>Edite a nota fiscal de compra.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <NotaFiscalCompraForm 
-              formData={formData} 
-              onChange={setFormData} 
-              fornecedores={fornecedores}
-              editing={true}
-            />
-          </div>
+          <FormProvider {...editForm}>
+            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+              <NotaFiscalCompraForm fornecedores={fornecedores} editing={true} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button onClick={handleSubmitEdit}>Salvar</Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Salvar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

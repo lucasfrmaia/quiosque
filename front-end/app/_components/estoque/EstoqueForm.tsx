@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -10,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Produto } from '@/types/interfaces/entities';
 
-interface EstoqueFormData {
+export interface EstoqueFormData {
   preco: string;
   quantidade: string;
   dataValidade: string;
@@ -19,19 +21,11 @@ interface EstoqueFormData {
 }
 
 interface EstoqueFormProps {
-  formData: EstoqueFormData;
-  onChange: (formData: EstoqueFormData) => void;
   produtos: Produto[];
 }
 
-export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos }) => {
-  const handleInputChange = (field: keyof EstoqueFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...formData, [field]: e.target.value });
-  };
-
-  const handleSelectChange = (field: keyof EstoqueFormData) => (value: string) => {
-    onChange({ ...formData, [field]: value });
-  };
+export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
+  const { control } = useFormContext<EstoqueFormData>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -39,18 +33,24 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
         <Label htmlFor="produtoId" className="text-right">
           Produto
         </Label>
-        <Select value={formData.produtoId} onValueChange={handleSelectChange('produtoId')}>
-          <SelectTrigger id="produtoId" className="col-span-3">
-            <SelectValue placeholder="Selecione um produto" />
-          </SelectTrigger>
-          <SelectContent>
-            {produtos.map((produto) => (
-              <SelectItem key={produto.id} value={produto.id.toString()}>
-                {produto.nome}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Controller
+          control={control}
+          name="produtoId"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="produtoId" className="col-span-3">
+                <SelectValue placeholder="Selecione um produto" />
+              </SelectTrigger>
+              <SelectContent>
+                {produtos.map((produto) => (
+                  <SelectItem key={produto.id} value={produto.id.toString()}>
+                    {produto.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
 
       <div className="grid grid-cols-4 items-center gap-4">
@@ -60,8 +60,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
         <Input
           id="preco"
           type="number"
-          value={formData.preco}
-          onChange={handleInputChange('preco')}
+          {...control.register('preco')}
           className="col-span-3"
           placeholder="Preço unitário"
           step="0.01"
@@ -75,8 +74,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
         <Input
           id="quantidade"
           type="number"
-          value={formData.quantidade}
-          onChange={handleInputChange('quantidade')}
+          {...control.register('quantidade')}
           className="col-span-3"
           placeholder="Quantidade em estoque"
         />
@@ -89,8 +87,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
         <Input
           id="dataValidade"
           type="date"
-          value={formData.dataValidade}
-          onChange={handleInputChange('dataValidade')}
+          {...control.register('dataValidade')}
           className="col-span-3"
         />
       </div>
@@ -102,8 +99,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ formData, onChange, produtos
         <Input
           id="unidade"
           type="text"
-          value={formData.unidade}
-          onChange={handleInputChange('unidade')}
+          {...control.register('unidade')}
           className="col-span-3"
           placeholder="Unidade (ex: Unidade, Kg)"
         />

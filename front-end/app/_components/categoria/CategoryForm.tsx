@@ -1,21 +1,17 @@
 import { FC } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UseFormRegister, FieldValues } from 'react-hook-form';
 
-interface CategoryFormData {
+export interface CategoryFormData {
   name: string;
 }
 
 interface CategoryFormProps {
-  formData: CategoryFormData;
-  onChange: (formData: CategoryFormData) => void;
+  register: UseFormRegister<CategoryFormData>;
 }
 
-export const CategoryForm: FC<CategoryFormProps> = ({ formData, onChange }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...formData, name: e.target.value });
-  };
-
+export const CategoryForm: FC<CategoryFormProps> = ({ register }) => {
   return (
     <div className="grid gap-4 py-4">
       <div className="grid grid-cols-4 items-center gap-4">
@@ -24,8 +20,7 @@ export const CategoryForm: FC<CategoryFormProps> = ({ formData, onChange }) => {
         </Label>
         <Input
           id="name"
-          value={formData.name}
-          onChange={handleChange}
+          {...register('name')}
           className="col-span-3"
           placeholder="Nome da categoria"
         />

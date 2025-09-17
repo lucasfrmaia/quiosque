@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UseFormRegister, FieldValues } from 'react-hook-form';
 
-interface FornecedorFormData {
+export interface FornecedorFormData {
   nome: string;
   cnpj: string;
   telefone: string;
@@ -10,16 +11,11 @@ interface FornecedorFormData {
 }
 
 interface FornecedorFormProps {
-  formData: FornecedorFormData;
-  onChange: (formData: FornecedorFormData) => void;
+  register: UseFormRegister<FornecedorFormData>;
   editing?: boolean;
 }
 
-export const FornecedorForm: FC<FornecedorFormProps> = ({ formData, onChange, editing = false }) => {
-  const handleInputChange = (field: keyof FornecedorFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...formData, [field]: e.target.value });
-  };
-
+export const FornecedorForm: FC<FornecedorFormProps> = ({ register, editing = false }) => {
   return (
     <div className="grid gap-4 py-4">
       <div className="grid grid-cols-4 items-center gap-4">
@@ -28,8 +24,7 @@ export const FornecedorForm: FC<FornecedorFormProps> = ({ formData, onChange, ed
         </Label>
         <Input
           id="nome"
-          value={formData.nome}
-          onChange={handleInputChange('nome')}
+          {...register('nome')}
           className="col-span-3"
           placeholder="Nome do fornecedor"
         />
@@ -41,8 +36,7 @@ export const FornecedorForm: FC<FornecedorFormProps> = ({ formData, onChange, ed
         </Label>
         <Input
           id="cnpj"
-          value={formData.cnpj}
-          onChange={handleInputChange('cnpj')}
+          {...register('cnpj')}
           className="col-span-3"
           placeholder="CNPJ (opcional)"
         />
@@ -54,8 +48,7 @@ export const FornecedorForm: FC<FornecedorFormProps> = ({ formData, onChange, ed
         </Label>
         <Input
           id="telefone"
-          value={formData.telefone}
-          onChange={handleInputChange('telefone')}
+          {...register('telefone')}
           className="col-span-3"
           placeholder="Telefone (opcional)"
         />
@@ -68,8 +61,7 @@ export const FornecedorForm: FC<FornecedorFormProps> = ({ formData, onChange, ed
         <Input
           id="email"
           type="email"
-          value={formData.email}
-          onChange={handleInputChange('email')}
+          {...register('email')}
           className="col-span-3"
           placeholder="Email (opcional)"
         />

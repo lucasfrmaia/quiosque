@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext as UseFormContextType } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -11,7 +13,7 @@ import {
 import { Produto } from '@/types/interfaces/entities';
 import { Category } from '@/types/interfaces/entities';
 
-interface ProdutoFormData {
+export interface ProdutoFormData {
   nome: string;
   descricao: string;
   imagemUrl: string;
@@ -21,20 +23,12 @@ interface ProdutoFormData {
 }
 
 interface ProdutoFormProps {
-  formData: ProdutoFormData;
-  onChange: (formData: ProdutoFormData) => void;
   categories: Category[];
   editing?: boolean;
 }
 
-export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categories, editing = false }) => {
-  const handleInputChange = (field: keyof ProdutoFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...formData, [field]: e.target.value });
-  };
-
-  const handleSelectChange = (value: string) => {
-    onChange({ ...formData, categoriaId: value });
-  };
+export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false }) => {
+  const { control } = useFormContext<ProdutoFormData>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -44,8 +38,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
         </Label>
         <Input
           id="nome"
-          value={formData.nome}
-          onChange={handleInputChange('nome')}
+          {...control.register('nome')}
           className="col-span-3"
           placeholder="Nome do produto"
         />
@@ -57,8 +50,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
         </Label>
         <Input
           id="descricao"
-          value={formData.descricao}
-          onChange={handleInputChange('descricao')}
+          {...control.register('descricao')}
           className="col-span-3"
           placeholder="Descrição do produto (opcional)"
         />
@@ -70,8 +62,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
         </Label>
         <Input
           id="imagemUrl"
-          value={formData.imagemUrl}
-          onChange={handleInputChange('imagemUrl')}
+          {...control.register('imagemUrl')}
           className="col-span-3"
           placeholder="URL da imagem (opcional)"
         />
@@ -81,48 +72,66 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ formData, onChange, categori
         <Label htmlFor="categoriaId" className="text-right">
           Categoria
         </Label>
-        <Select value={formData.categoriaId} onValueChange={handleSelectChange}>
-          <SelectTrigger id="categoriaId" className="col-span-3">
-            <SelectValue placeholder="Selecione uma categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id.toString()}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Controller
+          control={control}
+          name="categoriaId"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="categoriaId" className="col-span-3">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
   
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="ativo" className="text-right">
           Ativo
         </Label>
-        <Select value={formData.ativo} onValueChange={(value) => onChange({ ...formData, ativo: value })}>
-          <SelectTrigger id="ativo" className="col-span-3">
-            <SelectValue placeholder="Selecione se está ativo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="true">Sim</SelectItem>
-            <SelectItem value="false">Não</SelectItem>
-          </SelectContent>
-        </Select>
+        <Controller
+          control={control}
+          name="ativo"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger id="ativo" className="col-span-3">
+                <SelectValue placeholder="Selecione se está ativo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Sim</SelectItem>
+                <SelectItem value="false">Não</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
   
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="tipo" className="text-right">
           Tipo
         </Label>
-        <Select value={formData.tipo} onValueChange={(value) => onChange({ ...formData, tipo: value as 'INSUMO' | 'CARDAPIO' })}>
-          <SelectTrigger id="tipo" className="col-span-3">
-            <SelectValue placeholder="Selecione o tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="INSUMO">Insumo</SelectItem>
-            <SelectItem value="CARDAPIO">Cardápio</SelectItem>
-          </SelectContent>
-        </Select>
+        <Controller
+          control={control}
+          name="tipo"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={(value) => field.onChange(value as 'INSUMO' | 'CARDAPIO')}>
+              <SelectTrigger id="tipo" className="col-span-3">
+                <SelectValue placeholder="Selecione o tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="INSUMO">Insumo</SelectItem>
+                <SelectItem value="CARDAPIO">Cardápio</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Category } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +23,7 @@ import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { CategoryTable } from '@/app/_components/categoria/CategoryTable';
-import { CategoryForm } from '@/app/_components/categoria/CategoryForm';
+import { CategoryForm, CategoryFormData } from '@/app/_components/categoria/CategoryForm';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
@@ -42,31 +43,27 @@ const CategoriaPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [formData, setFormData] = useState({ name: '' });
+  
+  const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
+  const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
 
-  const handleSubmitCreate = () => {
-    handleCreate({
-      name: formData.name,
-    });
+  const handleSubmitCreate = createForm.handleSubmit((data) => {
+    handleCreate(data);
     setIsCreateModalOpen(false);
-    setFormData({ name: '' });
-  };
+    createForm.reset();
+  });
 
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedCategory) return;
-    handleEdit(selectedCategory.id, {
-      name: formData.name,
-    });
+    handleEdit(selectedCategory.id, data);
     setIsEditModalOpen(false);
     setSelectedCategory(null);
-    setFormData({ name: '' });
-  };
+    editForm.reset();
+  });
 
   const openEditModal = (category: Category) => {
     setSelectedCategory(category);
-    setFormData({
-      name: category.name,
-    });
+    editForm.setValue('name', category.name);
     setIsEditModalOpen(true);
   };
 
@@ -188,15 +185,12 @@ const CategoriaPage: FC = () => {
             <DialogTitle>Nova Categoria</DialogTitle>
             <DialogDescription>Crie uma nova categoria.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <CategoryForm 
-              formData={formData} 
-              onChange={setFormData} 
-            />
-          </div>
+          <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+            <CategoryForm register={createForm.register} />
+          </form>
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Criar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -208,15 +202,12 @@ const CategoriaPage: FC = () => {
             <DialogTitle>Editar Categoria</DialogTitle>
             <DialogDescription>Edite a categoria.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <CategoryForm 
-              formData={formData} 
-              onChange={setFormData} 
-            />
-          </div>
+          <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+            <CategoryForm register={editForm.register} />
+          </form>
           <DialogFooter>
-            <Button onClick={handleSubmitEdit}>Salvar</Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Salvar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

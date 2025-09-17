@@ -1,7 +1,9 @@
 'use client';
 
 import { FC, useState, useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { NotaFiscalVenda } from '@/types/interfaces/entities';
+import { NotaFiscalVendaFormData } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -43,22 +45,27 @@ const NotasVendasPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedNota, setSelectedNota] = useState<NotaFiscalVenda | null>(null);
-  const [formData, setFormData] = useState({
-    data: new Date().toISOString().split('T')[0],
-    total: '',
-    produtos: [] as Array<{
-      produtoId: string;
-      quantidade: string;
-      unidade: string;
-      precoUnitario: string;
-    }>,
+  const createForm = useForm<NotaFiscalVendaFormData>({
+    defaultValues: {
+      data: new Date().toISOString().split('T')[0],
+      total: '',
+      produtos: [],
+    }
   });
 
-  const handleSubmitCreate = () => {
+  const editForm = useForm<NotaFiscalVendaFormData>({
+    defaultValues: {
+      data: new Date().toISOString().split('T')[0],
+      total: '',
+      produtos: [],
+    }
+  });
+
+  const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      data: formData.data,
-      total: Number(formData.total),
-      produtos: formData.produtos.map(p => ({
+      data: data.data,
+      total: Number(data.total),
+      produtos: data.produtos.map((p: {produtoId: string, quantidade: string, unidade: string, precoUnitario: string}) => ({
         notaFiscalId: 0,
         produtoId: Number(p.produtoId),
         quantidade: Number(p.quantidade),
@@ -67,40 +74,30 @@ const NotasVendasPage: FC = () => {
       })),
     });
     setIsCreateModalOpen(false);
-    setFormData({
-      data: new Date().toISOString().split('T')[0],
-      total: '',
-      produtos: [],
-    });
-  };
+    createForm.reset();
+  });
 
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedNota) return;
     handleEdit(selectedNota.id, {
-      data: formData.data,
-      total: Number(formData.total),
+      data: data.data,
+      total: Number(data.total),
     });
     setIsEditModalOpen(false);
     setSelectedNota(null);
-    setFormData({
-      data: new Date().toISOString().split('T')[0],
-      total: '',
-      produtos: [],
-    });
-  };
+    editForm.reset();
+  });
 
   const openEditModal = (nota: NotaFiscalVenda) => {
     setSelectedNota(nota);
-    setFormData({
-      data: nota.data.split('T')[0],
-      total: nota.total.toString(),
-      produtos: nota.produtos?.map(p => ({
-        produtoId: p.produtoId.toString(),
-        quantidade: p.quantidade.toString(),
-        unidade: p.unidade,
-        precoUnitario: p.precoUnitario.toString(),
-      })) || [],
-    });
+    editForm.setValue('data', nota.data.split('T')[0]);
+    editForm.setValue('total', nota.total.toString());
+    editForm.setValue('produtos', nota.produtos?.map(p => ({
+      produtoId: p.produtoId.toString(),
+      quantidade: p.quantidade.toString(),
+      unidade: p.unidade,
+      precoUnitario: p.precoUnitario.toString(),
+    })) || []);
     setIsEditModalOpen(true);
   };
 
@@ -214,14 +211,13 @@ const NotasVendasPage: FC = () => {
             <DialogTitle>Nova Nota Fiscal de Venda</DialogTitle>
             <DialogDescription>Crie uma nova nota fiscal de venda.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <NotaFiscalVendaForm 
-              formData={formData} 
-              onChange={setFormData} 
-            />
-          </div>
+          <FormProvider {...createForm}>
+            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+              <NotaFiscalVendaForm />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
+            <Button type="submit">Criar</Button>
             <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
@@ -234,15 +230,13 @@ const NotasVendasPage: FC = () => {
             <DialogTitle>Editar Nota Fiscal de Venda</DialogTitle>
             <DialogDescription>Edite a nota fiscal de venda.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <NotaFiscalVendaForm 
-              formData={formData} 
-              onChange={setFormData} 
-              editing={true}
-            />
-          </div>
+          <FormProvider {...editForm}>
+            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+              <NotaFiscalVendaForm editing={true} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button onClick={handleSubmitEdit}>Salvar</Button>
+            <Button type="submit">Salvar</Button>
             <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>

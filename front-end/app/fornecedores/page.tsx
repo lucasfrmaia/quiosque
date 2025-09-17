@@ -1,6 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Fornecedor } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +22,7 @@ import {
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
-import { FornecedorForm } from '@/app/_components/fornecedor/FornecedorForm';
+import { FornecedorForm, FornecedorFormData } from '@/app/_components/fornecedor/FornecedorForm';
 import { FornecedorTable } from '@/app/_components/fornecedor/FornecedorTable';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
@@ -43,40 +44,40 @@ const FornecedoresPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFornecedor, setSelectedFornecedor] = useState<Fornecedor | null>(null);
-  const [formData, setFormData] = useState({ nome: '', cnpj: '', telefone: '', email: '' });
+  const createForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
 
-  const handleSubmitCreate = () => {
+  const editForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
+
+  const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      nome: formData.nome,
-      cnpj: formData.cnpj || null,
-      telefone: formData.telefone || null,
-      email: formData.email || null,
+      nome: data.nome,
+      cnpj: data.cnpj || null,
+      telefone: data.telefone || null,
+      email: data.email || null,
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', cnpj: '', telefone: '', email: '' });
-  };
+    createForm.reset();
+  });
 
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedFornecedor) return;
     handleEdit(selectedFornecedor.id, {
-      nome: formData.nome,
-      cnpj: formData.cnpj || null,
-      telefone: formData.telefone || null,
-      email: formData.email || null,
+      nome: data.nome,
+      cnpj: data.cnpj || null,
+      telefone: data.telefone || null,
+      email: data.email || null,
     });
     setIsEditModalOpen(false);
     setSelectedFornecedor(null);
-    setFormData({ nome: '', cnpj: '', telefone: '', email: '' });
-  };
+    editForm.reset();
+  });
 
   const openEditModal = (fornecedor: Fornecedor) => {
     setSelectedFornecedor(fornecedor);
-    setFormData({
-      nome: fornecedor.nome,
-      cnpj: fornecedor.cnpj || '',
-      telefone: fornecedor.telefone || '',
-      email: fornecedor.email || '',
-    });
+    editForm.setValue('nome', fornecedor.nome);
+    editForm.setValue('cnpj', fornecedor.cnpj || '');
+    editForm.setValue('telefone', fornecedor.telefone || '');
+    editForm.setValue('email', fornecedor.email || '');
     setIsEditModalOpen(true);
   };
 
@@ -187,15 +188,12 @@ const FornecedoresPage: FC = () => {
             <DialogTitle>Novo Fornecedor</DialogTitle>
             <DialogDescription>Crie um novo fornecedor.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <FornecedorForm 
-              formData={formData} 
-              onChange={setFormData} 
-            />
-          </div>
+          <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+            <FornecedorForm register={createForm.register} />
+          </form>
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Criar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -207,16 +205,12 @@ const FornecedoresPage: FC = () => {
             <DialogTitle>Editar Fornecedor</DialogTitle>
             <DialogDescription>Edite o fornecedor.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <FornecedorForm 
-              formData={formData} 
-              onChange={setFormData} 
-              editing={true}
-            />
-          </div>
+          <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+            <FornecedorForm register={editForm.register} editing={true} />
+          </form>
           <DialogFooter>
-            <Button onClick={handleSubmitEdit}>Salvar</Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Salvar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

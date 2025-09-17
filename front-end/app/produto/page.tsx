@@ -1,6 +1,7 @@
 'use client';
 
 import { FC, useState, useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { Produto } from '@/types/interfaces/entities';
 import { Category } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { ProdutoTable } from '@/app/_components/produto/ProdutoTable';
-import { ProdutoForm } from '@/app/_components/produto/ProdutoForm';
+import { ProdutoForm, ProdutoFormData } from '@/app/_components/produto/ProdutoForm';
 import { useProduto } from '@/app/_components/hooks/useProduto';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
@@ -45,46 +46,50 @@ const ProdutoPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
-  const [formData, setFormData] = useState({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO' as 'INSUMO' | 'CARDAPIO', descricao: '', imagemUrl: '' });
+  const createForm = useForm<ProdutoFormData>({
+    defaultValues: { nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' }
+  });
 
-  const handleSubmitCreate = () => {
+  const editForm = useForm<ProdutoFormData>({
+    defaultValues: { nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' }
+  });
+
+  const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      nome: formData.nome,
-      descricao: formData.descricao || null,
-      imagemUrl: formData.imagemUrl || null,
-      ativo: formData.ativo === 'true',
-      tipo: formData.tipo,
-      categoriaId: Number(formData.categoriaId),
+      nome: data.nome,
+      descricao: data.descricao || null,
+      imagemUrl: data.imagemUrl || null,
+      ativo: data.ativo === 'true',
+      tipo: data.tipo,
+      categoriaId: Number(data.categoriaId),
     });
     setIsCreateModalOpen(false);
-    setFormData({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' });
-  };
+    createForm.reset();
+  });
 
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedProduto) return;
     handleEdit(selectedProduto.id, {
-      nome: formData.nome,
-      descricao: formData.descricao || null,
-      imagemUrl: formData.imagemUrl || null,
-      ativo: formData.ativo === 'true',
-      tipo: formData.tipo,
-      categoriaId: Number(formData.categoriaId),
+      nome: data.nome,
+      descricao: data.descricao || null,
+      imagemUrl: data.imagemUrl || null,
+      ativo: data.ativo === 'true',
+      tipo: data.tipo,
+      categoriaId: Number(data.categoriaId),
     });
     setIsEditModalOpen(false);
     setSelectedProduto(null);
-    setFormData({ nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' });
-  };
+    editForm.reset();
+  });
 
   const openEditModal = (produto: Produto) => {
     setSelectedProduto(produto);
-    setFormData({
-      nome: produto.nome,
-      categoriaId: produto.categoriaId?.toString() || '',
-      ativo: produto.ativo.toString(),
-      tipo: produto.tipo,
-      descricao: produto.descricao || '',
-      imagemUrl: produto.imagemUrl || '',
-    });
+    editForm.setValue('nome', produto.nome);
+    editForm.setValue('categoriaId', produto.categoriaId?.toString() || '');
+    editForm.setValue('ativo', produto.ativo.toString());
+    editForm.setValue('tipo', produto.tipo);
+    editForm.setValue('descricao', produto.descricao || '');
+    editForm.setValue('imagemUrl', produto.imagemUrl || '');
     setIsEditModalOpen(true);
   };
 
@@ -205,16 +210,14 @@ const ProdutoPage: FC = () => {
             <DialogTitle>Novo Produto</DialogTitle>
             <DialogDescription>Crie um novo produto.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <ProdutoForm 
-              formData={formData} 
-              onChange={setFormData} 
-              categories={categories}
-            />
-          </div>
+          <FormProvider {...createForm}>
+            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+              <ProdutoForm categories={categories} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Criar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -226,17 +229,14 @@ const ProdutoPage: FC = () => {
             <DialogTitle>Editar Produto</DialogTitle>
             <DialogDescription>Edite o produto.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <ProdutoForm 
-              formData={formData} 
-              onChange={setFormData} 
-              categories={categories}
-              editing={true}
-            />
-          </div>
+          <FormProvider {...editForm}>
+            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+              <ProdutoForm categories={categories} editing={true} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button onClick={handleSubmitEdit}>Salvar</Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Salvar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,6 +1,7 @@
 'use client';
 
 import { FC, useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { ProdutoEstoque, FilterValues } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +24,7 @@ import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';
 import { PageHeader } from '@/app/_components/common/PageHeader';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
-import { EstoqueForm } from '@/app/_components/estoque/EstoqueForm';
+import { EstoqueForm, EstoqueFormData } from '@/app/_components/estoque/EstoqueForm';
 import { EstoqueTable } from '@/app/_components/estoque/EstoqueTable';
 import { useEstoque } from '@/app/_components/hooks/useEstoque';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
@@ -46,49 +47,59 @@ const EstoquePage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ProdutoEstoque | null>(null);
-  const [formData, setFormData] = useState({
-    preco: '',
-    quantidade: '',
-    dataValidade: '',
-    unidade: '',
-    produtoId: '',
+  const createForm = useForm<EstoqueFormData>({
+    defaultValues: {
+      preco: '',
+      quantidade: '',
+      dataValidade: '',
+      unidade: '',
+      produtoId: '',
+    }
   });
 
-  const handleSubmitCreate = () => {
+  const editForm = useForm<EstoqueFormData>({
+    defaultValues: {
+      preco: '',
+      quantidade: '',
+      dataValidade: '',
+      unidade: '',
+      produtoId: '',
+    }
+  });
+
+  const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      preco: Number(formData.preco),
-      quantidade: Number(formData.quantidade),
-      dataValidade: formData.dataValidade,
-      unidade: formData.unidade,
-      produtoId: Number(formData.produtoId),
+      preco: Number(data.preco),
+      quantidade: Number(data.quantidade),
+      dataValidade: data.dataValidade,
+      unidade: data.unidade,
+      produtoId: Number(data.produtoId),
     });
     setIsCreateModalOpen(false);
-    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '' });
-  };
+    createForm.reset();
+  });
 
-  const handleSubmitEdit = () => {
+  const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedItem) return;
     handleEdit(selectedItem.id, {
-      preco: Number(formData.preco),
-      quantidade: Number(formData.quantidade),
-      dataValidade: formData.dataValidade,
-      unidade: formData.unidade,
-      produtoId: Number(formData.produtoId),
+      preco: Number(data.preco),
+      quantidade: Number(data.quantidade),
+      dataValidade: data.dataValidade,
+      unidade: data.unidade,
+      produtoId: Number(data.produtoId),
     });
     setIsEditModalOpen(false);
     setSelectedItem(null);
-    setFormData({ preco: '', quantidade: '', dataValidade: '', unidade: '', produtoId: '' });
-  };
+    editForm.reset();
+  });
 
   const openEditModal = (item: ProdutoEstoque) => {
     setSelectedItem(item);
-    setFormData({
-      preco: item.preco.toString(),
-      quantidade: item.quantidade.toString(),
-      dataValidade: item.dataValidade || '',
-      unidade: item.unidade,
-      produtoId: item.produtoId.toString(),
-    });
+    editForm.setValue('preco', item.preco.toString());
+    editForm.setValue('quantidade', item.quantidade.toString());
+    editForm.setValue('dataValidade', item.dataValidade || '');
+    editForm.setValue('unidade', item.unidade);
+    editForm.setValue('produtoId', item.produtoId.toString());
     setIsEditModalOpen(true);
   };
 
@@ -256,16 +267,14 @@ const EstoquePage: FC = () => {
             <DialogTitle>Novo Item de Estoque</DialogTitle>
             <DialogDescription>Crie um novo item de estoque.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <EstoqueForm 
-              formData={formData} 
-              onChange={setFormData} 
-              produtos={produtos}
-            />
-          </div>
+          <FormProvider {...createForm}>
+            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+              <EstoqueForm produtos={produtos} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button type="submit" onClick={handleSubmitCreate}>Criar</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Criar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -277,16 +286,14 @@ const EstoquePage: FC = () => {
             <DialogTitle>Editar Item de Estoque</DialogTitle>
             <DialogDescription>Edite o item de estoque.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <EstoqueForm 
-              formData={formData} 
-              onChange={setFormData} 
-              produtos={produtos}
-            />
-          </div>
+          <FormProvider {...editForm}>
+            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+              <EstoqueForm produtos={produtos} />
+            </form>
+          </FormProvider>
           <DialogFooter>
-            <Button onClick={handleSubmitEdit}>Salvar</Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+            <Button type="submit">Salvar</Button>
+            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
