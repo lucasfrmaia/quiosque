@@ -1,30 +1,28 @@
 import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Category, FilterValues, SortDirection } from '@/types/interfaces/entities';
 
-export const useCategory = () => {
+export const useCategory = (filters: FilterValues) => {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
-  const filterValues = useMemo<FilterValues>(() => ({
-    search: searchParams.get('search') || '',
-    quantidadeMin: searchParams.get('quantidadeMin') || '',
-    quantidadeMax: searchParams.get('quantidadeMax') || '',
-    precoMin: searchParams.get('precoMin') || '',
-    precoMax: searchParams.get('precoMax') || '',
-    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
-    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
-    sortField: searchParams.get('sortField') || 'name',
-    sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
-  }), [searchParams]);
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('page', filters.currentPage.toString());
+    params.set('limit', filters.itemsPerPage.toString());
+    params.set('sortField', filters.sortField);
+    params.set('sortDirection', filters.sortDirection);
+    if (filters.search) params.set('search', filters.search);
+    if (filters.quantidadeMin) params.set('quantidadeMin', filters.quantidadeMin);
+    if (filters.quantidadeMax) params.set('quantidadeMax', filters.quantidadeMax);
+    if (filters.precoMin) params.set('precoMin', filters.precoMin);
+    if (filters.precoMax) params.set('precoMax', filters.precoMax);
+    return params.toString();
+  }, [filters]);
 
-  const { data: categories = [] } = useQuery<Category[]>({
-    queryKey: ['categories'],
+  const { data: response, isLoading, error } = useQuery<{ data: Category[]; total?: number }>({
+    queryKey: ['categories', queryParams],
     queryFn: async () => {
-      const response = await fetch('/api/category/findAll');
+      const response = await fetch(`/api/category/findPerPage?${queryParams}`);
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
       }
@@ -32,73 +30,12 @@ export const useCategory = () => {
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch categories');
       }
-      return result.data;
+      return result;
     },
   });
 
+  const categories = response?.data || [];
 
-  const filteredCategories = useMemo(() => {
-    let filtered = [...(Array.isArray(categories) ? categories : [])];
-
-    if (filterValues.search) {
-      filtered = filtered.filter(c => c.name.toLowerCase().includes(filterValues.search.toLowerCase()));
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      const aValue = (a as any)[filterValues.sortField];
-      const bValue = (b as any)[filterValues.sortField];
-      if (aValue < bValue) return filterValues.sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return filterValues.sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return filtered;
-  }, [categories, filterValues]);
-
-  const paginatedCategories = useMemo(() => {
-    const startIndex = (filterValues.currentPage - 1) * filterValues.itemsPerPage;
-    const endIndex = startIndex + filterValues.itemsPerPage;
-    return filteredCategories.slice(startIndex, endIndex);
-  }, [filteredCategories, filterValues]);
-
-  const handleFilter = useCallback((newFilters: Partial<FilterValues>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const isPaginationChange = 'currentPage' in newFilters || 'itemsPerPage' in newFilters;
-
-    Object.entries(newFilters).forEach(([key, value]) => {
-      if (value === '' || value === undefined || value === null) {
-        params.delete(key);
-      } else {
-        params.set(key, String(value));
-      }
-    });
-
-    if (!isPaginationChange) {
-      params.set('currentPage', '1');
-    }
-
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [searchParams, router, pathname]);
-
-  const handleSort = useCallback((field: string) => {
-    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('sortField', field);
-    params.set('sortDirection', direction);
-    params.set('currentPage', '1');
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [filterValues.sortField, filterValues.sortDirection, searchParams, router, pathname]);
-
-
-  const handleReset = useCallback(() => {
-    const params = new URLSearchParams();
-    params.set('currentPage', '1');
-    params.set('itemsPerPage', '10');
-    params.set('sortField', 'name');
-    params.set('sortDirection', 'asc');
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [router, pathname]);
 
   const createMutation = useMutation({
     mutationFn: async (category: Omit<Category, 'id' | 'produtos'>) => {
@@ -175,12 +112,10 @@ export const useCategory = () => {
 
   return {
     categories,
-    paginatedCategories,
-    filteredCategories,
-    filterValues,
-    handleSort,
-    handleFilter,
-    handleReset,
+    total: response?.total || 0,
+    filters,
+    isLoading,
+    error,
     handleCreate,
     handleEdit,
     handleDelete,

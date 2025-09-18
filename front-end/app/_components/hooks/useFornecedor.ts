@@ -1,30 +1,28 @@
 import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Fornecedor, FilterValues, SortDirection } from '@/types/interfaces/entities';
 
-export const useFornecedor = () => {
+export const useFornecedor = (filters: FilterValues) => {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
-  const filterValues = useMemo<FilterValues>(() => ({
-    search: searchParams.get('search') || '',
-    quantidadeMin: searchParams.get('quantidadeMin') || '',
-    quantidadeMax: searchParams.get('quantidadeMax') || '',
-    precoMin: searchParams.get('precoMin') || '',
-    precoMax: searchParams.get('precoMax') || '',
-    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
-    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
-    sortField: searchParams.get('sortField') || 'nome',
-    sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
-  }), [searchParams]);
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('page', '1');
+    params.set('limit', filters.itemsPerPage.toString());
+    params.set('sortField', filters.sortField);
+    params.set('sortDirection', filters.sortDirection);
+    if (filters.search) params.set('search', filters.search);
+    if (filters.quantidadeMin) params.set('quantidadeMin', filters.quantidadeMin);
+    if (filters.quantidadeMax) params.set('quantidadeMax', filters.quantidadeMax);
+    if (filters.precoMin) params.set('precoMin', filters.precoMin);
+    if (filters.precoMax) params.set('precoMax', filters.precoMax);
+    return params.toString();
+  }, [filters]);
 
-  const { data: fornecedores = [] } = useQuery<Fornecedor[]>({
-    queryKey: ['fornecedores'],
+  const { data: response, isLoading, error } = useQuery<{ data: Fornecedor[]; total?: number }>({
+    queryKey: ['fornecedores', queryParams],
     queryFn: async () => {
-      const response = await fetch('/api/fornecedor/findAll');
+      const response = await fetch(`/api/fornecedor/findPerPage?${queryParams}`);
       if (!response.ok) {
         throw new Error('Failed to fetch fornecedores');
       }
@@ -32,58 +30,11 @@ export const useFornecedor = () => {
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch fornecedores');
       }
-      return result.data;
+      return result;
     },
   });
 
-  const filteredFornecedores = useMemo(() => {
-    let filtered = [...(Array.isArray(fornecedores) ? fornecedores : [])];
-
-    if (filterValues.search) {
-      filtered = filtered.filter(f => f.nome.toLowerCase().includes(filterValues.search.toLowerCase()));
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      const aValue = (a as any)[filterValues.sortField];
-      const bValue = (b as any)[filterValues.sortField];
-      if (aValue < bValue) return filterValues.sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return filterValues.sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return filtered;
-  }, [fornecedores, filterValues]);
-
-  const paginatedFornecedores = useMemo(() => {
-    const startIndex = (filterValues.currentPage - 1) * filterValues.itemsPerPage;
-    const endIndex = startIndex + filterValues.itemsPerPage;
-    return filteredFornecedores.slice(startIndex, endIndex);
-  }, [filteredFornecedores, filterValues]);
-
-  const handleFilter = useCallback((newFilters: Partial<FilterValues>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const isPaginationChange = 'currentPage' in newFilters || 'itemsPerPage' in newFilters;
-
-    Object.entries(newFilters).forEach(([key, value]) => {
-      if (value === '' || value === undefined || value === null) {
-        params.delete(key);
-      } else {
-        params.set(key, String(value));
-      }
-    });
-
-    if (!isPaginationChange) {
-      params.set('currentPage', '1');
-    }
-
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [searchParams, router, pathname]);
-
-  const handleSort = useCallback((field: string) => {
-    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
-    handleFilter({ sortField: field, sortDirection: direction, currentPage: 1 });
-  }, [filterValues.sortField, filterValues.sortDirection, handleFilter]);
+  const fornecedores = response?.data || [];
 
   const createMutation = useMutation({
     mutationFn: async (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
@@ -158,23 +109,11 @@ export const useFornecedor = () => {
     deleteMutation.mutate(id);
   };
 
-  const handleReset = useCallback(() => {
-    const params = new URLSearchParams();
-    params.set('currentPage', '1');
-    params.set('itemsPerPage', '10');
-    params.set('sortField', 'nome');
-    params.set('sortDirection', 'asc');
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [router, pathname]);
-
   return {
     fornecedores,
-    paginatedFornecedores,
-    filteredFornecedores,
-    filterValues,
-    handleSort,
-    handleFilter,
-    handleReset,
+    filters,
+    isLoading,
+    error,
     handleCreate,
     handleEdit,
     handleDelete,

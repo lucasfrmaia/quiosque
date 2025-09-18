@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ProdutoEstoque, FilterValues, SortDirection, Produto } from '@/types/interfaces/entities';
 
 type FilterState = FilterValues;
@@ -8,39 +7,36 @@ type FilterState = FilterValues;
 interface UseEstoqueReturn {
   estoque: ProdutoEstoque[];
   produtos: Produto[];
-  filteredEstoque: ProdutoEstoque[];
-  paginatedEstoque: ProdutoEstoque[];
-  filterValues: FilterState;
-  handleSort: (field: string) => void;
-  handleFilter: (updates: Partial<FilterState>) => void;
-  handleReset: () => void;
+  filters: FilterState;
+  isLoading: boolean;
+  error: unknown;
+  total: number;
   handleCreate: (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => void;
   handleEdit: (id: number, updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>) => void;
   handleDelete: (id: number) => void;
 }
 
-export const useEstoque = (): UseEstoqueReturn => {
+export const useEstoque = (filters: FilterState): UseEstoqueReturn => {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
 
-  const filterValues = useMemo<FilterState>(() => ({
-    search: searchParams.get('search') || '',
-    quantidadeMin: searchParams.get('quantidadeMin') || '',
-    quantidadeMax: searchParams.get('quantidadeMax') || '',
-    precoMin: searchParams.get('precoMin') || '',
-    precoMax: searchParams.get('precoMax') || '',
-    currentPage: parseInt(searchParams.get('currentPage') || '1', 10),
-    itemsPerPage: parseInt(searchParams.get('itemsPerPage') || '10', 10),
-    sortField: searchParams.get('sortField') || 'nome',
-    sortDirection: (searchParams.get('sortDirection') || 'asc') as SortDirection,
-  }), [searchParams]);
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('page', filters.currentPage.toString());
+    params.set('limit', filters.itemsPerPage.toString());
+    params.set('sortField', filters.sortField);
+    params.set('sortDirection', filters.sortDirection);
+    if (filters.search) params.set('search', filters.search);
+    if (filters.quantidadeMin) params.set('quantidadeMin', filters.quantidadeMin);
+    if (filters.quantidadeMax) params.set('quantidadeMax', filters.quantidadeMax);
+    if (filters.precoMin) params.set('precoMin', filters.precoMin);
+    if (filters.precoMax) params.set('precoMax', filters.precoMax);
+    return params.toString();
+  }, [filters]);
 
-  const { data: estoque = [], isLoading, error } = useQuery<ProdutoEstoque[]>({
-    queryKey: ['estoque'],
+  const { data: response, isLoading, error } = useQuery<{ data: ProdutoEstoque[]; total?: number }>({
+    queryKey: ['estoque', queryParams],
     queryFn: async () => {
-      const response = await fetch('/api/estoque/findAll');
+      const response = await fetch(`/api/estoque/findPerPage?${queryParams}`);
       if (!response.ok) {
         throw new Error('Failed to fetch estoque');
       }
@@ -48,14 +44,21 @@ export const useEstoque = (): UseEstoqueReturn => {
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch estoque');
       }
-      return result.data;
+      return result;
     },
   });
 
-  const { data: produtos = [] } = useQuery<Produto[]>({
-    queryKey: ['produtos'],
+  const estoque = response?.data || [];
+
+  const produtosQueryParams = useMemo(() => new URLSearchParams({
+    page: '1',
+    limit: '1000',
+  }).toString(), []);
+
+  const { data: produtosResponse, isLoading: isLoadingProdutos, error: errorProdutos } = useQuery<{ data: Produto[]; total?: number }>({
+    queryKey: ['produtos', produtosQueryParams],
     queryFn: async () => {
-      const response = await fetch('/api/produto/findAll');
+      const response = await fetch(`/api/produto/findPerPage?${produtosQueryParams}`);
       if (!response.ok) {
         throw new Error('Failed to fetch produtos');
       }
@@ -63,47 +66,11 @@ export const useEstoque = (): UseEstoqueReturn => {
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch produtos');
       }
-      return result.data;
+      return result;
     },
   });
 
-  const handleFilter = useCallback((updates: Partial<FilterState>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const isPaginationChange = 'currentPage' in updates || 'itemsPerPage' in updates;
-
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === '' || value === undefined || value === null) {
-        params.delete(key);
-      } else {
-        params.set(key, String(value));
-      }
-    });
-
-    if (!isPaginationChange) {
-      params.set('currentPage', '1');
-    }
-
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [searchParams, router, pathname]);
-
-
-  const handleReset = useCallback(() => {
-    const params = new URLSearchParams();
-    params.set('currentPage', '1');
-    params.set('itemsPerPage', '10');
-    params.set('sortField', 'nome');
-    params.set('sortDirection', 'asc');
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [router, pathname]);
-
-  const handleSort = useCallback((field: string) => {
-    const direction = filterValues.sortField === field && filterValues.sortDirection === 'asc' ? 'desc' : 'asc';
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('sortField', field);
-    params.set('sortDirection', direction);
-    params.set('currentPage', '1');
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [filterValues.sortField, filterValues.sortDirection, searchParams, router, pathname]);
+  const produtos = produtosResponse?.data || [];
 
   const createMutation = useMutation({
     mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
@@ -178,48 +145,13 @@ export const useEstoque = (): UseEstoqueReturn => {
     deleteMutation.mutate(id);
   };
 
-  const filteredEstoque = useMemo(() => estoque.filter(item => {
-    const nome = item.produto?.nome || '';
-    const matchesSearch = nome.toLowerCase().includes(filterValues.search.toLowerCase());
-    const matchesQuantidadeMin = !filterValues.quantidadeMin || item.quantidade >= Number(filterValues.quantidadeMin);
-    const matchesQuantidadeMax = !filterValues.quantidadeMax || item.quantidade <= Number(filterValues.quantidadeMax);
-    const matchesPrecoMin = !filterValues.precoMin || item.preco >= Number(filterValues.precoMin);
-    const matchesPrecoMax = !filterValues.precoMax || item.preco <= Number(filterValues.precoMax);
-
-    return matchesSearch && matchesQuantidadeMin && matchesQuantidadeMax && matchesPrecoMin && matchesPrecoMax;
-  }).sort((a, b) => {
-    const direction = filterValues.sortDirection === 'asc' ? 1 : -1;
-    if (filterValues.sortField === 'nome') {
-      const nomeA = a.produto?.nome || '';
-      const nomeB = b.produto?.nome || '';
-      return nomeA.localeCompare(nomeB) * direction;
-    }
-    if (filterValues.sortField === 'preco') {
-      return (a.preco - b.preco) * direction;
-    }
-    if (filterValues.sortField === 'quantidade') {
-      return (a.quantidade - b.quantidade) * direction;
-    }
-    if (filterValues.sortField === 'produtoId') {
-      return (a.produtoId - b.produtoId) * direction;
-    }
-    return 0;
-  }), [estoque, filterValues]);
-
-  const paginatedEstoque = useMemo(() => filteredEstoque.slice(
-    (filterValues.currentPage - 1) * filterValues.itemsPerPage,
-    filterValues.currentPage * filterValues.itemsPerPage
-  ), [filteredEstoque, filterValues]);
-
   return {
     estoque,
+    total: response?.total || 0,
     produtos,
-    filteredEstoque,
-    paginatedEstoque,
-    filterValues,
-    handleSort,
-    handleFilter,
-    handleReset,
+    filters,
+    isLoading,
+    error,
     handleCreate,
     handleEdit,
     handleDelete,

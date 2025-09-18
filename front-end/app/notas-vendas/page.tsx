@@ -25,7 +25,7 @@ import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { NotaFiscalVendaTable } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaTable';
 import { NotaFiscalVendaForm } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
-import { useNotas } from '@/app/_components/hooks/useNotas';
+import { useNotasFiscaisVendas } from '@/app/_components/hooks/useNotasFiscalVendas';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
 const NotasVendasPage: FC = () => {
@@ -39,7 +39,7 @@ const NotasVendasPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-  } = useNotas();
+  } = useNotasFiscaisVendas();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
