@@ -7,7 +7,7 @@ export const useFornecedor = (filters: FilterValues) => {
 
   const queryParams = useMemo(() => {
     const params = new URLSearchParams();
-    params.set('page', '1');
+    params.set('page', filters.currentPage.toString());
     params.set('limit', filters.itemsPerPage.toString());
     params.set('sortField', filters.sortField);
     params.set('sortDirection', filters.sortDirection);
@@ -111,6 +111,7 @@ export const useFornecedor = (filters: FilterValues) => {
 
   return {
     fornecedores,
+    total: response?.total || 0,
     filters,
     isLoading,
     error,

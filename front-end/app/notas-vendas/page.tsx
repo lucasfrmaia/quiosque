@@ -1,6 +1,8 @@
 'use client';
 
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { FilterValues, SortDirection } from '@/types/interfaces/entities';
 import { useForm, FormProvider } from 'react-hook-form';
 import { NotaFiscalVenda } from '@/types/interfaces/entities';
 import { NotaFiscalVendaFormData } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
@@ -29,17 +31,45 @@ import { useNotasFiscaisVendas } from '@/app/_components/hooks/useNotasFiscalVen
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 
 const NotasVendasPage: FC = () => {
-  const {
-    notas,
-    filteredNotas,
-    paginatedNotas,
-    filterValues,
-    handleSort,
-    handleFilter,
-    handleCreate,
-    handleEdit,
-    handleDelete,
-  } = useNotasFiscaisVendas();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const defaultFilters: FilterValues = {
+    currentPage: 1,
+    itemsPerPage: 10,
+    sortField: 'data',
+    sortDirection: 'desc' as SortDirection,
+    search: '',
+    quantidadeMin: '',
+    quantidadeMax: '',
+    precoMin: '',
+    precoMax: '',
+  };
+
+  const getFiltersFromParams = useCallback((): FilterValues => {
+    const params = new URLSearchParams(searchParams.toString());
+    return {
+      ...defaultFilters,
+      currentPage: parseInt(params.get('page') || defaultFilters.currentPage.toString()) || defaultFilters.currentPage,
+      itemsPerPage: parseInt(params.get('limit') || defaultFilters.itemsPerPage.toString()) || defaultFilters.itemsPerPage,
+      sortField: params.get('sortField') || defaultFilters.sortField,
+      sortDirection: (params.get('sortDirection') as SortDirection) || defaultFilters.sortDirection,
+      search: params.get('search') || defaultFilters.search,
+      quantidadeMin: params.get('quantidadeMin') || defaultFilters.quantidadeMin,
+      quantidadeMax: params.get('quantidadeMax') || defaultFilters.quantidadeMax,
+      precoMin: params.get('precoMin') || defaultFilters.precoMin,
+      precoMax: params.get('precoMax') || defaultFilters.precoMax,
+    };
+  }, [searchParams]);
+
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(getFiltersFromParams());
+  const [pendingFilters, setPendingFilters] = useState<FilterValues>(appliedFilters);
+
+  useEffect(() => {
+    setPendingFilters(appliedFilters);
+  }, [appliedFilters]);
+
+  const { notas, total, filters: hookFilters, isLoading, handleCreate, handleEdit, handleDelete } = useNotasFiscaisVendas(appliedFilters);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -60,6 +90,72 @@ const NotasVendasPage: FC = () => {
       produtos: [],
     }
   });
+
+  const updateUrl = useCallback((newFilters: FilterValues) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newFilters.currentPage.toString());
+    params.set('limit', newFilters.itemsPerPage.toString());
+    params.set('sortField', newFilters.sortField);
+    params.set('sortDirection', newFilters.sortDirection);
+    if (newFilters.search) {
+      params.set('search', newFilters.search);
+    } else {
+      params.delete('search');
+    }
+    if (newFilters.quantidadeMin) {
+      params.set('quantidadeMin', newFilters.quantidadeMin);
+    } else {
+      params.delete('quantidadeMin');
+    }
+    if (newFilters.quantidadeMax) {
+      params.set('quantidadeMax', newFilters.quantidadeMax);
+    } else {
+      params.delete('quantidadeMax');
+    }
+    if (newFilters.precoMin) {
+      params.set('precoMin', newFilters.precoMin);
+    } else {
+      params.delete('precoMin');
+    }
+    if (newFilters.precoMax) {
+      params.set('precoMax', newFilters.precoMax);
+    } else {
+      params.delete('precoMax');
+    }
+    router.replace(`?${params.toString()}`);
+  }, [router, searchParams]);
+
+  const handleApply = () => {
+    const newFilters = { ...pendingFilters, currentPage: 1 };
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  const resetFilters = () => {
+    setPendingFilters(defaultFilters);
+    setAppliedFilters(defaultFilters);
+    const params = new URLSearchParams();
+    router.replace(`?${params.toString()}`);
+  };
+
+  const handleSort = (field: string) => {
+    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
+    const newFilters = { ...appliedFilters, sortField: field, sortDirection: newDirection as SortDirection, currentPage: 1 };
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  const handlePageChange = (page: number) => {
+    const newFilters = { ...appliedFilters, currentPage: page };
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    const newFilters = { ...appliedFilters, itemsPerPage, currentPage: 1 };
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
+  };
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
@@ -115,8 +211,8 @@ const NotasVendasPage: FC = () => {
 
   const getActiveFilters = () => {
     const active = [];
-    if (filterValues.search) {
-      active.push({ label: 'Pesquisa', value: filterValues.search });
+    if (appliedFilters.search) {
+      active.push({ label: 'Pesquisa', value: appliedFilters.search });
     }
     return active;
   };
@@ -125,22 +221,17 @@ const NotasVendasPage: FC = () => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
     
+    let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Pesquisa':
-        handleFilter({ search: '' });
+        newFilters = { ...newFilters, search: '' };
         break;
     }
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
   };
 
-  const resetFilters = () => {
-    handleFilter({
-      search: '',
-      currentPage: 1,
-      itemsPerPage: 10,
-      sortField: 'data',
-      sortDirection: 'desc'
-    });
-  };
+  // resetFilters defined above
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -164,10 +255,11 @@ const NotasVendasPage: FC = () => {
             title=""
             description=""
             onReset={resetFilters}
+            onApply={handleApply}
           >
             <TextFilter
-              value={filterValues.search}
-              onChange={(search) => handleFilter({ search })}
+              value={pendingFilters.search}
+              onChange={(search) => setPendingFilters(prev => ({ ...prev, search }))}
               placeholder="Pesquisar por ID..."
               label="Pesquisa"
               description="Digite o ID da nota"
@@ -185,21 +277,21 @@ const NotasVendasPage: FC = () => {
       <Card>
         <CardContent className="pt-6 space-y-6">
           <NotaFiscalVendaTable
-            items={paginatedNotas}
-            filterValues={filterValues}
+            items={notas}
+            filterValues={appliedFilters}
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
           />
 
           <Pagination
-            currentPage={filterValues.currentPage}
-            totalPages={Math.ceil(filteredNotas.length / filterValues.itemsPerPage)}
-            itemsPerPage={filterValues.itemsPerPage}
-            totalItems={filteredNotas.length}
-            startIndex={(filterValues.currentPage - 1) * filterValues.itemsPerPage}
-            onPageChange={(page) => handleFilter({ currentPage: page })}
-            onItemsPerPageChange={(itemsPerPage) => handleFilter({ itemsPerPage, currentPage: 1 })}
+            currentPage={appliedFilters.currentPage}
+            totalPages={Math.ceil((total || 0) / appliedFilters.itemsPerPage)}
+            itemsPerPage={appliedFilters.itemsPerPage}
+            totalItems={total || 0}
+            startIndex={(appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
           />
         </CardContent>
       </Card>

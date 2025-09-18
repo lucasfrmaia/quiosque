@@ -20,7 +20,7 @@ export const useNotasFiscaisVendas = (filters: FilterState): UseNotasReturn => {
 
   const queryParams = useMemo(() => {
     const params = new URLSearchParams();
-    params.set('page', '1');
+    params.set('page', filters.currentPage.toString());
     params.set('limit', filters.itemsPerPage.toString());
     params.set('sortField', filters.sortField);
     params.set('sortDirection', filters.sortDirection);
@@ -35,7 +35,7 @@ export const useNotasFiscaisVendas = (filters: FilterState): UseNotasReturn => {
   const { data: response, isLoading, error } = useQuery<{ data: NotaFiscalVenda[]; total?: number }>({
     queryKey: ['notas', queryParams],
     queryFn: async () => {
-      const response = await fetch(`/api/notas/findPerPage?${queryParams}`);
+      const response = await fetch(`/api/nota-fiscal-venda/findPerPage?${queryParams}`);
       if (!response.ok) {
         throw new Error('Failed to fetch notas');
       }

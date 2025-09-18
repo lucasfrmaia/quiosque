@@ -64,15 +64,15 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead 
-              className="cursor-pointer" 
-              onClick={() => onSort('nome')}
+              className="cursor-pointer"
+              onClick={() => onSort('produto.nome')}
             >
               <div className="flex items-center space-x-1">
                 <span>Nome</span>
-                <SortIcon 
-                  field="nome" 
-                  currentSortField={filterValues.sortField} 
-                  currentSortDirection={filterValues.sortDirection} 
+                <SortIcon
+                  field="produto.nome"
+                  currentSortField={filterValues.sortField}
+                  currentSortDirection={filterValues.sortDirection}
                 />
               </div>
             </TableHead>
