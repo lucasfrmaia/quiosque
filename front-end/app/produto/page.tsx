@@ -63,12 +63,8 @@ const ProdutoPage: FC = () => {
     };
   }, [searchParams]);
 
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(getFiltersFromParams());
-  const [pendingFilters, setPendingFilters] = useState<FilterValues>(appliedFilters);
 
-  useEffect(() => {
-    setPendingFilters(appliedFilters);
-  }, [appliedFilters]);
+  const appliedFilters = getFiltersFromParams();
 
   const { produtos, total, handleCreate, handleEdit, handleDelete } = useProduto(appliedFilters);
 
@@ -179,8 +175,7 @@ const ProdutoPage: FC = () => {
   }, [router, searchParams]);
 
   const handleApply = () => {
-    const newFilters = { ...pendingFilters, currentPage: 1 };
-    setAppliedFilters(newFilters);
+    const newFilters = { ...appliedFilters, currentPage: 1 };
     updateUrl(newFilters);
   };
 
@@ -194,13 +189,10 @@ const ProdutoPage: FC = () => {
         newFilters = { ...newFilters, search: '' };
         break;
     }
-    setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
 
   const resetFilters = () => {
-    setPendingFilters(defaultFilters);
-    setAppliedFilters(defaultFilters);
     const params = new URLSearchParams();
     router.replace(`?${params.toString()}`);
   };
@@ -208,19 +200,16 @@ const ProdutoPage: FC = () => {
   const handleSort = (field: string) => {
     const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
     const newFilters = { ...appliedFilters, sortField: field, sortDirection: newDirection as SortDirection, currentPage: 1 };
-    setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
 
   const handlePageChange = (page: number) => {
     const newFilters = { ...appliedFilters, currentPage: page };
-    setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
 
   const handleItemsPerPageChange = (itemsPerPage: number) => {
     const newFilters = { ...appliedFilters, itemsPerPage, currentPage: 1 };
-    setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
 
@@ -249,8 +238,11 @@ const ProdutoPage: FC = () => {
             onApply={handleApply}
           >
             <TextFilter
-              value={pendingFilters.search}
-              onChange={(search) => setPendingFilters(prev => ({ ...prev, search }))}
+              value={appliedFilters.search}
+              onChange={(search) => {
+                const newFilters = { ...appliedFilters, search, currentPage: 1 };
+                updateUrl(newFilters);
+              }}
               placeholder="Pesquisar por nome..."
               label="Nome"
               description="Digite o nome do produto"
