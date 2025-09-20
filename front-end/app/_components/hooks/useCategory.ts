@@ -36,7 +36,6 @@ export const useCategory = (filters: FilterValues) => {
 
   const categories = response?.data || [];
 
-
   const createMutation = useMutation({
     mutationFn: async (category: Omit<Category, 'id' | 'produtos'>) => {
       const response = await fetch('/api/category/create', {

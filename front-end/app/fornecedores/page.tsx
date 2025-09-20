@@ -40,6 +40,10 @@ const defaultFilters: FilterValues = {
   precoMax: '',
 };
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { ModalCreateFornecedor } from '../_components/modals/fornecedores/ModalCreateFornecedor';
+import { ModalEditFornecedor } from '../_components/modals/fornecedores/ModalEditFornecedor';
+import { Modal } from '../_components/Modal';
+import { ModalDeleteFornecedor } from '../_components/modals/fornecedores/ModalDeleteFornecedor';
 
 const FornecedoresPage: FC = () => {
   const searchParams = useSearchParams();
@@ -169,7 +173,7 @@ const FornecedoresPage: FC = () => {
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
-    
+
     let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Nome':
@@ -270,54 +274,30 @@ const FornecedoresPage: FC = () => {
       </Card>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Novo Fornecedor</DialogTitle>
-            <DialogDescription>Crie um novo fornecedor.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-            <FornecedorForm register={createForm.register} />
-          </form>
-          <DialogFooter>
-            <Button type="submit">Criar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalCreateFornecedor
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        createForm={createForm}
+        handleSubmitCreate={handleSubmitCreate}
+      />
+
 
       {/* Edit Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Editar Fornecedor</DialogTitle>
-            <DialogDescription>Edite o fornecedor.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-            <FornecedorForm register={editForm.register} editing={true} />
-          </form>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalEditFornecedor
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        editForm={editForm}
+        handleSubmitEdit={handleSubmitEdit}
+      />
 
       {/* Delete Dialog */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir o fornecedor "{selectedFornecedor?.nome}"? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDeleteFornecedor
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        selectedFornecedor={selectedFornecedor}
+        handleDeleteConfirm={handleDeleteConfirm}
+      />
+
     </div>
   );
 };

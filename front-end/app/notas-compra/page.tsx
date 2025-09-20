@@ -29,7 +29,11 @@ import { NotaFiscalCompraForm } from '@/app/_components/nota-fiscal-compra/NotaF
 import { useNotaFiscalCompra } from '@/app/_components/hooks/useNotaFiscalCompra';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
-import { notaFiscalCompraSchema} from '../_components/validation'
+import { notaFiscalCompraSchema } from '../_components/validation'
+import { Modal } from '../_components/Modal';
+import { ModalCreateNotaCompra } from '../_components/modals/notas-compras/ModalCreateNotaCompra';
+import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEditeNotaCompra';
+import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
 
 const NotasCompraPage: FC = () => {
   const searchParams = useSearchParams();
@@ -227,7 +231,7 @@ const NotasCompraPage: FC = () => {
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
-    
+
     let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Pesquisa':
@@ -304,58 +308,30 @@ const NotasCompraPage: FC = () => {
       </Card>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Nova Nota Fiscal de Compra</DialogTitle>
-            <DialogDescription>Crie uma nova nota fiscal de compra.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...createForm}>
-            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-              <NotaFiscalCompraForm fornecedores={fornecedores} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Criar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalCreateNotaCompra
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        createForm={createForm}
+        handleSubmitCreate={handleSubmitCreate}
+        fornecedores={fornecedores}
+      />
 
       {/* Edit Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Editar Nota Fiscal de Compra</DialogTitle>
-            <DialogDescription>Edite a nota fiscal de compra.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...editForm}>
-            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-              <NotaFiscalCompraForm fornecedores={fornecedores} editing={true} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalEditNotaCompra
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        editForm={editForm}
+        handleSubmitEdit={handleSubmitEdit}
+        fornecedores={fornecedores}
+      />
 
       {/* Delete Dialog */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir a nota fiscal de compra #{selectedNota?.id}? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDeleteNotaCompra
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        selectedNota={selectedNota}
+        handleDeleteConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };

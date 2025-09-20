@@ -40,6 +40,9 @@ const defaultFilters: FilterValues = {
   precoMax: '',
 };
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
+import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
+import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
 
 const CategoriaPage: FC = () => {
   const searchParams = useSearchParams();
@@ -70,7 +73,7 @@ const CategoriaPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  
+
   const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
   const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
 
@@ -156,7 +159,7 @@ const CategoriaPage: FC = () => {
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
-    
+
     let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Nome':
@@ -257,54 +260,29 @@ const CategoriaPage: FC = () => {
       </Card>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Nova Categoria</DialogTitle>
-            <DialogDescription>Crie uma nova categoria.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-            <CategoryForm register={createForm.register} />
-          </form>
-          <DialogFooter>
-            <Button type="submit">Criar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalCreateCategory
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        handleSubmitCreate={handleSubmitCreate}
+        createForm={createForm}
+      />
 
       {/* Edit Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Editar Categoria</DialogTitle>
-            <DialogDescription>Edite a categoria.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-            <CategoryForm register={editForm.register} />
-          </form>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalUpdateCategory
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        handleSubmitEdit={handleSubmitEdit}
+        editForm={editForm}
+      />
 
       {/* Delete Dialog */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir a categoria "{selectedCategory?.name}"? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDeleteCategory
+        isDeleteModalOpen={isDeleteModalOpen}
+        selectedCategory={selectedCategory}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        handleDeleteConfirm={handleDeleteConfirm}
+      />
+
     </div>
   );
 };

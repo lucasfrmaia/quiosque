@@ -42,6 +42,9 @@ const defaultFilters: FilterValues = {
 };
 import { useCategory } from '@/app/_components/hooks/useCategory';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { ModalCreateProduct } from '../_components/modals/product/ModalCreateProdutct';
+import { ModalUpdateProduct } from '../_components/modals/product/ModalUpadteProduct';
+import { ModalDeleteProduct } from '../_components/modals/product/ModalDeleteProduct';
 
 const ProdutoPage: FC = () => {
   const searchParams = useSearchParams();
@@ -182,7 +185,7 @@ const ProdutoPage: FC = () => {
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
-    
+
     let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Nome':
@@ -283,58 +286,31 @@ const ProdutoPage: FC = () => {
       </Card>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Novo Produto</DialogTitle>
-            <DialogDescription>Crie um novo produto.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...createForm}>
-            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-              <ProdutoForm categories={categories} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Criar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalCreateProduct
+        isCreateModalOpen={isCreateModalOpen}
+        createForm={createForm}
+        categories={categories}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        handleSubmitCreate={handleSubmitCreate}
+      />
 
-      {/* Edit Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Editar Produto</DialogTitle>
-            <DialogDescription>Edite o produto.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...editForm}>
-            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-              <ProdutoForm categories={categories} editing={true} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalUpdateProduct
+        isEditModalOpen={isEditModalOpen}
+        editForm={editForm}
+        categories={categories}
+        setIsEditModalOpen={setIsEditModalOpen}
+        handleSubmitEdit={handleSubmitEdit}
+      />
 
       {/* Delete Dialog */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir o produto "{selectedProduto?.nome}"? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDeleteProduct
+        isDeleteModalOpen={isDeleteModalOpen}
+        selectedProduto={selectedProduto}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        handleDeleteConfirm={handleDeleteConfirm}
+      />
+
+
     </div>
   );
 };

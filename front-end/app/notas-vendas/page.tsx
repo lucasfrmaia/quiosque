@@ -29,6 +29,9 @@ import { NotaFiscalVendaTable } from '@/app/_components/nota-fiscal-venda/NotaFi
 import { NotaFiscalVendaForm } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
 import { useNotasFiscaisVendas } from '@/app/_components/hooks/useNotasFiscalVendas';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { ModalCreateNotaVenda } from '../_components/modals/nota-vendas/ModalCreateNotaVenda';
+import { ModalEditNotaVenda } from '../_components/modals/nota-vendas/ModalEditNotaVenda';
+import { ModalDeleteNotaVenda } from '../_components/modals/nota-vendas/ModalDeleteNotaVenda';
 
 const NotasVendasPage: FC = () => {
   const searchParams = useSearchParams();
@@ -161,7 +164,7 @@ const NotasVendasPage: FC = () => {
     handleCreate({
       data: data.data,
       total: Number(data.total),
-      produtos: data.produtos.map((p: {produtoId: string, quantidade: string, unidade: string, precoUnitario: string}) => ({
+      produtos: data.produtos.map((p: { produtoId: string, quantidade: string, unidade: string, precoUnitario: string }) => ({
         notaFiscalId: 0,
         produtoId: Number(p.produtoId),
         quantidade: Number(p.quantidade),
@@ -220,7 +223,7 @@ const NotasVendasPage: FC = () => {
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
-    
+
     let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Pesquisa':
@@ -297,58 +300,28 @@ const NotasVendasPage: FC = () => {
       </Card>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Nova Nota Fiscal de Venda</DialogTitle>
-            <DialogDescription>Crie uma nova nota fiscal de venda.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...createForm}>
-            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-              <NotaFiscalVendaForm />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Criar</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalCreateNotaVenda
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        createForm={createForm}
+        handleSubmitCreate={handleSubmitCreate}
+      />
 
       {/* Edit Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Editar Nota Fiscal de Venda</DialogTitle>
-            <DialogDescription>Edite a nota fiscal de venda.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...editForm}>
-            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-              <NotaFiscalVendaForm editing={true} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalEditNotaVenda
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        editForm={editForm}
+        handleSubmitEdit={handleSubmitEdit}
+      />
 
       {/* Delete Dialog */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir a nota fiscal de venda #{selectedNota?.id}? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDeleteNotaVenda
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        selectedNota={selectedNota}
+        handleDeleteConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };

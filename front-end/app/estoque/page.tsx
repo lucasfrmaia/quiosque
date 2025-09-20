@@ -42,6 +42,10 @@ const defaultFilters: FilterValues = {
   precoMax: '',
 };
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { ModalEstoqueCreate } from '../_components/modals/estoque/ModalEstoqueCreate';
+import { ModalEditEstoque } from '../_components/modals/estoque/ModalEditEstoque';
+import { Modal } from '../_components/Modal';
+import { ModalDeleteEstoque } from '../_components/modals/estoque/ModalDeleteEstoque';
 
 const EstoquePage: FC = () => {
   const searchParams = useSearchParams();
@@ -207,7 +211,7 @@ const EstoquePage: FC = () => {
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
-    
+
     let newFilters = { ...appliedFilters };
     switch (filterToRemove.label) {
       case 'Nome':
@@ -345,58 +349,31 @@ const EstoquePage: FC = () => {
       </Card>
 
       {/* Create Dialog */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Novo Item de Estoque</DialogTitle>
-            <DialogDescription>Crie um novo item de estoque.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...createForm}>
-            <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-              <EstoqueForm produtos={produtos} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Criar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalEstoqueCreate
+        isCreateModalOpen={isCreateModalOpen}
+        setIsCreateModalOpen={setIsCreateModalOpen}
+        handleSubmitCreate={handleSubmitCreate}
+        createForm={createForm}
+        produtos={produtos}
+      />
 
       {/* Edit Dialog */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Editar Item de Estoque</DialogTitle>
-            <DialogDescription>Edite o item de estoque.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...editForm}>
-            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-              <EstoqueForm produtos={produtos} />
-            </form>
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalEditEstoque
+        isEditModalOpen={isEditModalOpen}
+        setIsEditModalOpen={setIsEditModalOpen}
+        handleSubmitEdit={handleSubmitEdit}
+        editForm={editForm}
+        produtos={produtos}
+      />
 
       {/* Delete Dialog */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir o item "{selectedItem?.produto?.nome}"? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDeleteEstoque
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        selectedItem={selectedItem}
+        handleDeleteConfirm={handleDeleteConfirm}
+      />
+
     </div>
   );
 };
