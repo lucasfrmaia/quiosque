@@ -150,32 +150,19 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<Fornecedor[]> {
+  async findPerPage(page: number, limit: number) {
     const skip = (page - 1) * limit;
-    const fornecedores = await this.prisma.fornecedor.findMany({
+    const data = await this.prisma.fornecedor.findMany({
       skip,
       take: limit,
-      include: {
-        compras: {
-          include: {
-            produtos: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            }
-          }
-        }
-      }
     });
-    return fornecedores.map(f => ({
-      id: f.id,
-      nome: f.nome,
-      cnpj: f.cnpj,
-      telefone: f.telefone,
-      email: f.email,
-      compras: this.mapCompras(f.compras)
-    }));
+
+    const total = await this.prisma.fornecedor.count()
+    
+    return {
+      fornecedores: data,
+      total
+    };
   }
 
   async update(id: number, fornecedor: Partial<Omit<Fornecedor, 'id' | 'compras'>>): Promise<Fornecedor> {

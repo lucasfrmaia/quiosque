@@ -39,25 +39,25 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
               className="cursor-pointer select-none"
               onClick={() => onSort('nome')}
             >
-              Nome <SortIcon field="nome" filterValues={filterValues} />
+              Nome 
             </TableHead>
             <TableHead
               className="cursor-pointer select-none"
               onClick={() => onSort('cnpj')}
             >
-              CNPJ <SortIcon field="cnpj" filterValues={filterValues} />
+              CNPJ 
             </TableHead>
             <TableHead
               className="cursor-pointer select-none"
               onClick={() => onSort('telefone')}
             >
-              Telefone <SortIcon field="telefone" filterValues={filterValues} />
+              Telefone 
             </TableHead>
             <TableHead
               className="cursor-pointer select-none"
               onClick={() => onSort('email')}
             >
-              Email <SortIcon field="email" filterValues={filterValues} />
+              Email 
             </TableHead>
             <TableHead className="text-right">
               Ações

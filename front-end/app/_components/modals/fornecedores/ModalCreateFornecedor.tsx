@@ -13,17 +13,17 @@ export function ModalCreateFornecedor({ isCreateModalOpen, setIsCreateModalOpen,
     return (
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Novo Fornecedor</DialogTitle>
-                    <DialogDescription>Crie um novo fornecedor.</DialogDescription>
-                </DialogHeader>
                 <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Novo Fornecedor</DialogTitle>
+                        <DialogDescription>Crie um novo fornecedor.</DialogDescription>
+                    </DialogHeader>
                     <FornecedorForm register={createForm.register} />
+                    <DialogFooter>
+                        <Button type="submit">Criar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
                 </form>
-                <DialogFooter>
-                    <Button type="submit">Criar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
 

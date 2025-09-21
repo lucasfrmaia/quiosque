@@ -1,19 +1,9 @@
 'use client';
 
-import { FC, useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { FilterValues, SortDirection } from '@/types/interfaces/entities';
+import { FC, useState  } from 'react';
 import { useForm } from 'react-hook-form';
 import { Category } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   Card,
   CardContent,
@@ -25,16 +15,13 @@ import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { CategoryTable } from '@/app/_components/categoria/CategoryTable';
-import { CategoryForm, CategoryFormData } from '@/app/_components/categoria/CategoryForm';
+import { CategoryFormData } from '@/app/_components/categoria/CategoryForm';
 import { useCategory } from '@/app/_components/hooks/useCategory';
-
-
 
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
 import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
 import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
-import { useQuery } from '@tanstack/react-query';
 
 const CategoriaPage: FC = () => {
 

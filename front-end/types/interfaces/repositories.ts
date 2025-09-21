@@ -13,7 +13,7 @@ export interface IFornecedorRepository {
   create(fornecedor: Omit<Fornecedor, 'id' | 'compras'>): Promise<Fornecedor>;
   findById(id: number): Promise<Fornecedor | null>;
   findAll(): Promise<Fornecedor[]>;
-  findPerPage(page: number, limit: number): Promise<Fornecedor[]>;
+  findPerPage(page: number, limit: number): Promise<{ fornecedores: Fornecedor[], total: number }>;
   update(id: number, fornecedor: Partial<Omit<Fornecedor, 'id' | 'compras'>>): Promise<Fornecedor>;
   delete(id: number): Promise<void>;
 }
@@ -22,7 +22,7 @@ export interface ICategoryRepository {
   create(category: Omit<Category, 'id' | 'produtos'>): Promise<Category>;
   findById(id: number): Promise<Category | null>;
   findAll(): Promise<Category[]>;
-  findPerPage(page: number, limit: number): Promise<{ categories: Category[], total: number}>;
+  findPerPage(page: number, limit: number): Promise<{ categories: Category[], total: number }>;
   update(id: number, category: Partial<Omit<Category, 'id' | 'produtos'>>): Promise<Category>;
   delete(id: number): Promise<void>;
 }
