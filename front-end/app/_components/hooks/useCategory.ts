@@ -1,9 +1,59 @@
 import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Category } from '@/types/interfaces/entities';
+import { Category, FilterValues } from '@/types/interfaces/entities';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+
+const defaultFilters: FilterValues = {
+  currentPage: 1,
+  itemsPerPage: 10,
+  search: ''
+};
 
 export const useCategory = () => {
   const queryClient = useQueryClient();
+  const router = useRouter()
+  const searchParams = useSearchParams();
+
+  const getFiltersFromParams = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    const currentPage = Number(params.get('page')) || defaultFilters.currentPage
+    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage
+    const search = params.get('search') || defaultFilters.search
+
+    params.set('page', String(currentPage))
+    params.set('limit', String(itemsPerPage))
+    params.set('search', String(search))
+
+    return {
+      currentPage,
+      itemsPerPage,
+      search,
+      toString: params.toString()
+    };
+
+  }, [searchParams]);
+
+  const queryParams = getFiltersFromParams()
+  const paramsToString = queryParams.toString
+
+  const { data: categories, isLoading, error } = useQuery<Category[]>({
+    queryKey: ['categories', paramsToString],
+    queryFn: async () => {
+      const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+
+      const result = await response.json();
+
+      return result;
+    },
+  });
+
+  const total = categories?.length
 
   const createMutation = useMutation({
     mutationFn: async (category: Omit<Category, 'id' | 'produtos'>) => {
@@ -22,7 +72,7 @@ export const useCategory = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['categories', paramsToString] });
     },
   });
 
@@ -49,7 +99,7 @@ export const useCategory = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['categories', paramsToString] });
     },
   });
 
@@ -72,7 +122,7 @@ export const useCategory = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['categories', paramsToString] });
     },
   });
 
@@ -80,9 +130,79 @@ export const useCategory = () => {
     deleteMutation.mutate(id);
   };
 
+  const getActiveFilters = () => {
+    const active = [];
+    if (queryParams.search) {
+      active.push({ label: 'Nome', value: queryParams.search });
+    }
+    return active;
+  };
+
+  const updateUrl = useCallback((newFilters: FilterValues) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set('page', String(newFilters.currentPage));
+    params.set('limit', String(newFilters.itemsPerPage));
+
+    if (newFilters.search) {
+      params.set('search', newFilters.search);
+    } else {
+      params.delete('search');
+    }
+
+    router.replace(`?${params.toString()}`);
+  }, [router, searchParams]);
+
+  const handleApply = () => {
+    const newFilters = { ...queryParams, currentPage: 1 };
+    updateUrl(newFilters);
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    const activeFilters = getActiveFilters();
+    const filterToRemove = activeFilters[index];
+
+    let newFilters = { ...queryParams };
+    switch (filterToRemove.label) {
+      case 'Nome':
+        newFilters = { ...newFilters, search: '' };
+        break;
+    }
+    updateUrl(newFilters);
+  };
+
+  const resetFilters = () => {
+    const params = new URLSearchParams();
+    router.replace(`?${params.toString()}`);
+  };
+
+  const handleSort = (field: string) => { };
+
+  const handlePageChange = (page: number) => {
+    const newFilters = { ...queryParams, currentPage: page };
+    updateUrl(newFilters);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    const newFilters = { ...queryParams, itemsPerPage, currentPage: 1 };
+    updateUrl(newFilters);
+  };
+
   return {
+    categories,
+    isLoading,
+    total,
+    queryParams,
     handleCreate,
     handleEdit,
     handleDelete,
+    handleApply,
+    resetFilters,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleRemoveFilter,
+    handleSort,
+    updateUrl,
+    getActiveFilters
   };
 };

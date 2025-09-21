@@ -28,11 +28,7 @@ import { CategoryTable } from '@/app/_components/categoria/CategoryTable';
 import { CategoryForm, CategoryFormData } from '@/app/_components/categoria/CategoryForm';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 
-const defaultFilters: FilterValues = {
-  currentPage: 1,
-  itemsPerPage: 10,
-  search: ''
-};
+
 
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
@@ -41,28 +37,6 @@ import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteC
 import { useQuery } from '@tanstack/react-query';
 
 const CategoriaPage: FC = () => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const getFiltersFromParams = useCallback(() => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    const currentPage = Number(params.get('page')) || defaultFilters.currentPage
-    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage
-    const search = params.get('search') || defaultFilters.search
-
-    params.set('page', String(currentPage))
-    params.set('limit', String(itemsPerPage))
-    params.set('search', String(search))
-
-    return {
-      currentPage,
-      itemsPerPage,
-      search,
-      toString: params.toString()
-    };
-
-  }, [searchParams]);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -71,26 +45,24 @@ const CategoriaPage: FC = () => {
 
   const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
   const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
-  const queryParams = getFiltersFromParams()
-  const { handleCreate, handleDelete, handleEdit } = useCategory()
 
-  const { data: categories, isLoading, error } = useQuery<Category[]>({
-    queryKey: ['categories', queryParams],
-    queryFn: async () => {
-      const response = await fetch(`/api/category/findPerPage?${queryParams.toString}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-
-      const result = await response.json();
-
-      return result;
-    },
-  });
-
-
-  const total = categories?.length
+  const { 
+      categories,
+      isLoading,
+      total,
+      queryParams, 
+      handleRemoveFilter,
+      handlePageChange,
+      handleItemsPerPageChange,
+      handleCreate,
+      handleDelete,
+      handleEdit,
+      handleApply,
+      resetFilters,
+      updateUrl, 
+      handleSort,
+      getActiveFilters
+   } = useCategory()
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate(data);
@@ -124,67 +96,8 @@ const CategoriaPage: FC = () => {
     setSelectedCategory(null);
   };
 
-  const getActiveFilters = () => {
-    const active = [];
-    if (queryParams.search) {
-      active.push({ label: 'Nome', value: queryParams.search });
-    }
-    return active;
-  };
-
-  const updateUrl = useCallback((newFilters: FilterValues) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    params.set('page', String(newFilters.currentPage));
-    params.set('limit', String(newFilters.itemsPerPage));
-
-    if (newFilters.search) {
-      params.set('search', newFilters.search);
-    } else {
-      params.delete('search');
-    }
-
-    router.replace(`?${params.toString()}`);
-  }, [router, searchParams]);
-
-  const handleApply = () => {
-    const newFilters = { ...queryParams, currentPage: 1 };
-    updateUrl(newFilters);
-  };
-
-  const handleRemoveFilter = (index: number) => {
-    const activeFilters = getActiveFilters();
-    const filterToRemove = activeFilters[index];
-
-    let newFilters = { ...queryParams };
-    switch (filterToRemove.label) {
-      case 'Nome':
-        newFilters = { ...newFilters, search: '' };
-        break;
-    }
-    updateUrl(newFilters);
-  };
-
-  const resetFilters = () => {
-    const params = new URLSearchParams();
-    router.replace(`?${params.toString()}`);
-  };
-
-  const handleSort = (field: string) => { };
-
-  const handlePageChange = (page: number) => {
-    const newFilters = { ...queryParams, currentPage: page };
-    updateUrl(newFilters);
-  };
-
-  const handleItemsPerPageChange = (itemsPerPage: number) => {
-    const newFilters = { ...queryParams, itemsPerPage, currentPage: 1 };
-    updateUrl(newFilters);
-  };
-
   if (isLoading)
     return <>Carregando...</>
-
 
   return (
     <div className="container mx-auto py-6 space-y-6">
