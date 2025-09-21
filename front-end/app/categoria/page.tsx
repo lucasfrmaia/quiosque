@@ -31,43 +31,38 @@ import { useCategory } from '@/app/_components/hooks/useCategory';
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 10,
-  sortField: 'name',
-  sortDirection: 'asc' as SortDirection,
-  search: '',
-  quantidadeMin: '',
-  quantidadeMax: '',
-  precoMin: '',
-  precoMax: '',
+  search: ''
 };
+
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
 import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
 import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
+import { useQuery } from '@tanstack/react-query';
 
 const CategoriaPage: FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const getFiltersFromParams = useCallback((): FilterValues => {
+  const getFiltersFromParams = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
+
+    const currentPage = Number(params.get('page')) || defaultFilters.currentPage
+    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage
+    const search = params.get('search') || defaultFilters.search
+
+    params.set('page', String(currentPage))
+    params.set('limit', String(itemsPerPage))
+    params.set('search', String(search))
+
     return {
-      ...defaultFilters,
-      currentPage: parseInt(params.get('page') || defaultFilters.currentPage.toString()) || defaultFilters.currentPage,
-      itemsPerPage: parseInt(params.get('limit') || defaultFilters.itemsPerPage.toString()) || defaultFilters.itemsPerPage,
-      sortField: params.get('sortField') || defaultFilters.sortField,
-      sortDirection: (params.get('sortDirection') as SortDirection) || defaultFilters.sortDirection,
-      search: params.get('search') || defaultFilters.search,
-      quantidadeMin: params.get('quantidadeMin') || defaultFilters.quantidadeMin,
-      quantidadeMax: params.get('quantidadeMax') || defaultFilters.quantidadeMax,
-      precoMin: params.get('precoMin') || defaultFilters.precoMin,
-      precoMax: params.get('precoMax') || defaultFilters.precoMax,
+      currentPage,
+      itemsPerPage,
+      search,
+      toString: params.toString()
     };
+
   }, [searchParams]);
-
-
-  const appliedFilters = getFiltersFromParams();
-
-  const { categories, total, isLoading, handleCreate, handleEdit, handleDelete } = useCategory(appliedFilters);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -76,6 +71,26 @@ const CategoriaPage: FC = () => {
 
   const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
   const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
+  const queryParams = getFiltersFromParams()
+  const { handleCreate, handleDelete, handleEdit } = useCategory()
+
+  const { data: categories, isLoading, error } = useQuery<Category[]>({
+    queryKey: ['categories', queryParams],
+    queryFn: async () => {
+      const response = await fetch(`/api/category/findPerPage?${queryParams.toString}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+
+      const result = await response.json();
+
+      return result;
+    },
+  });
+
+
+  const total = categories?.length
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate(data);
@@ -111,48 +126,29 @@ const CategoriaPage: FC = () => {
 
   const getActiveFilters = () => {
     const active = [];
-    if (appliedFilters.search) {
-      active.push({ label: 'Nome', value: appliedFilters.search });
+    if (queryParams.search) {
+      active.push({ label: 'Nome', value: queryParams.search });
     }
     return active;
   };
 
   const updateUrl = useCallback((newFilters: FilterValues) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', newFilters.currentPage.toString());
-    params.set('limit', newFilters.itemsPerPage.toString());
-    params.set('sortField', newFilters.sortField);
-    params.set('sortDirection', newFilters.sortDirection);
+
+    params.set('page', String(newFilters.currentPage));
+    params.set('limit', String(newFilters.itemsPerPage));
+
     if (newFilters.search) {
       params.set('search', newFilters.search);
     } else {
       params.delete('search');
     }
-    if (newFilters.quantidadeMin) {
-      params.set('quantidadeMin', newFilters.quantidadeMin);
-    } else {
-      params.delete('quantidadeMin');
-    }
-    if (newFilters.quantidadeMax) {
-      params.set('quantidadeMax', newFilters.quantidadeMax);
-    } else {
-      params.delete('quantidadeMax');
-    }
-    if (newFilters.precoMin) {
-      params.set('precoMin', newFilters.precoMin);
-    } else {
-      params.delete('precoMin');
-    }
-    if (newFilters.precoMax) {
-      params.set('precoMax', newFilters.precoMax);
-    } else {
-      params.delete('precoMax');
-    }
+
     router.replace(`?${params.toString()}`);
   }, [router, searchParams]);
 
   const handleApply = () => {
-    const newFilters = { ...appliedFilters, currentPage: 1 };
+    const newFilters = { ...queryParams, currentPage: 1 };
     updateUrl(newFilters);
   };
 
@@ -160,7 +156,7 @@ const CategoriaPage: FC = () => {
     const activeFilters = getActiveFilters();
     const filterToRemove = activeFilters[index];
 
-    let newFilters = { ...appliedFilters };
+    let newFilters = { ...queryParams };
     switch (filterToRemove.label) {
       case 'Nome':
         newFilters = { ...newFilters, search: '' };
@@ -174,21 +170,21 @@ const CategoriaPage: FC = () => {
     router.replace(`?${params.toString()}`);
   };
 
-  const handleSort = (field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    const newFilters = { ...appliedFilters, sortField: field, sortDirection: newDirection as SortDirection, currentPage: 1 };
-    updateUrl(newFilters);
-  };
+  const handleSort = (field: string) => { };
 
   const handlePageChange = (page: number) => {
-    const newFilters = { ...appliedFilters, currentPage: page };
+    const newFilters = { ...queryParams, currentPage: page };
     updateUrl(newFilters);
   };
 
   const handleItemsPerPageChange = (itemsPerPage: number) => {
-    const newFilters = { ...appliedFilters, itemsPerPage, currentPage: 1 };
+    const newFilters = { ...queryParams, itemsPerPage, currentPage: 1 };
     updateUrl(newFilters);
   };
+
+  if (isLoading)
+    return <>Carregando...</>
+
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -215,9 +211,9 @@ const CategoriaPage: FC = () => {
             onApply={handleApply}
           >
             <TextFilter
-              value={appliedFilters.search}
+              value={queryParams.search || ""}
               onChange={(search) => {
-                const newFilters = { ...appliedFilters, search, currentPage: 1 };
+                const newFilters = { ...queryParams, search, currentPage: 1 };
                 updateUrl(newFilters);
               }}
               placeholder="Pesquisar por nome..."
@@ -237,22 +233,22 @@ const CategoriaPage: FC = () => {
       <Card>
         <CardContent className="pt-6 space-y-6">
           <CategoryTable
-            items={categories}
-            filterValues={appliedFilters}
+            items={categories || []}
+            filterValues={queryParams}
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(id) => {
-              const category = categories.find(c => c.id === id);
+              const category = categories?.find(c => c.id === id);
               if (category) openDeleteModal(category);
             }}
           />
 
           <Pagination
-            currentPage={appliedFilters.currentPage}
-            totalPages={Math.ceil((total || 0) / appliedFilters.itemsPerPage)}
-            itemsPerPage={appliedFilters.itemsPerPage}
+            currentPage={queryParams.currentPage}
+            totalPages={Math.ceil((total || 0) / queryParams.itemsPerPage)}
+            itemsPerPage={queryParams.itemsPerPage}
             totalItems={total || 0}
-            startIndex={(appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage}
+            startIndex={(queryParams.currentPage - 1) * queryParams.itemsPerPage}
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}
           />

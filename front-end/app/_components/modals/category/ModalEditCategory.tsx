@@ -13,17 +13,17 @@ export function ModalUpdateCategory({ isEditModalOpen, setIsEditModalOpen, handl
     return (
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Editar Categoria</DialogTitle>
-                    <DialogDescription>Edite a categoria.</DialogDescription>
-                </DialogHeader>
                 <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Editar Categoria</DialogTitle>
+                        <DialogDescription>Edite a categoria.</DialogDescription>
+                    </DialogHeader>
                     <CategoryForm register={editForm.register} />
+                    <DialogFooter>
+                        <Button type="submit">Salvar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
                 </form>
-                <DialogFooter>
-                    <Button type="submit">Salvar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     )

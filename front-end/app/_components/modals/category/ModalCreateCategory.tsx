@@ -14,17 +14,17 @@ export function ModalCreateCategory({ isCreateModalOpen, setIsCreateModalOpen, h
     return (
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Nova Categoria</DialogTitle>
-                    <DialogDescription>Crie uma nova categoria.</DialogDescription>
-                </DialogHeader>
                 <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Nova Categoria</DialogTitle>
+                        <DialogDescription>Crie uma nova categoria.</DialogDescription>
+                    </DialogHeader>
                     <CategoryForm register={createForm.register} />
+                    <DialogFooter>
+                        <Button type="submit">Criar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
                 </form>
-                <DialogFooter>
-                    <Button type="submit">Criar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     )

@@ -10,14 +10,11 @@ import {
 } from '@/components/ui/table';
 import { Edit, Trash2 } from 'lucide-react';
 import { SortIcon } from '../SortIcon';
-import { Category } from '@/types/interfaces/entities';
+import { Category, FilterValues } from '@/types/interfaces/entities';
 
 interface CategoryTableProps {
   items: Category[];
-  filterValues: {
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
+  filterValues: FilterValues;
   onSort: (field: string) => void;
   onEdit: (item: Category) => void;
   onDelete: (id: number) => void;
@@ -64,11 +61,6 @@ export const CategoryTable: FC<CategoryTableProps> = ({
             >
               <div className="flex items-center space-x-1">
                 <span>Nome</span>
-                <SortIcon 
-                  field="name" 
-                  currentSortField={filterValues.sortField} 
-                  currentSortDirection={filterValues.sortDirection} 
-                />
               </div>
             </TableHead>
             <TableHead>Número de Produtos</TableHead>

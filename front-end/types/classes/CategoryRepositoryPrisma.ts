@@ -126,32 +126,12 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
     const skip = (page - 1) * limit;
     const categories = await this.prisma.category.findMany({
       skip,
-      take: limit,
-      include: {
-        produtos: {
-          include: {
-            categoria: true,
-            estoques: true,
-            compras: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            },
-            vendas: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            }
-          }
-        }
-      }
+      take: limit
     });
+    
     return categories.map(c => ({
       id: c.id,
       name: c.name,
-      produtos: this.mapProdutos(c.produtos)
     }));
   }
 

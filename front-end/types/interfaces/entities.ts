@@ -86,13 +86,13 @@ export interface ProdutoVenda {
 export type SortDirection = 'asc' | 'desc';
 
 export interface FilterValues {
-  search: string;
-  quantidadeMin: string;
-  quantidadeMax: string;
-  precoMin: string;
-  precoMax: string;
   currentPage: number;
   itemsPerPage: number;
-  sortField: string;
-  sortDirection: SortDirection;
+  search?: string;
+  quantidadeMin?: string;
+  quantidadeMax?: string;
+  precoMin?: string;
+  precoMax?: string;
+  sortField?: string;
+  sortDirection?: SortDirection;
 }
