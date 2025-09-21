@@ -55,6 +55,23 @@ export const useCategory = () => {
     });
   }
 
+  const getAllCategories = () => {
+    return useQuery<Category[]>({
+      queryKey: ['categories'],
+      queryFn: async () => {
+        const response = await fetch(`/api/category/findAll`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories');
+        }
+
+        const result = await response.json();
+
+        return result;
+      },
+    });
+  }
+
   const createMutation = useMutation({
     mutationFn: async (category: Omit<Category, 'id' | 'produtos'>) => {
       const response = await fetch('/api/category/create', {
@@ -201,6 +218,7 @@ export const useCategory = () => {
     handleRemoveFilter,
     handleSort,
     updateUrl,
-    getActiveFilters
+    getActiveFilters,
+    getAllCategories
   };
 };

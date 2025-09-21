@@ -14,10 +14,6 @@ import { Produto } from '@/types/interfaces/entities';
 
 interface ProdutoTableProps {
   items: Produto[];
-  filterValues: {
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
   onSort: (field: string) => void;
   onEdit: (item: Produto) => void;
   onDelete: (id: number) => void;
@@ -25,7 +21,6 @@ interface ProdutoTableProps {
 
 export const ProdutoTable: FC<ProdutoTableProps> = ({
   items,
-  filterValues,
   onSort,
   onEdit,
   onDelete,
@@ -64,11 +59,7 @@ export const ProdutoTable: FC<ProdutoTableProps> = ({
             >
               <div className="flex items-center space-x-1">
                 <span>Nome</span>
-                <SortIcon 
-                  field="nome" 
-                  currentSortField={filterValues.sortField} 
-                  currentSortDirection={filterValues.sortDirection} 
-                />
+               
               </div>
             </TableHead>
             <TableHead>Categoria</TableHead>

@@ -4,33 +4,33 @@ import { FormProvider } from "react-hook-form"
 import { ProdutoForm } from "../../produto/ProdutoForm"
 
 interface ModalUpdateProductProps {
-    isEditModalOpen: boolean;
-    editForm: any;
-    categories: any[];
-    setIsEditModalOpen: (open: boolean) => void;
-    handleSubmitEdit: (e: React.BaseSyntheticEvent) => Promise<void>;
+  isEditModalOpen: boolean;
+  editForm: any;
+  categories: any[];
+  setIsEditModalOpen: (open: boolean) => void;
+  handleSubmitEdit: (e: React.BaseSyntheticEvent) => Promise<void>;
 }
 
 export function ModalUpdateProduct({ isEditModalOpen, setIsEditModalOpen, editForm, handleSubmitEdit, categories }: ModalUpdateProductProps) {
 
-    return (
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+  return (
+    <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
           <DialogHeader>
             <DialogTitle>Editar Produto</DialogTitle>
             <DialogDescription>Edite o produto.</DialogDescription>
           </DialogHeader>
           <FormProvider {...editForm}>
-            <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-              <ProdutoForm categories={categories} editing={true} />
-            </form>
+            <ProdutoForm categories={categories} editing={true} />
           </FormProvider>
           <DialogFooter>
             <Button type="submit">Salvar</Button>
             <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-)
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
 
 }

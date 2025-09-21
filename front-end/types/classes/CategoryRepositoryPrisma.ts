@@ -93,32 +93,11 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
   }
 
   async findAll(): Promise<Category[]> {
-    const categories = await this.prisma.category.findMany({
-      include: {
-        produtos: {
-          include: {
-            categoria: true,
-            estoques: true,
-            compras: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            },
-            vendas: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            }
-          }
-        }
-      }
-    });
+    const categories = await this.prisma.category.findMany();
+    
     return categories.map(c => ({
       id: c.id,
       name: c.name,
-      produtos: this.mapProdutos(c.produtos)
     }));
   }
 

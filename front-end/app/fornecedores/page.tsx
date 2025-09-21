@@ -100,8 +100,6 @@ const FornecedoresPage: FC = () => {
   if (isLoading) return <p>Carregando...</p>;
   if (error) return <p>Erro!</p>;
 
-  console.log("bomba", response)
-
   return (
     <div className="container mx-auto py-6 space-y-6">
       <Card>

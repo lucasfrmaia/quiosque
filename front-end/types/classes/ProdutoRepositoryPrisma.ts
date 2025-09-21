@@ -230,33 +230,14 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<Produto[]> {
+  async findPerPage(page: number, limit: number) {
     const skip = (page - 1) * limit;
-    const produtos = await this.prisma.produto.findMany({
+    const response = await this.prisma.produto.findMany({
       skip,
       take: limit,
-      include: {
-        categoria: true,
-        estoques: true,
-        compras: {
-          include: {
-            produto: true,
-            notaFiscal: {
-              include: {
-                fornecedor: true
-              }
-            }
-          }
-        },
-        vendas: {
-          include: {
-            produto: true,
-            notaFiscal: true
-          }
-        }
-      }
     });
-    return produtos.map(p => ({
+
+    const produtos = response.map(p => ({
       id: p.id,
       nome: p.nome,
       descricao: p.descricao,
@@ -264,11 +245,15 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
       ativo: p.ativo,
       tipo: p.tipo,
       categoriaId: p.categoriaId,
-      categoria: this.mapCategoria(p.categoria),
-      estoques: this.mapEstoques(p.estoques),
-      compras: this.mapCompras(p.compras),
-      vendas: this.mapVendas(p.vendas)
     }));
+
+    const total = await this.prisma.produto.count()
+
+    return {
+      produtos,
+      total
+    }
+
   }
 
   async update(id: number, produto: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>): Promise<Produto> {

@@ -1,45 +1,67 @@
-import { useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Produto, FilterValues, SortDirection } from '@/types/interfaces/entities';
+import { Produto, FilterValues } from '@/types/interfaces/entities';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export const useProduto = (filters: FilterValues) => {
+const defaultFilters: FilterValues = {
+  currentPage: 1,
+  itemsPerPage: 10,
+  search: '',
+};
+
+export const useProduto = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const queryParams = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set('page', filters.currentPage.toString());
-    params.set('limit', filters.itemsPerPage.toString());
-    params.set('sortField', filters.sortField);
-    params.set('sortDirection', filters.sortDirection);
-    if (filters.search) params.set('search', filters.search);
-    if (filters.quantidadeMin) params.set('quantidadeMin', filters.quantidadeMin);
-    if (filters.precoMax) params.set('precoMax', filters.precoMax);
-    if (filters.precoMin) params.set('precoMin', filters.precoMin);
-    if (filters.quantidadeMax) params.set('quantidadeMax', filters.quantidadeMax);
-    return params.toString();
-  }, [filters]);
+  // 🔹 Extrai os filtros da URL
+  const getFiltersFromParams = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
 
-  const { data: response, isLoading, error } = useQuery<{ data: Produto[]; total?: number }>({
-    queryKey: ['produtos', queryParams],
-    queryFn: async () => {
-      const response = await fetch(`/api/produto/findPerPage?${queryParams}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch produtos');
-      }
-      const result = await response.json();
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to fetch produtos');
-      }
-      return result;
-    },
-  });
+    const currentPage = Number(params.get('page')) || defaultFilters.currentPage;
+    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage;
+    const search = params.get('search') || defaultFilters.search;
 
-  const produtos = response?.data || [];
+    params.set('page', String(currentPage));
+    params.set('limit', String(itemsPerPage));
+    
+    if (search)
+      params.set('search', String(search));
 
+    return {
+      currentPage,
+      itemsPerPage,
+      search,
+      toString: params.toString(),
+    };
+  }, [searchParams]);
 
+  const queryParams = getFiltersFromParams();
+  const paramsToString = queryParams.toString;
 
+  // 🔹 Buscar produtos paginados
+  const getProdutosByParams = () => {
+    return useQuery<{ produtos: Produto[]; total: number }>({
+      queryKey: ['produtos', paramsToString],
+      queryFn: async () => {
+        const response = await fetch(`/api/produto/findPerPage?${paramsToString}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch products', await response.json());
+        }
+        
+        const result = await response.json();
+
+        return result;
+      },
+    });
+  };
+
+  // 🔹 Criar produto
   const createMutation = useMutation({
-    mutationFn: async (produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>) => {
+    mutationFn: async (
+      produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>
+    ) => {
       const response = await fetch('/api/produto/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,24 +77,37 @@ export const useProduto = (filters: FilterValues) => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
     },
   });
 
-  const handleCreate = (produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>) => {
+  const handleCreate = (
+    produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>
+  ) => {
     createMutation.mutate(produto);
   };
 
+  // 🔹 Editar produto
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>> }) => {
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: number;
+      updates: Partial<
+        Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>
+      >;
+    }) => {
       const response = await fetch(`/api/produto/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
+
       if (!response.ok) {
         throw new Error('Failed to update produto');
       }
+
       const result = await response.json();
       if (!result.success) {
         throw new Error(result.error || 'Failed to update produto');
@@ -80,14 +115,18 @@ export const useProduto = (filters: FilterValues) => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>) => {
+  const handleEdit = (
+    id: number,
+    updates: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>
+  ) => {
     editMutation.mutate({ id, updates });
   };
 
+  // 🔹 Deletar produto
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/produto/delete/${id}`, {
@@ -103,7 +142,7 @@ export const useProduto = (filters: FilterValues) => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
     },
   });
 
@@ -111,14 +150,82 @@ export const useProduto = (filters: FilterValues) => {
     deleteMutation.mutate(id);
   };
 
+  // 🔹 Filtros ativos
+  const getActiveFilters = () => {
+    const active = [];
+    if (queryParams.search) {
+      active.push({ label: 'Nome', value: queryParams.search });
+    }
+    return active;
+  };
+
+  // 🔹 Atualizar URL
+  const updateUrl = useCallback(
+    (newFilters: FilterValues) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      params.set('page', String(newFilters.currentPage));
+      params.set('limit', String(newFilters.itemsPerPage));
+
+      if (newFilters.search) {
+        params.set('search', newFilters.search);
+      } else {
+        params.delete('search');
+      }
+
+      router.replace(`?${params.toString()}`);
+    },
+    [router, searchParams]
+  );
+
+  const handleApply = () => {
+    const newFilters = { ...queryParams, currentPage: 1 };
+    updateUrl(newFilters);
+  };
+
+  const handleRemoveFilter = (index: number) => {
+    const activeFilters = getActiveFilters();
+    const filterToRemove = activeFilters[index];
+
+    let newFilters = { ...queryParams };
+    switch (filterToRemove.label) {
+      case 'Nome':
+        newFilters = { ...newFilters, search: '' };
+        break;
+    }
+    updateUrl(newFilters);
+  };
+
+  const resetFilters = () => {
+    const params = new URLSearchParams();
+    router.replace(`?${params.toString()}`);
+  };
+
+  const handleSort = (field: string) => {};
+
+  const handlePageChange = (page: number) => {
+    const newFilters = { ...queryParams, currentPage: page };
+    updateUrl(newFilters);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    const newFilters = { ...queryParams, itemsPerPage, currentPage: 1 };
+    updateUrl(newFilters);
+  };
+
   return {
-    produtos,
-    total: response?.total || 0,
-    filters,
-    isLoading,
-    error,
+    queryParams,
+    getProdutosByParams,
     handleCreate,
     handleEdit,
     handleDelete,
+    handleApply,
+    resetFilters,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleRemoveFilter,
+    handleSort,
+    updateUrl,
+    getActiveFilters,
   };
 };

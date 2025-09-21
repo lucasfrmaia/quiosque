@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid page or limit' }, { status: 400 });
     }
     const produtos = await repositoryFactory.produtoRepository.findPerPage(page, limit);
-    return NextResponse.json({ success: true, data: produtos });
+    return NextResponse.json(produtos);
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
   }
