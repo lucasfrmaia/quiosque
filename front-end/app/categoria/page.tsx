@@ -46,23 +46,23 @@ const CategoriaPage: FC = () => {
   const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
   const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
 
-  const { 
-      categories,
-      isLoading,
-      total,
-      queryParams, 
-      handleRemoveFilter,
-      handlePageChange,
-      handleItemsPerPageChange,
-      handleCreate,
-      handleDelete,
-      handleEdit,
-      handleApply,
-      resetFilters,
-      updateUrl, 
-      handleSort,
-      getActiveFilters
-   } = useCategory()
+  const {
+    queryParams,
+    handleRemoveFilter,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleCreate,
+    handleDelete,
+    handleEdit,
+    handleApply,
+    resetFilters,
+    updateUrl,
+    handleSort,
+    getActiveFilters,
+    getCategoriesByParams
+  } = useCategory()
+
+  const { data: response, isLoading } = getCategoriesByParams()
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate(data);
@@ -146,21 +146,21 @@ const CategoriaPage: FC = () => {
       <Card>
         <CardContent className="pt-6 space-y-6">
           <CategoryTable
-            items={categories || []}
+            items={response?.categories || []}
             filterValues={queryParams}
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(id) => {
-              const category = categories?.find(c => c.id === id);
+              const category = response?.categories?.find(c => c.id === id);
               if (category) openDeleteModal(category);
             }}
           />
 
           <Pagination
             currentPage={queryParams.currentPage}
-            totalPages={Math.ceil((total || 0) / queryParams.itemsPerPage)}
+            totalPages={Math.ceil((response?.total || 0) / queryParams.itemsPerPage)}
             itemsPerPage={queryParams.itemsPerPage}
-            totalItems={total || 0}
+            totalItems={response?.total || 0}
             startIndex={(queryParams.currentPage - 1) * queryParams.itemsPerPage}
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}

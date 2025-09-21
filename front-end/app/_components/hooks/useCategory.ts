@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 const defaultFilters: FilterValues = {
   currentPage: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 5,
   search: ''
 };
 
@@ -38,22 +38,22 @@ export const useCategory = () => {
   const queryParams = getFiltersFromParams()
   const paramsToString = queryParams.toString
 
-  const { data: categories, isLoading, error } = useQuery<Category[]>({
-    queryKey: ['categories', paramsToString],
-    queryFn: async () => {
-      const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
+  const getCategoriesByParams = () => {
+    return useQuery<{ categories: Category[], total: number }>({
+      queryKey: ['categories', paramsToString],
+      queryFn: async () => {
+        const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
+        if (!response.ok) {
+          throw new Error('Failed to fetch categories');
+        }
 
-      const result = await response.json();
+        const result = await response.json();
 
-      return result;
-    },
-  });
-
-  const total = categories?.length
+        return result;
+      },
+    });
+  }
 
   const createMutation = useMutation({
     mutationFn: async (category: Omit<Category, 'id' | 'produtos'>) => {
@@ -189,10 +189,8 @@ export const useCategory = () => {
   };
 
   return {
-    categories,
-    isLoading,
-    total,
     queryParams,
+    getCategoriesByParams,
     handleCreate,
     handleEdit,
     handleDelete,

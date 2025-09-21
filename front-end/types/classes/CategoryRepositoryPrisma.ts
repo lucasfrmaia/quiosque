@@ -122,17 +122,18 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<Category[]> {
+  async findPerPage(page: number, limit: number): Promise<{ categories: Category[], total: number}> {
     const skip = (page - 1) * limit;
     const categories = await this.prisma.category.findMany({
       skip,
       take: limit
     });
+    const total = await this.prisma.category.count()
     
-    return categories.map(c => ({
-      id: c.id,
-      name: c.name,
-    }));
+    return {
+      categories: categories,
+      total: total
+    };
   }
 
   async update(id: number, category: Partial<Omit<Category, 'id' | 'produtos'>>): Promise<Category> {

@@ -22,7 +22,7 @@ export interface ICategoryRepository {
   create(category: Omit<Category, 'id' | 'produtos'>): Promise<Category>;
   findById(id: number): Promise<Category | null>;
   findAll(): Promise<Category[]>;
-  findPerPage(page: number, limit: number): Promise<Category[]>;
+  findPerPage(page: number, limit: number): Promise<{ categories: Category[], total: number}>;
   update(id: number, category: Partial<Omit<Category, 'id' | 'produtos'>>): Promise<Category>;
   delete(id: number): Promise<void>;
 }
