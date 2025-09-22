@@ -24,7 +24,7 @@ export const useProduto = () => {
 
     params.set('page', String(currentPage));
     params.set('limit', String(itemsPerPage));
-    
+
     if (search)
       params.set('search', String(search));
 
@@ -39,17 +39,34 @@ export const useProduto = () => {
   const queryParams = getFiltersFromParams();
   const paramsToString = queryParams.toString;
 
+  const getAllProdutos = () => {
+    return useQuery<Produto[]>({
+      queryKey: ['produtos'],
+      queryFn: async () => {
+        const response = await fetch(`/api/produto/findAll`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch products', await response.json());
+        }
+
+        const result = await response.json();
+
+        return result;
+      },
+    });
+  }
+
   // 🔹 Buscar produtos paginados
   const getProdutosByParams = () => {
     return useQuery<{ produtos: Produto[]; total: number }>({
       queryKey: ['produtos', paramsToString],
       queryFn: async () => {
         const response = await fetch(`/api/produto/findPerPage?${paramsToString}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch products', await response.json());
         }
-        
+
         const result = await response.json();
 
         return result;
@@ -201,7 +218,7 @@ export const useProduto = () => {
     router.replace(`?${params.toString()}`);
   };
 
-  const handleSort = (field: string) => {};
+  const handleSort = (field: string) => { };
 
   const handlePageChange = (page: number) => {
     const newFilters = { ...queryParams, currentPage: page };
@@ -227,5 +244,6 @@ export const useProduto = () => {
     handleSort,
     updateUrl,
     getActiveFilters,
+    getAllProdutos
   };
 };

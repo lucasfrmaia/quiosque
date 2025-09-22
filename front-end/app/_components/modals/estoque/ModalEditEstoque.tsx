@@ -16,19 +16,19 @@ export function ModalEditEstoque({ isEditModalOpen, setIsEditModalOpen, handleSu
     return (
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Editar Item de Estoque</DialogTitle>
-                    <DialogDescription>Edite o item de estoque.</DialogDescription>
-                </DialogHeader>
-                <FormProvider {...editForm}>
-                    <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+                <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Editar Item de Estoque</DialogTitle>
+                        <DialogDescription>Edite o item de estoque.</DialogDescription>
+                    </DialogHeader>
+                    <FormProvider {...editForm}>
                         <EstoqueForm produtos={produtos} />
-                    </form>
-                </FormProvider>
-                <DialogFooter>
-                    <Button type="submit">Salvar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
+                    </FormProvider>
+                    <DialogFooter>
+                        <Button type="submit">Salvar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
     )

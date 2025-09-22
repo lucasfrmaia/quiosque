@@ -120,8 +120,6 @@ const ProdutoPage: FC = () => {
     setSelectedProduto(null);
   };
 
-  console.log(data?.produtos, data?.total, error, isLoading)
-
   if (isLoading || isLoadingCategories) return <p>Carregando...</p>;
   if (error || erroCategories) return <p>Error!</p>;
 

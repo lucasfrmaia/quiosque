@@ -15,10 +15,6 @@ import { ProdutoEstoque } from '@/types/interfaces/entities';
 
 interface EstoqueTableProps {
   items: ProdutoEstoque[];
-  filterValues: {
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
   onSort: (field: string) => void;
   onEdit: (item: ProdutoEstoque) => void;
   onDelete: (id: number) => void;
@@ -26,7 +22,6 @@ interface EstoqueTableProps {
 
 export const EstoqueTable: FC<EstoqueTableProps> = ({
   items,
-  filterValues,
   onSort,
   onEdit,
   onDelete,
@@ -69,11 +64,7 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
             >
               <div className="flex items-center space-x-1">
                 <span>Nome</span>
-                <SortIcon
-                  field="produto.nome"
-                  currentSortField={filterValues.sortField}
-                  currentSortDirection={filterValues.sortDirection}
-                />
+               
               </div>
             </TableHead>
             <TableHead 
@@ -82,11 +73,6 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
             >
               <div className="flex items-center space-x-1">
                 <span>Quantidade</span>
-                <SortIcon 
-                  field="quantidade" 
-                  currentSortField={filterValues.sortField} 
-                  currentSortDirection={filterValues.sortDirection} 
-                />
               </div>
             </TableHead>
             <TableHead 
@@ -95,11 +81,6 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
             >
               <div className="flex items-center space-x-1">
                 <span>Preço</span>
-                <SortIcon 
-                  field="preco" 
-                  currentSortField={filterValues.sortField} 
-                  currentSortDirection={filterValues.sortDirection} 
-                />
               </div>
             </TableHead>
             <TableHead>Data Validade</TableHead>

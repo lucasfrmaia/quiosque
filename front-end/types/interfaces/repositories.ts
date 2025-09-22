@@ -31,7 +31,7 @@ export interface IProdutoRepository {
   create(produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>): Promise<Produto>;
   findById(id: number): Promise<Produto | null>;
   findAll(): Promise<Produto[]>;
-  findPerPage(page: number, limit: number): Promise<{ produtos: Produto[], total: number}>;
+  findPerPage(page: number, limit: number): Promise<{ produtos: Produto[], total: number }>;
   update(id: number, produto: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>): Promise<Produto>;
   delete(id: number): Promise<void>;
 }
@@ -40,7 +40,7 @@ export interface IProdutoEstoqueRepository {
   create(produtoEstoque: Omit<ProdutoEstoque, 'id' | 'produto'>): Promise<ProdutoEstoque>;
   findById(id: number): Promise<ProdutoEstoque | null>;
   findAll(): Promise<ProdutoEstoque[]>;
-  findPerPage(page: number, limit: number): Promise<ProdutoEstoque[]>;
+  findPerPage(page: number, limit: number): Promise<{ estoque: ProdutoEstoque[], total: number }>;
   update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>): Promise<ProdutoEstoque>;
   delete(id: number): Promise<void>;
 }

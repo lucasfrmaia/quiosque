@@ -193,41 +193,9 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
   }
 
   async findAll(): Promise<Produto[]> {
-    const produtos = await this.prisma.produto.findMany({
-      include: {
-        categoria: true,
-        estoques: true,
-        compras: {
-          include: {
-            produto: true,
-            notaFiscal: {
-              include: {
-                fornecedor: true
-              }
-            }
-          }
-        },
-        vendas: {
-          include: {
-            produto: true,
-            notaFiscal: true
-          }
-        }
-      }
-    });
-    return produtos.map(p => ({
-      id: p.id,
-      nome: p.nome,
-      descricao: p.descricao,
-      imagemUrl: p.imagemUrl,
-      ativo: p.ativo,
-      tipo: p.tipo,
-      categoriaId: p.categoriaId,
-      categoria: this.mapCategoria(p.categoria),
-      estoques: this.mapEstoques(p.estoques),
-      compras: this.mapCompras(p.compras),
-      vendas: this.mapVendas(p.vendas)
-    }));
+    const produtos = await this.prisma.produto.findMany();
+
+    return produtos;
   }
 
   async findPerPage(page: number, limit: number) {

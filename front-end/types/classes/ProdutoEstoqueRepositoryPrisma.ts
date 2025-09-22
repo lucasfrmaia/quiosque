@@ -83,7 +83,7 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<ProdutoEstoque[]> {
+  async findPerPage(page: number, limit: number) {
     const skip = (page - 1) * limit;
     const produtoEstoques = await this.prisma.produtoEstoque.findMany({
       skip,
@@ -92,7 +92,8 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
         produto: true
       }
     });
-    return produtoEstoques.map(pe => ({
+
+    const estoque = produtoEstoques.map(pe => ({
       id: pe.id,
       preco: pe.preco,
       quantidade: pe.quantidade,
@@ -101,6 +102,11 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produtoId: pe.produtoId,
       produto: this.mapProduto(pe.produto)
     }));
+
+    return {
+      estoque: estoque,
+      total: await this.prisma.produtoEstoque.count()
+    }
   }
 
   async update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>): Promise<ProdutoEstoque> {

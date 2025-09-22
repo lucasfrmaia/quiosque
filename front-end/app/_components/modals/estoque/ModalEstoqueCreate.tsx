@@ -16,19 +16,19 @@ export function ModalEstoqueCreate({ isCreateModalOpen, setIsCreateModalOpen, ha
     return (
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Novo Item de Estoque</DialogTitle>
-                    <DialogDescription>Crie um novo item de estoque.</DialogDescription>
-                </DialogHeader>
-                <FormProvider {...createForm}>
-                    <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+                <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Novo Item de Estoque</DialogTitle>
+                        <DialogDescription>Crie um novo item de estoque.</DialogDescription>
+                    </DialogHeader>
+                    <FormProvider {...createForm}>
                         <EstoqueForm produtos={produtos} />
-                    </form>
-                </FormProvider>
-                <DialogFooter>
-                    <Button type="submit">Criar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
+                    </FormProvider>
+                    <DialogFooter>
+                        <Button type="submit">Criar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
 
