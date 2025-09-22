@@ -29,7 +29,7 @@ export interface Produto {
   ativo: boolean;
   tipo: TipoProduto;
   categoriaId?: number | null;
-  categoria?: Category;
+  categoria?: Category | null;
   estoques?: ProdutoEstoque[];
   compras?: ProdutoCompra[];
   vendas?: ProdutoVenda[];

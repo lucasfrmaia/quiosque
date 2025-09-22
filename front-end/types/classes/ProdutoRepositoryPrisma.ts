@@ -203,22 +203,15 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     const response = await this.prisma.produto.findMany({
       skip,
       take: limit,
+      include: {
+        categoria: true
+      }
     });
-
-    const produtos = response.map(p => ({
-      id: p.id,
-      nome: p.nome,
-      descricao: p.descricao,
-      imagemUrl: p.imagemUrl,
-      ativo: p.ativo,
-      tipo: p.tipo,
-      categoriaId: p.categoriaId,
-    }));
 
     const total = await this.prisma.produto.count()
 
     return {
-      produtos,
+      produtos: response,
       total
     }
 
