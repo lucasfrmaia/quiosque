@@ -39,22 +39,21 @@ export const useProduto = () => {
   const queryParams = getFiltersFromParams();
   const paramsToString = queryParams.toString;
 
-  const getAllProdutos = () => {
-    return useQuery<Produto[]>({
-      queryKey: ['produtos'],
-      queryFn: async () => {
-        const response = await fetch(`/api/produto/findAll`);
+  // 🔹 Buscar todos os produtos - moved to top level
+  const allProdutosQuery = useQuery<Produto[]>({
+    queryKey: ['produtos-all'],
+    queryFn: async () => {
+      const response = await fetch(`/api/produto/findAll`);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch products', await response.json());
-        }
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
 
-        const result = await response.json();
+      const result = await response.json();
 
-        return result;
-      },
-    });
-  }
+      return result;
+    },
+  });
 
   // 🔹 Buscar produtos paginados
   const getProdutosByParams = () => {
@@ -64,7 +63,7 @@ export const useProduto = () => {
         const response = await fetch(`/api/produto/findPerPage?${paramsToString}`);
 
         if (!response.ok) {
-          throw new Error('Failed to fetch products', await response.json());
+          throw new Error('Failed to fetch products');
         }
 
         const result = await response.json();
@@ -95,6 +94,7 @@ export const useProduto = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -133,6 +133,7 @@ export const useProduto = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -160,6 +161,7 @@ export const useProduto = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -232,6 +234,7 @@ export const useProduto = () => {
 
   return {
     queryParams,
+    allProdutosQuery,
     getProdutosByParams,
     handleCreate,
     handleEdit,
@@ -244,6 +247,5 @@ export const useProduto = () => {
     handleSort,
     updateUrl,
     getActiveFilters,
-    getAllProdutos
   };
 };

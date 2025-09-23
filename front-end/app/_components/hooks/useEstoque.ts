@@ -1,12 +1,15 @@
 import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ProdutoEstoque, Produto, FilterValues } from '@/types/interfaces/entities';
+import { ProdutoEstoque, Produto, FilterValues, SortDirection } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 10,
   search: '',
+  categoryId: null,
+  sortField: '',
+  sortDirection: 'asc' as SortDirection,
 };
 
 export const useEstoque = () => {
@@ -25,15 +28,29 @@ export const useEstoque = () => {
     const quantidadeMax = params.get('quantidadeMax') || '';
     const precoMin = params.get('precoMin') || '';
     const precoMax = params.get('precoMax') || '';
+    const categoryId = params.get('categoryId') ? Number(params.get('categoryId')) : null;
+    const sortField = params.get('sortField') || defaultFilters.sortField;
+    const sortDirection = (params.get('sortDirection') as SortDirection) || defaultFilters.sortDirection;
 
     params.set('page', String(currentPage));
     params.set('limit', String(itemsPerPage));
     
     if (search) params.set('search', search);
+    else params.delete('search');
     if (quantidadeMin) params.set('quantidadeMin', quantidadeMin);
+    else params.delete('quantidadeMin');
     if (quantidadeMax) params.set('quantidadeMax', quantidadeMax);
+    else params.delete('quantidadeMax');
     if (precoMin) params.set('precoMin', precoMin);
+    else params.delete('precoMin');
     if (precoMax) params.set('precoMax', precoMax);
+    else params.delete('precoMax');
+    if (categoryId !== null) params.set('categoryId', String(categoryId));
+    else params.delete('categoryId');
+    if (sortField) params.set('sortField', sortField);
+    else params.delete('sortField');
+    if (sortDirection) params.set('sortDirection', sortDirection);
+    else params.delete('sortDirection');
 
     return {
       currentPage,
@@ -43,6 +60,9 @@ export const useEstoque = () => {
       quantidadeMax,
       precoMin,
       precoMax,
+      categoryId,
+      sortField,
+      sortDirection,
       toString: params.toString(),
     };
   }, [searchParams]);
@@ -50,23 +70,20 @@ export const useEstoque = () => {
   const queryParams = getFiltersFromParams();
   const paramsToString = queryParams.toString;
 
-  // 🔹 Buscar estoque paginado
-  const getEstoqueByParams = () => {
-    return useQuery<{ estoque: ProdutoEstoque[]; total: number }>({
-      queryKey: ['estoque', paramsToString],
-      queryFn: async () => {
-        const response = await fetch(`/api/estoque/findPerPage?${paramsToString}`);
+  // 🔹 Buscar estoque paginado - moved to top level
+  const estoqueQuery = useQuery({
+    queryKey: ['estoque', paramsToString],
+    queryFn: async () => {
+      const response = await fetch(`/api/estoque/findPerPage?${paramsToString}`);
 
-        if (!response.ok) 
-          throw new Error('Failed to fetch estoque');
+      if (!response.ok) 
+        throw new Error('Failed to fetch estoque');
 
-        const result = await response.json();
+      const result = await response.json();
 
-        return result;
-      },
-    });
-  };
-
+      return result;
+    },
+  });
 
   // 🔹 Criar estoque
   const createMutation = useMutation({
@@ -146,6 +163,8 @@ export const useEstoque = () => {
       active.push({ label: 'Qtd Max', value: queryParams.quantidadeMax });
     if (queryParams.precoMin) active.push({ label: 'Preço Min', value: queryParams.precoMin });
     if (queryParams.precoMax) active.push({ label: 'Preço Max', value: queryParams.precoMax });
+    if (queryParams.categoryId !== null) active.push({ label: 'Categoria', value: queryParams.categoryId.toString() });
+    if (queryParams.sortField) active.push({ label: 'Ordenar', value: `${queryParams.sortField} ${queryParams.sortDirection}` });
     return active;
   };
 
@@ -172,6 +191,15 @@ export const useEstoque = () => {
       if (newFilters.precoMax) params.set('precoMax', newFilters.precoMax);
       else params.delete('precoMax');
 
+      if (newFilters.categoryId !== null) params.set('categoryId', String(newFilters.categoryId));
+      else params.delete('categoryId');
+
+      if (newFilters.sortField) params.set('sortField', newFilters.sortField);
+      else params.delete('sortField');
+
+      if (newFilters.sortDirection) params.set('sortDirection', newFilters.sortDirection);
+      else params.delete('sortDirection');
+
       router.replace(`?${params.toString()}`);
     },
     [router, searchParams]
@@ -182,7 +210,15 @@ export const useEstoque = () => {
     updateUrl(newFilters);
   };
 
-  const handleSort = () => {}
+  const handleSort = (field: string, direction: SortDirection) => {
+    const newFilters = {
+      ...queryParams,
+      sortField: field,
+      sortDirection: direction,
+      currentPage: 1
+    };
+    updateUrl(newFilters);
+  };
 
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
@@ -205,12 +241,21 @@ export const useEstoque = () => {
       case 'Preço Max':
         newFilters.precoMax = '';
         break;
+      case 'Categoria':
+        newFilters.categoryId = null;
+        break;
+      case 'Ordenar':
+        newFilters.sortField = '';
+        newFilters.sortDirection = 'asc' as SortDirection;
+        break;
     }
     updateUrl(newFilters);
   };
 
   const resetFilters = () => {
     const params = new URLSearchParams();
+    params.set('page', '1');
+    params.set('limit', '10');
     router.replace(`?${params.toString()}`);
   };
 
@@ -226,7 +271,7 @@ export const useEstoque = () => {
 
   return {
     queryParams,
-    getEstoqueByParams,
+    estoqueQuery,
     handleCreate,
     handleEdit,
     handleDelete,

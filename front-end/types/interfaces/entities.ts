@@ -93,6 +93,7 @@ export interface FilterValues {
   quantidadeMax?: string;
   precoMin?: string;
   precoMax?: string;
+  categoryId?: number | null;
   sortField?: string;
   sortDirection?: SortDirection;
 }

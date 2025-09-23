@@ -17,12 +17,12 @@ interface ActiveFiltersProps {
 }
 
 const ActiveFilter: FC<ActiveFilterProps> = ({ label, value, onRemove }) => (
-  <div className="inline-flex items-center bg-blue-50 text-blue-700 rounded-full px-3 py-1 text-sm">
+  <div className="inline-flex items-center bg-green-50 text-green-700 rounded-full px-3 py-1 text-sm">
     <span className="font-medium mr-1">{label}:</span>
     <span className="mr-2">{value}</span>
     <button
       onClick={onRemove}
-      className="text-blue-500 hover:text-blue-700 transition-colors"
+      className="text-green-500 hover:text-green-700 transition-colors"
       title="Remover filtro"
     >
       <FiX size={16} />
@@ -43,7 +43,7 @@ export const ActiveFilters: FC<ActiveFiltersProps> = ({
         <h4 className="text-sm font-medium text-gray-700">Filtros Ativos</h4>
         <button
           onClick={onClearAll}
-          className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          className="text-sm text-green-600 hover:text-green-800 transition-colors"
         >
           Limpar Todos
         </button>
