@@ -4,6 +4,8 @@ import { FC, useState  } from 'react';
 import { useForm } from 'react-hook-form';
 import { Category } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, X } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -12,13 +14,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { TextFilter } from '@/app/_components/filtros/TextFilter';
-import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { CategoryTable } from '@/app/_components/categoria/CategoryTable';
 import { CategoryFormData } from '@/app/_components/categoria/CategoryForm';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 
-import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
 import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
 import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
@@ -98,37 +97,39 @@ const CategoriaPage: FC = () => {
         </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre as categorias por nome</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <FilterContainer
-            title=""
-            description=""
-            onReset={resetFilters}
-            onApply={handleApply}
-          >
-            <TextFilter
-              value={queryParams.search || ""}
-              onChange={(search) => {
-                const newFilters = { ...queryParams, search, currentPage: 1 };
-                updateUrl(newFilters);
-              }}
-              placeholder="Pesquisar por nome..."
-              label="Nome"
-              description="Digite o nome da categoria"
-            />
-          </FilterContainer>
+      {/* Search Bar */}
+      <Card className="border-green-100 shadow-sm">
+        <CardContent className="p-4">
+          <div className="relative flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Pesquisar categorias..."
+                value={queryParams.search || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const newFilters = { ...queryParams, search: e.target.value, currentPage: 1 };
+                  updateUrl(newFilters);
+                }}
+                className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
+              />
+              {queryParams.search && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  onClick={() => {
+                    const newFilters = { ...queryParams, search: '', currentPage: 1 };
+                    updateUrl(newFilters);
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      <ActiveFilters
-        filters={getActiveFilters()}
-        onRemoveFilter={handleRemoveFilter}
-        onClearAll={resetFilters}
-      />
 
       <Card>
         <CardContent className="pt-6 space-y-6">

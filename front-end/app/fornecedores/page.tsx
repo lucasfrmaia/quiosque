@@ -1,6 +1,8 @@
 'use client';
 
 import { FC, useState, useEffect, useCallback } from 'react';
+import { Input } from '@/components/ui/input';
+import { Search, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Fornecedor } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
@@ -12,13 +14,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { TextFilter } from '@/app/_components/filtros/TextFilter';
-import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { FornecedorForm, FornecedorFormData } from '@/app/_components/fornecedor/FornecedorForm';
 import { FornecedorTable } from '@/app/_components/fornecedor/FornecedorTable';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 
-import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 import { ModalCreateFornecedor } from '../_components/modals/fornecedores/ModalCreateFornecedor';
 import { ModalEditFornecedor } from '../_components/modals/fornecedores/ModalEditFornecedor';
 import { ModalDeleteFornecedor } from '../_components/modals/fornecedores/ModalDeleteFornecedor';
@@ -34,23 +33,19 @@ const FornecedoresPage: FC = () => {
   const editForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
 
   const {
+    fornecedorQuery,
     handleCreate,
     handleEdit,
     handleDelete,
-    getFornecedorByParams,
-    handleApply,
     handleItemsPerPageChange,
     handlePageChange,
-    handleRemoveFilter,
     handleSort,
-    resetFilters,
-    getFiltersFromParams,
     updateUrl,
-    getActiveFilters
+    appliedFilters
   } = useFornecedor();
 
-  const appliedFilters = getFiltersFromParams();
-  const { data: response, isLoading, error } = getFornecedorByParams()
+  const { data: response, isLoading, error } = fornecedorQuery;
+
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
@@ -112,37 +107,38 @@ const FornecedoresPage: FC = () => {
         </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre os fornecedores por nome</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <FilterContainer
-            title=""
-            description=""
-            onReset={resetFilters}
-            onApply={handleApply}
-          >
-            <TextFilter
-              value={appliedFilters.search}
-              onChange={(search) => {
-                const newFilters = { ...appliedFilters, search, currentPage: 1 };
-                updateUrl(newFilters);
-              }}
-              placeholder="Pesquisar por nome..."
-              label="Nome"
-              description="Digite o nome do fornecedor"
-            />
-          </FilterContainer>
+      {/* Search Bar */}
+      <Card className="border-green-100 shadow-sm">
+        <CardContent className="p-4">
+          <div className="relative flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Pesquisar fornecedores..."
+                value={appliedFilters.search || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const newFilters = { ...appliedFilters, search: e.target.value, currentPage: 1 };
+                  updateUrl(newFilters);
+                }}
+                className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
+              />
+              {appliedFilters.search && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  onClick={() => {
+                    const newFilters = { ...appliedFilters, search: '', currentPage: 1 };
+                    updateUrl(newFilters);
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
-
-      <ActiveFilters
-        filters={getActiveFilters()}
-        onRemoveFilter={handleRemoveFilter}
-        onClearAll={resetFilters}
-      />
 
       <Card>
         <CardContent className="pt-6 space-y-6">
@@ -152,7 +148,7 @@ const FornecedoresPage: FC = () => {
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(id) => {
-              const fornecedor = response?.fornecedores.find(f => f.id === id);
+              const fornecedor = response?.fornecedores.find((f: Fornecedor) => f.id === id);
               if (fornecedor) openDeleteModal(fornecedor);
             }}
           />

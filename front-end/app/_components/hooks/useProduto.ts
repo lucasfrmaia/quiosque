@@ -3,10 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Produto, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-const defaultFilters: FilterValues = {
+const defaultFilters: FilterValues & { categoryId?: number } = {
   currentPage: 1,
   itemsPerPage: 10,
   search: '',
+  categoryId: undefined,
 };
 
 export const useProduto = () => {
@@ -21,6 +22,7 @@ export const useProduto = () => {
     const currentPage = Number(params.get('page')) || defaultFilters.currentPage;
     const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage;
     const search = params.get('search') || defaultFilters.search;
+    const categoryId = Number(params.get('category')) || defaultFilters.categoryId;
 
     params.set('page', String(currentPage));
     params.set('limit', String(itemsPerPage));
@@ -28,10 +30,14 @@ export const useProduto = () => {
     if (search)
       params.set('search', String(search));
 
+    if (categoryId)
+      params.set('category', String(categoryId));
+
     return {
       currentPage,
       itemsPerPage,
       search,
+      categoryId,
       toString: params.toString(),
     };
   }, [searchParams]);
@@ -175,12 +181,15 @@ export const useProduto = () => {
     if (queryParams.search) {
       active.push({ label: 'Nome', value: queryParams.search });
     }
+    if (queryParams.categoryId) {
+      active.push({ label: 'Categoria', value: queryParams.categoryId.toString() });
+    }
     return active;
   };
 
   // 🔹 Atualizar URL
   const updateUrl = useCallback(
-    (newFilters: FilterValues) => {
+    (newFilters: FilterValues & { categoryId?: number }) => {
       const params = new URLSearchParams(searchParams.toString());
 
       params.set('page', String(newFilters.currentPage));
@@ -190,6 +199,12 @@ export const useProduto = () => {
         params.set('search', newFilters.search);
       } else {
         params.delete('search');
+      }
+
+      if (newFilters.categoryId) {
+        params.set('category', String(newFilters.categoryId));
+      } else {
+        params.delete('category');
       }
 
       router.replace(`?${params.toString()}`);
@@ -211,12 +226,17 @@ export const useProduto = () => {
       case 'Nome':
         newFilters = { ...newFilters, search: '' };
         break;
+      case 'Categoria':
+        newFilters = { ...newFilters, categoryId: undefined };
+        break;
     }
     updateUrl(newFilters);
   };
 
   const resetFilters = () => {
     const params = new URLSearchParams();
+    params.set('page', '1');
+    params.set('limit', '10');
     router.replace(`?${params.toString()}`);
   };
 
@@ -233,7 +253,7 @@ export const useProduto = () => {
   };
 
   return {
-    queryParams,
+    queryParams: queryParams as FilterValues,
     allProdutosQuery,
     getProdutosByParams,
     handleCreate,
