@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +25,7 @@ interface NotaFiscalVendaFormProps {
 }
 
 export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = false }) => {
-  const { register, watch } = useFormContext<NotaFiscalVendaFormData>();
+  const { register, watch, setValue } = useFormContext<NotaFiscalVendaFormData>();
   const produtos = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control: useFormContext().control,
@@ -36,6 +36,13 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
   const [isOpen, setIsOpen] = useState(false);
   const [selectedEstoqueId, setSelectedEstoqueId] = useState<string | null>(null);
   const [pendingQuantity, setPendingQuantity] = useState('1');
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    if (!watch('data')) {
+      setValue('data', today);
+    }
+  }, [setValue, watch]);
 
   const { data: allEstoque, isLoading, error } = useQuery<ProdutoEstoque[]>({
     queryKey: ['all-estoque-venda'],
@@ -180,12 +187,10 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
             const produto = estoqueItem?.produto;
             if (!estoqueItem || !produto) return null;
 
-            const totalItemPrice = (parseFloat(produtoVenda.quantidade || '0') * parseFloat(produtoVenda.precoUnitario || '0')).toFixed(2);
-
             return (
               <Badge key={field.id} variant="secondary" className="flex items-center gap-1 px-3 py-1 text-xs">
                 <span className="flex-1 min-w-0 truncate">
-                  {produtoVenda.quantidade}x {produto.nome} (R$ {totalItemPrice})
+                  {produto.nome} - {produtoVenda.quantidade} x R$ {produtoVenda.precoUnitario}
                 </span>
                 <Button
                   type="button"

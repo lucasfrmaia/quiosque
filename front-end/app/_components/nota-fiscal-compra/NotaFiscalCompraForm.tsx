@@ -1,9 +1,9 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useFormContext } from 'react-hook-form';
-import { Controller, useFieldArray } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 import {
   Select,
   SelectContent,
@@ -11,12 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Fornecedor, NotaFiscalCompra, ProdutoCompra } from '@/types/interfaces/entities';
+import { Badge } from '@/components/ui/badge';
+import { useProduto } from '../hooks/useProduto';
+import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto } from '@/types/interfaces/entities';
 
 interface NotaFiscalCompraFormData {
   data: string;
   fornecedorId: string;
-  total: string;
   produtos: Array<{
     produtoId: string;
     quantidade: string;
@@ -36,6 +37,38 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
     control,
     name: "produtos"
   });
+
+  const { allProdutosQuery: { data: produtos = [] } } = useProduto();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProdutoId, setSelectedProdutoId] = useState('');
+  const [quantidade, setQuantidade] = useState('');
+  const [precoUnitario, setPrecoUnitario] = useState('');
+
+  const filteredProdutos = produtos.filter((p: Produto) =>
+    p.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const selectedProduto = produtos.find((p: Produto) => p.id.toString() === selectedProdutoId);
+
+  const handleAddProduto = () => {
+    if (!selectedProdutoId || !quantidade || !precoUnitario) return;
+
+    const produto = produtos.find((p: Produto) => p.id.toString() === selectedProdutoId);
+    if (!produto) return;
+
+    append({
+      produtoId: selectedProdutoId,
+      quantidade,
+      unidade: 'Unidade', // Default since not in Produto
+      precoUnitario
+    });
+
+    setSelectedProdutoId('');
+    setQuantidade('');
+    setPrecoUnitario('');
+    setSearchTerm('');
+  };
 
   return (
     <div className="grid gap-4 py-4">
@@ -75,77 +108,85 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
         />
       </div>
 
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="total" className="text-right">
-          Total
-        </Label>
-        <Input
-          id="total"
-          type="number"
-          {...register('total')}
-          className="col-span-3"
-          placeholder="Total da nota fiscal"
-          step="0.01"
-        />
-      </div>
-
       <div>
-        <Label className="text-sm font-medium">Produtos</Label>
+        <Label className="text-sm font-medium">Adicionar Produto</Label>
+        <div className="grid grid-cols-4 items-center gap-4 mt-2">
+          <Label className="text-right">Produto</Label>
+          <div className="col-span-3 space-y-2">
+            <Input
+              placeholder="Buscar produto..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Select value={selectedProdutoId} onValueChange={setSelectedProdutoId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um produto" />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredProdutos.map((produto: Produto) => (
+                  <SelectItem key={produto.id} value={produto.id.toString()}>
+                    {produto.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4 mt-2">
+          <Label className="text-right">Quantidade</Label>
+          <Input
+            type="number"
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.target.value)}
+            placeholder="Quantidade"
+            className="col-span-3"
+          />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4 mt-2">
+          <Label className="text-right">Preço Unitário</Label>
+          <Input
+            type="number"
+            value={precoUnitario}
+            onChange={(e) => setPrecoUnitario(e.target.value)}
+            placeholder="Preço unitário"
+            className="col-span-3"
+            step="0.01"
+          />
+        </div>
         <Button
           type="button"
-          onClick={() => append({ produtoId: '', quantidade: '', unidade: '', precoUnitario: '' })}
+          onClick={handleAddProduto}
           className="mt-2"
         >
           Adicionar Produto
         </Button>
-        {fields.map((field, index) => (
-          <div key={field.id} className="border p-4 mt-4 rounded">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Produto ID</Label>
-              <Input
-                {...register(`produtos.${index}.produtoId` as const)}
-                placeholder="ID do produto"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4 mt-2">
-              <Label className="text-right">Quantidade</Label>
-              <Input
-                type="number"
-                {...register(`produtos.${index}.quantidade` as const)}
-                placeholder="Quantidade"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4 mt-2">
-              <Label className="text-right">Unidade</Label>
-              <Input
-                {...register(`produtos.${index}.unidade` as const)}
-                placeholder="Unidade"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4 mt-2">
-              <Label className="text-right">Preço Unitário</Label>
-              <Input
-                type="number"
-                {...register(`produtos.${index}.precoUnitario` as const)}
-                placeholder="Preço unitário"
-                className="col-span-3"
-                step="0.01"
-              />
-            </div>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => remove(index)}
-              className="mt-2"
-            >
-              Remover Produto
-            </Button>
-          </div>
-        ))}
       </div>
+
+      {fields.length > 0 && (
+        <div>
+          <Label className="text-sm font-medium">Produtos Adicionados</Label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {fields.map((field, index) => {
+              const produto = produtos.find((p: Produto) => p.id.toString() === field.produtoId);
+              return (
+                <div key={field.id} className="flex items-center">
+                  <Badge variant="secondary" className="mr-1">
+                    {produto?.nome || 'Produto desconhecido'} - Qtd: {field.quantidade} - Preço: R$ {parseFloat(field.precoUnitario || '0').toFixed(2)}
+                  </Badge>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => remove(index)}
+                  >
+                    ×
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

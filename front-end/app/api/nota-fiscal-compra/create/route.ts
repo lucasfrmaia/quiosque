@@ -6,7 +6,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] };
     const notaFiscal = await repositoryFactory.notaFiscalCompraRepository.create(body);
-    return NextResponse.json({ success: true, data: notaFiscal }, { status: 201 });
+    
+    return NextResponse.json(notaFiscal, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
   }

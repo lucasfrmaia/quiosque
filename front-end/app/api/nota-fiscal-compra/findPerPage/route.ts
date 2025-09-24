@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     };
 
     const result = await repositoryFactory.notaFiscalCompraRepository.findPerPage(filters);
-    return NextResponse.json(result);
+    return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     console.error('Error fetching nota fiscal compra per page:', error);
     return NextResponse.json({ success: false, error: error.message || 'Failed to fetch nota fiscal compra' }, { status: 500 });
