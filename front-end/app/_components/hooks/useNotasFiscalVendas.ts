@@ -38,7 +38,7 @@ export const useNotasFiscaisVendas = () => {
 
   // Buscar notas fiscais com paginação e filtros
   const getNotasByParams = () => {
-    return useQuery<{ data: NotaFiscalVenda[]; total: number }>({
+    return useQuery<{ notas: NotaFiscalVenda[]; total: number }>({
       queryKey: ['notas', paramsToString],
       queryFn: async () => {
         const response = await fetch(`/api/nota-fiscal-venda/findPerPage?${paramsToString}`);
@@ -72,7 +72,7 @@ export const useNotasFiscaisVendas = () => {
   const createMutation = useMutation({
     mutationFn: async (
       nota: Omit<NotaFiscalVenda, 'id' | 'produtos'> & {
-        produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal'>[];
+        produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal' | 'notaFiscalId'>[];
       }
     ) => {
       const response = await fetch('/api/nota-fiscal-venda/create', {
@@ -96,7 +96,7 @@ export const useNotasFiscaisVendas = () => {
 
   const handleCreate = (
     nota: Omit<NotaFiscalVenda, 'id' | 'produtos'> & {
-      produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal'>[];
+      produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal' | 'notaFiscalId'>[];
     }
   ) => {
     createMutation.mutate(nota);

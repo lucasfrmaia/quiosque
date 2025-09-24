@@ -95,8 +95,7 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
       include: {
         produtos: {
           include: {
-            produto: true,
-            notaFiscal: true
+            produto: true
           }
         }
       }

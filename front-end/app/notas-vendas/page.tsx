@@ -73,10 +73,9 @@ const NotasVendasPage: FC = () => {
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      data: data.data,
+      data: new Date(data.data),
       total: Number(data.total),
       produtos: data.produtos.map((p) => ({
-        notaFiscalId: 0,
         produtoId: Number(p.produtoId),
         quantidade: Number(p.quantidade),
         unidade: p.unidade,
@@ -90,7 +89,7 @@ const NotasVendasPage: FC = () => {
   const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedNota) return;
     handleEdit(selectedNota.id, {
-      data: data.data,
+      data: new Date(data.data),
       total: Number(data.total),
     });
     setIsEditModalOpen(false);
@@ -100,7 +99,7 @@ const NotasVendasPage: FC = () => {
 
   const openEditModal = (nota: NotaFiscalVenda) => {
     setSelectedNota(nota);
-    editForm.setValue('data', nota.data.split('T')[0]);
+    editForm.setValue('data', nota.data.toDateString());
     editForm.setValue('total', nota.total.toString());
     editForm.setValue(
       'produtos',
@@ -183,12 +182,12 @@ const NotasVendasPage: FC = () => {
       <Card>
         <CardContent className="pt-6 space-y-6">
           <NotaFiscalVendaTable
-            items={response?.data || []}
+            items={response?.notas || []}
             filterValues={appliedFilters}
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(id) => {
-              const nota = response?.data?.find((n) => n.id === id.id);
+              const nota = response?.notas?.find((n) => n.id === id.id);
               if (nota) openDeleteModal(nota);
             }}
           />
