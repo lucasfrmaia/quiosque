@@ -7,8 +7,6 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { TextFilter } from '@/app/_components/filtros/TextFilter';
-import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { NotaFiscalCompraTable } from '@/app/_components/nota-fiscal-compra/NotaFiscalCompraTable';
 import { useNotaFiscalCompra } from '@/app/_components/hooks/useNotaFiscalCompra';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
@@ -17,6 +15,8 @@ import { notaFiscalCompraSchema } from '../_components/validation';
 import { ModalCreateNotaCompra } from '../_components/modals/notas-compras/ModalCreateNotaCompra';
 import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEditeNotaCompra';
 import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
+import { Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const NotasCompraPage: FC = () => {
   const searchParams = useSearchParams();
@@ -34,38 +34,21 @@ const NotasCompraPage: FC = () => {
   };
 
   /** Extrai filtros da URL */
-  const getFiltersFromParams = useCallback((): FilterValues => {
-    const params = new URLSearchParams(searchParams.toString());
-    return {
-      ...defaultFilters,
-      currentPage: parseInt(params.get('page') || defaultFilters.currentPage.toString()) || defaultFilters.currentPage,
-      itemsPerPage: parseInt(params.get('limit') || defaultFilters.itemsPerPage.toString()) || defaultFilters.itemsPerPage,
+  const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras, updateUrl, resetFilters, queryParams } = useNotaFiscalCompra();
+  const { data: responseNotas, isLoading, error } = getNotasFiscaisCompras()
 
-      search: params.get('search') || defaultFilters.search,
-      quantidadeMin: params.get('quantidadeMin') || defaultFilters.quantidadeMin,
-      quantidadeMax: params.get('quantidadeMax') || defaultFilters.quantidadeMax,
-      precoMin: params.get('precoMin') || defaultFilters.precoMin,
-      precoMax: params.get('precoMax') || defaultFilters.precoMax,
-    };
-  }, [searchParams]);
-
-  /** Estados de filtros aplicados e pendentes */
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(getFiltersFromParams());
-  const [pendingFilters, setPendingFilters] = useState<FilterValues>(appliedFilters);
-
-  useEffect(() => {
-    setPendingFilters(appliedFilters);
-  }, [appliedFilters]);
-
-  /** Hook da entidade */
-  const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras } = useNotaFiscalCompra();
-  const { data: responseNotas , isLoading, error } = getNotasFiscaisCompras()
-
-  /** Fornecedores (para selects no formulário) */
   const { getAllFornecedores } = useFornecedor();
   const { data: responsefornecedores, isLoading: isLoadingFornecedor, error: errorFornecedor } = getAllFornecedores()
 
-  /** Estados de modais */
+  /** Estados de filtros aplicados e pendentes */
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(queryParams);
+  const [localSearch, setLocalSearch] = useState(appliedFilters.search || '');
+
+  useEffect(() => {
+    setLocalSearch(appliedFilters.search || '');
+  }, [appliedFilters.search]);
+
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -90,33 +73,13 @@ const NotasCompraPage: FC = () => {
     },
   });
 
-  /** Atualiza URL com filtros */
-  const updateUrl = useCallback((newFilters: FilterValues) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', newFilters.currentPage.toString());
-    params.set('limit', newFilters.itemsPerPage.toString());
-
-    newFilters.search ? params.set('search', newFilters.search) : params.delete('search');
-    newFilters.quantidadeMin ? params.set('quantidadeMin', newFilters.quantidadeMin) : params.delete('quantidadeMin');
-    newFilters.quantidadeMax ? params.set('quantidadeMax', newFilters.quantidadeMax) : params.delete('quantidadeMax');
-    newFilters.precoMin ? params.set('precoMin', newFilters.precoMin) : params.delete('precoMin');
-    newFilters.precoMax ? params.set('precoMax', newFilters.precoMax) : params.delete('precoMax');
-
-    router.replace(`?${params.toString()}`);
-  }, [router, searchParams]);
-
-  /** Filtros */
-  const handleApply = () => {
-    const newFilters = { ...pendingFilters, currentPage: 1 };
+  const handleSearch = useCallback(() => {
+    const newFilters = { ...appliedFilters, search: localSearch, currentPage: 1 };
     setAppliedFilters(newFilters);
     updateUrl(newFilters);
-  };
+  }, [appliedFilters, localSearch, updateUrl]);
 
-  const resetFilters = () => {
-    setPendingFilters(defaultFilters);
-    setAppliedFilters(defaultFilters);
-    router.replace(`?`);
-  };
+  /** Atualiza URL com filtros */
 
   const handlePageChange = (page: number) => {
     const newFilters = { ...appliedFilters, currentPage: page };
@@ -203,8 +166,8 @@ const NotasCompraPage: FC = () => {
     updateUrl(newFilters);
   };
 
-  if (isLoading || isLoadingFornecedor) return <>Carregando...</>
-  if (error || errorFornecedor) return <>Error</>
+ if (isLoading || isLoadingFornecedor) return <>Carregando...</>
+ if (error || errorFornecedor) return <>Error</>
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -221,20 +184,34 @@ const NotasCompraPage: FC = () => {
 
       {/* Filtros */}
       <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre as notas por ID ou fornecedor</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <FilterContainer onReset={resetFilters} onApply={handleApply}>
-            <TextFilter
-              value={pendingFilters.search || ""}
-              onChange={(search) => setPendingFilters(prev => ({ ...prev, search }))}
-              placeholder="Pesquisar por ID ou fornecedor..."
-              label="Pesquisa"
-              description="Digite o ID da nota ou nome do fornecedor"
-            />
-          </FilterContainer>
+        <CardContent className="p-4">
+          <div className="relative flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Pesquisar por ID ou fornecedor..."
+                value={localSearch}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
+                className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
+              />
+              {localSearch && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  onClick={() => setLocalSearch('')}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            <Button onClick={handleSearch} variant="default" size="sm">
+              Buscar
+            </Button>
+            <Button onClick={resetFilters} variant="outline" size="sm">
+              Limpar Filtros
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -250,8 +227,13 @@ const NotasCompraPage: FC = () => {
         <CardContent className="pt-6 space-y-6">
           <NotaFiscalCompraTable
             items={responseNotas?.notas || []}
+            filterValues={appliedFilters}
+            onSort={() => { }}
             onEdit={openEditModal}
-            onDelete={openDeleteModal}
+            onDelete={(id) => {
+              const nota = responseNotas?.notas?.find(nota => nota.id === id);
+              if (nota) openDeleteModal(nota);
+            }}
           />
 
           <Pagination

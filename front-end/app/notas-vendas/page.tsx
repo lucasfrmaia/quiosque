@@ -2,7 +2,7 @@
 
 import { FC, useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { NotaFiscalVenda } from '@/types/interfaces/entities';
+import { FilterValues, NotaFiscalVenda } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
@@ -23,6 +23,24 @@ import { ModalEditNotaVenda } from '../_components/modals/nota-vendas/ModalEditN
 import { ModalDeleteNotaVenda } from '../_components/modals/nota-vendas/ModalDeleteNotaVenda';
 
 const NotasVendasPage: FC = () => {
+
+  const {
+    queryParams,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleCreate,
+    handleDelete,
+    handleEdit,
+    resetFilters,
+    updateUrl,
+    handleSort,
+    getNotasByParams,
+  } = useNotasFiscaisVendas();
+
+  const { data: response, isLoading, error } = getNotasByParams();
+
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(queryParams);
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -43,24 +61,6 @@ const NotasVendasPage: FC = () => {
       produtos: [],
     },
   });
-
-  const {
-    queryParams,
-    handleRemoveFilter,
-    handlePageChange,
-    handleItemsPerPageChange,
-    handleCreate,
-    handleDelete,
-    handleEdit,
-    handleApply,
-    resetFilters,
-    updateUrl,
-    handleSort,
-    getActiveFilters,
-    getNotasByParams,
-  } = useNotasFiscaisVendas();
-
-  const { data: response, isLoading } = getNotasByParams();
 
   useEffect(() => {
     setLocalSearch(queryParams.search || '');
@@ -127,6 +127,7 @@ const NotasVendasPage: FC = () => {
   };
 
   if (isLoading) return <>Carregando...</>;
+ if (error) return <>Error</>
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -183,6 +184,7 @@ const NotasVendasPage: FC = () => {
         <CardContent className="pt-6 space-y-6">
           <NotaFiscalVendaTable
             items={response?.data || []}
+            filterValues={appliedFilters}
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(id) => {

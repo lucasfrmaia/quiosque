@@ -29,7 +29,8 @@ interface DataTableProps<T> {
   filterValues: FilterValues;
   onSort: (field: string) => void;
   onEdit: (item: T) => void;
-  onDelete: (id: number) => void;
+  onDelete: (item: T) => void;
+  onView?: (item: T) => void;
   emptyMessage?: string;
 }
 
@@ -40,6 +41,7 @@ export const DataTable = <T extends { id: number }>({
   onSort,
   onEdit,
   onDelete,
+  onView,
   emptyMessage = 'Nenhum item encontrado.',
 }: DataTableProps<T>) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -140,10 +142,15 @@ export const DataTable = <T extends { id: number }>({
               ))}
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
+                  {onView && (
+                    <Button variant="outline" size="sm" onClick={() => onView(item)}>
+                      Ver
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => onDelete(item.id)}>
+                  <Button variant="destructive" size="sm" onClick={() => onDelete(item)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
