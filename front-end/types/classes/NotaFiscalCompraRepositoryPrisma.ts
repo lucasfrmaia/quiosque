@@ -9,52 +9,6 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
     this.prisma = prisma;
   }
 
-  private mapFornecedor(fornecedor: any): Fornecedor {
-    return {
-      id: fornecedor.id,
-      nome: fornecedor.nome,
-      cnpj: fornecedor.cnpj,
-      telefone: fornecedor.telefone,
-      email: fornecedor.email,
-      compras: []
-    };
-  }
-
-  private mapProdutoCompra(produtoCompra: any): ProdutoCompra {
-    return {
-      id: produtoCompra.id,
-      notaFiscalId: produtoCompra.notaFiscalId,
-      produtoId: produtoCompra.produtoId,
-      quantidade: produtoCompra.quantidade,
-      unidade: produtoCompra.unidade,
-      precoUnitario: produtoCompra.precoUnitario,
-      produto: {
-        id: produtoCompra.produto.id,
-        nome: produtoCompra.produto.nome,
-        descricao: produtoCompra.produto.descricao,
-        imagemUrl: produtoCompra.produto.imagemUrl,
-        ativo: produtoCompra.produto.ativo,
-        tipo: produtoCompra.produto.tipo,
-        categoriaId: produtoCompra.produto.categoriaId,
-        categoria: produtoCompra.produto.categoria,
-        estoques: [],
-        compras: [],
-        vendas: []
-      },
-      notaFiscal: produtoCompra.notaFiscal ? {
-        id: produtoCompra.notaFiscal.id,
-        data: produtoCompra.notaFiscal.data.toISOString(),
-        total: produtoCompra.notaFiscal.total,
-        fornecedorId: produtoCompra.notaFiscal.fornecedorId,
-        fornecedor: this.mapFornecedor(produtoCompra.notaFiscal.fornecedor)
-      } : undefined
-    };
-  }
-
-  private mapProdutoCompras(produtoCompras: any[]): ProdutoCompra[] {
-    return produtoCompras.map(this.mapProdutoCompra);
-  }
-
   async create(notaFiscal: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }): Promise<NotaFiscalCompra> {
     const { data, total, fornecedorId, produtos } = notaFiscal;
     const createData = {
@@ -74,6 +28,7 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }))
       }
     };
+
     const createdNotaFiscal = await this.prisma.notaFiscalCompra.create({
       data: createData,
       include: {
@@ -86,14 +41,8 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }
       }
     });
-    return {
-      id: createdNotaFiscal.id,
-      data: createdNotaFiscal.data.toISOString(),
-      total: createdNotaFiscal.total,
-      fornecedorId: createdNotaFiscal.fornecedorId,
-      fornecedor: this.mapFornecedor(createdNotaFiscal.fornecedor),
-      produtos: this.mapProdutoCompras(createdNotaFiscal.produtos)
-    };
+
+    return createdNotaFiscal;
   }
 
   async findById(id: number): Promise<NotaFiscalCompra | null> {
@@ -109,15 +58,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }
       }
     });
+
     if (!notaFiscal) return null;
-    return {
-      id: notaFiscal.id,
-      data: notaFiscal.data.toISOString(),
-      total: notaFiscal.total,
-      fornecedorId: notaFiscal.fornecedorId,
-      fornecedor: this.mapFornecedor(notaFiscal.fornecedor),
-      produtos: this.mapProdutoCompras(notaFiscal.produtos)
-    };
+
+    return notaFiscal;
   }
 
   async findAll(): Promise<NotaFiscalCompra[]> {
@@ -132,14 +76,8 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }
       }
     });
-    return notasFiscais.map(nf => ({
-      id: nf.id,
-      data: nf.data.toISOString(),
-      total: nf.total,
-      fornecedorId: nf.fornecedorId,
-      fornecedor: this.mapFornecedor(nf.fornecedor),
-      produtos: this.mapProdutoCompras(nf.produtos)
-    }));
+
+    return notasFiscais;
   }
 
   async findPerPage(filters: FilterValues) {
@@ -155,7 +93,7 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
       ];
     }
 
-    const notasFiscais = await this.prisma.notaFiscalCompra.findMany({
+    const notas = await this.prisma.notaFiscalCompra.findMany({
       where,
       skip,
       take: itemsPerPage,
@@ -169,31 +107,27 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }
       }
     });
-    const notas = notasFiscais.map(nf => ({
-      id: nf.id,
-      data: nf.data.toISOString(),
-      total: nf.total,
-      fornecedorId: nf.fornecedorId,
-      fornecedor: this.mapFornecedor(nf.fornecedor),
-      produtos: this.mapProdutoCompras(nf.produtos)
-    }));
 
-    const total = await this.prisma.notaFiscalCompra.count({ where });
+
+    const total = await this.prisma.notaFiscalCompra.count();
 
     return { notas, total };
   }
 
   async update(id: number, notaFiscal: Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>>): Promise<NotaFiscalCompra> {
     const data: any = { ...notaFiscal };
+
     if (data.data) {
       data.data = new Date(data.data);
     }
+
     if (data.fornecedorId) {
       data.fornecedor = {
         connect: { id: data.fornecedorId }
       };
       delete data.fornecedorId;
     }
+
     const updatedNotaFiscal = await this.prisma.notaFiscalCompra.update({
       where: { id },
       data,
@@ -207,14 +141,8 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }
       }
     });
-    return {
-      id: updatedNotaFiscal.id,
-      data: updatedNotaFiscal.data.toISOString(),
-      total: updatedNotaFiscal.total,
-      fornecedorId: updatedNotaFiscal.fornecedorId,
-      fornecedor: this.mapFornecedor(updatedNotaFiscal.fornecedor),
-      produtos: this.mapProdutoCompras(updatedNotaFiscal.produtos)
-    };
+
+    return updatedNotaFiscal;
   }
 
   async delete(id: number): Promise<void> {

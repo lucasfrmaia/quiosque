@@ -39,7 +39,7 @@ export interface ProdutoEstoque {
   id: number;
   preco: number;
   quantidade: number;
-  dataValidade?: string | null;
+  dataValidade?: Date | null;
   unidade: string;
   produtoId: number;
   produto?: Produto;
@@ -47,7 +47,7 @@ export interface ProdutoEstoque {
 
 export interface NotaFiscalCompra {
   id: number;
-  data: string;
+  data: Date;
   total: number;
   fornecedorId: number;
   fornecedor?: Fornecedor;
@@ -67,7 +67,7 @@ export interface ProdutoCompra {
 
 export interface NotaFiscalVenda {
   id: number;
-  data: string;
+  data: Date;
   total: number;
   produtos?: ProdutoVenda[];
 }

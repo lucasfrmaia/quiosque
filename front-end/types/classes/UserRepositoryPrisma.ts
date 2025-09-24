@@ -13,6 +13,7 @@ export class UserRepositoryPrisma implements IUserRepository {
     const createdUser = await this.prisma.user.create({
       data: user
     });
+
     return createdUser;
   }
 
@@ -46,7 +47,7 @@ export class UserRepositoryPrisma implements IUserRepository {
       take: itemsPerPage
     });
 
-    const total = await this.prisma.user.count({ where });
+    const total = await this.prisma.user.count();
 
     return {
       users,
@@ -59,6 +60,7 @@ export class UserRepositoryPrisma implements IUserRepository {
       where: { id },
       data: user
     });
+
     return updatedUser;
   }
 

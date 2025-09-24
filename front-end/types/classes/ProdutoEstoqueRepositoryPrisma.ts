@@ -9,46 +9,20 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
     this.prisma = prisma;
   }
 
-  private mapProduto(produto: any): Produto {
-    return {
-      id: produto.id,
-      nome: produto.nome,
-      descricao: produto.descricao,
-      imagemUrl: produto.imagemUrl,
-      ativo: produto.ativo,
-      tipo: produto.tipo,
-      categoriaId: produto.categoriaId,
-      categoria: produto.categoria ? {
-        id: produto.categoria.id,
-        name: produto.categoria.name,
-        produtos: []
-      } : null,
-      estoques: [],
-      compras: [],
-      vendas: []
-    };
-  }
-
   async create(produtoEstoque: Omit<ProdutoEstoque, 'id' | 'produto'>): Promise<ProdutoEstoque> {
     const data = {
       ...produtoEstoque,
       dataValidade: produtoEstoque.dataValidade ? new Date(produtoEstoque.dataValidade) : null
     };
+
     const createdProdutoEstoque = await this.prisma.produtoEstoque.create({
       data,
       include: {
         produto: true
       }
     });
-    return {
-      id: createdProdutoEstoque.id,
-      preco: createdProdutoEstoque.preco,
-      quantidade: createdProdutoEstoque.quantidade,
-      dataValidade: createdProdutoEstoque.dataValidade ? createdProdutoEstoque.dataValidade.toISOString() : null,
-      unidade: createdProdutoEstoque.unidade,
-      produtoId: createdProdutoEstoque.produtoId,
-      produto: this.mapProduto(createdProdutoEstoque.produto)
-    };
+
+    return createdProdutoEstoque;
   }
 
   async findById(id: number): Promise<ProdutoEstoque | null> {
@@ -58,16 +32,10 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
         produto: true
       }
     });
+
     if (!produtoEstoque) return null;
-    return {
-      id: produtoEstoque.id,
-      preco: produtoEstoque.preco,
-      quantidade: produtoEstoque.quantidade,
-      dataValidade: produtoEstoque.dataValidade ? produtoEstoque.dataValidade.toISOString() : null,
-      unidade: produtoEstoque.unidade,
-      produtoId: produtoEstoque.produtoId,
-      produto: this.mapProduto(produtoEstoque.produto)
-    };
+
+    return produtoEstoque;
   }
 
   async findAll(): Promise<ProdutoEstoque[]> {
@@ -77,16 +45,7 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       }
     });
 
-    return produtoEstoques.map(pe => ({
-      id: pe.id,
-      preco: pe.preco,
-      quantidade: pe.quantidade,
-      dataValidade: pe.dataValidade ? pe.dataValidade.toISOString() : null,
-      unidade: pe.unidade,
-      produtoId: pe.produtoId,
-      produto: this.mapProduto(pe.produto)
-    }));
-
+    return produtoEstoques
   }
 
   async findPerPage(filters: FilterValues) {
@@ -151,22 +110,12 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       }
     });
 
-    const estoque = produtoEstoques.map(pe => ({
-      id: pe.id,
-      preco: pe.preco,
-      quantidade: pe.quantidade,
-      dataValidade: pe.dataValidade ? pe.dataValidade.toISOString() : null,
-      unidade: pe.unidade,
-      produtoId: pe.produtoId,
-      produto: this.mapProduto(pe.produto)
-    }));
-
-    const total = await this.prisma.produtoEstoque.count({ where });
-
+    const total = await this.prisma.produtoEstoque.count();
     return {
-      estoque: estoque,
+      estoque: produtoEstoques,
       total
     }
+
   }
 
   async update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>): Promise<ProdutoEstoque> {
@@ -181,15 +130,8 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
         produto: true
       }
     });
-    return {
-      id: updatedProdutoEstoque.id,
-      preco: updatedProdutoEstoque.preco,
-      quantidade: updatedProdutoEstoque.quantidade,
-      dataValidade: updatedProdutoEstoque.dataValidade ? updatedProdutoEstoque.dataValidade.toISOString() : null,
-      unidade: updatedProdutoEstoque.unidade,
-      produtoId: updatedProdutoEstoque.produtoId,
-      produto: this.mapProduto(updatedProdutoEstoque.produto)
-    };
+
+    return updatedProdutoEstoque;
   }
 
   async delete(id: number): Promise<void> {
