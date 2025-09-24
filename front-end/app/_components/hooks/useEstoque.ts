@@ -8,8 +8,6 @@ const defaultFilters: FilterValues = {
   itemsPerPage: 10,
   search: '',
   categoryId: null,
-  sortField: '',
-  sortDirection: 'asc' as SortDirection,
 };
 
 export const useEstoque = () => {
@@ -29,8 +27,7 @@ export const useEstoque = () => {
     const precoMin = params.get('precoMin') || '';
     const precoMax = params.get('precoMax') || '';
     const categoryId = params.get('categoryId') ? Number(params.get('categoryId')) : null;
-    const sortField = params.get('sortField') || defaultFilters.sortField;
-    const sortDirection = (params.get('sortDirection') as SortDirection) || defaultFilters.sortDirection;
+
 
     params.set('page', String(currentPage));
     params.set('limit', String(itemsPerPage));
@@ -47,10 +44,6 @@ export const useEstoque = () => {
     else params.delete('precoMax');
     if (categoryId !== null) params.set('categoryId', String(categoryId));
     else params.delete('categoryId');
-    if (sortField) params.set('sortField', sortField);
-    else params.delete('sortField');
-    if (sortDirection) params.set('sortDirection', sortDirection);
-    else params.delete('sortDirection');
 
     return {
       currentPage,
@@ -61,8 +54,6 @@ export const useEstoque = () => {
       precoMin,
       precoMax,
       categoryId,
-      sortField,
-      sortDirection,
       toString: params.toString(),
     };
   }, [searchParams]);
@@ -164,7 +155,6 @@ export const useEstoque = () => {
     if (queryParams.precoMin) active.push({ label: 'Preço Min', value: queryParams.precoMin });
     if (queryParams.precoMax) active.push({ label: 'Preço Max', value: queryParams.precoMax });
     if (queryParams.categoryId !== null) active.push({ label: 'Categoria', value: queryParams.categoryId.toString() });
-    if (queryParams.sortField) active.push({ label: 'Ordenar', value: `${queryParams.sortField} ${queryParams.sortDirection}` });
     return active;
   };
 
@@ -193,12 +183,6 @@ export const useEstoque = () => {
 
       if (newFilters.categoryId !== null) params.set('categoryId', String(newFilters.categoryId));
       else params.delete('categoryId');
-
-      if (newFilters.sortField) params.set('sortField', newFilters.sortField);
-      else params.delete('sortField');
-
-      if (newFilters.sortDirection) params.set('sortDirection', newFilters.sortDirection);
-      else params.delete('sortDirection');
 
       router.replace(`?${params.toString()}`);
     },
@@ -243,10 +227,6 @@ export const useEstoque = () => {
         break;
       case 'Categoria':
         newFilters.categoryId = null;
-        break;
-      case 'Ordenar':
-        newFilters.sortField = '';
-        newFilters.sortDirection = 'asc' as SortDirection;
         break;
     }
     updateUrl(newFilters);
