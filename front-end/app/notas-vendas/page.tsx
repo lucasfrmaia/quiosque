@@ -1,20 +1,11 @@
 'use client';
 
 import { FC, useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { FilterValues, SortDirection } from '@/types/interfaces/entities';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { NotaFiscalVenda } from '@/types/interfaces/entities';
-import { NotaFiscalVendaFormData } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Search, X } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -23,148 +14,68 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { TextFilter } from '@/app/_components/filtros/TextFilter';
-import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { NotaFiscalVendaTable } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaTable';
-import { NotaFiscalVendaForm } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
+import { NotaFiscalVendaFormData } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
 import { useNotasFiscaisVendas } from '@/app/_components/hooks/useNotasFiscalVendas';
-import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+
 import { ModalCreateNotaVenda } from '../_components/modals/nota-vendas/ModalCreateNotaVenda';
 import { ModalEditNotaVenda } from '../_components/modals/nota-vendas/ModalEditNotaVenda';
 import { ModalDeleteNotaVenda } from '../_components/modals/nota-vendas/ModalDeleteNotaVenda';
 
 const NotasVendasPage: FC = () => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const defaultFilters: FilterValues = {
-    currentPage: 1,
-    itemsPerPage: 10,
-    sortField: 'data',
-    sortDirection: 'desc' as SortDirection,
-    search: '',
-    quantidadeMin: '',
-    quantidadeMax: '',
-    precoMin: '',
-    precoMax: '',
-  };
-
-  const getFiltersFromParams = useCallback((): FilterValues => {
-    const params = new URLSearchParams(searchParams.toString());
-    return {
-      ...defaultFilters,
-      currentPage: parseInt(params.get('page') || defaultFilters.currentPage.toString()) || defaultFilters.currentPage,
-      itemsPerPage: parseInt(params.get('limit') || defaultFilters.itemsPerPage.toString()) || defaultFilters.itemsPerPage,
-      sortField: params.get('sortField') || defaultFilters.sortField,
-      sortDirection: (params.get('sortDirection') as SortDirection) || defaultFilters.sortDirection,
-      search: params.get('search') || defaultFilters.search,
-      quantidadeMin: params.get('quantidadeMin') || defaultFilters.quantidadeMin,
-      quantidadeMax: params.get('quantidadeMax') || defaultFilters.quantidadeMax,
-      precoMin: params.get('precoMin') || defaultFilters.precoMin,
-      precoMax: params.get('precoMax') || defaultFilters.precoMax,
-    };
-  }, [searchParams]);
-
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(getFiltersFromParams());
-  const [pendingFilters, setPendingFilters] = useState<FilterValues>(appliedFilters);
-
-  useEffect(() => {
-    setPendingFilters(appliedFilters);
-  }, [appliedFilters]);
-
-  const { notas, total, filters: hookFilters, isLoading, handleCreate, handleEdit, handleDelete } = useNotasFiscaisVendas(appliedFilters);
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedNota, setSelectedNota] = useState<NotaFiscalVenda | null>(null);
+  const [localSearch, setLocalSearch] = useState('');
+
   const createForm = useForm<NotaFiscalVendaFormData>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
       total: '',
       produtos: [],
-    }
+    },
   });
-
   const editForm = useForm<NotaFiscalVendaFormData>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
       total: '',
       produtos: [],
-    }
+    },
   });
 
-  const updateUrl = useCallback((newFilters: FilterValues) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('page', newFilters.currentPage.toString());
-    params.set('limit', newFilters.itemsPerPage.toString());
-    params.set('sortField', newFilters.sortField);
-    params.set('sortDirection', newFilters.sortDirection);
-    if (newFilters.search) {
-      params.set('search', newFilters.search);
-    } else {
-      params.delete('search');
-    }
-    if (newFilters.quantidadeMin) {
-      params.set('quantidadeMin', newFilters.quantidadeMin);
-    } else {
-      params.delete('quantidadeMin');
-    }
-    if (newFilters.quantidadeMax) {
-      params.set('quantidadeMax', newFilters.quantidadeMax);
-    } else {
-      params.delete('quantidadeMax');
-    }
-    if (newFilters.precoMin) {
-      params.set('precoMin', newFilters.precoMin);
-    } else {
-      params.delete('precoMin');
-    }
-    if (newFilters.precoMax) {
-      params.set('precoMax', newFilters.precoMax);
-    } else {
-      params.delete('precoMax');
-    }
-    router.replace(`?${params.toString()}`);
-  }, [router, searchParams]);
+  const {
+    queryParams,
+    handleRemoveFilter,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleCreate,
+    handleDelete,
+    handleEdit,
+    handleApply,
+    resetFilters,
+    updateUrl,
+    handleSort,
+    getActiveFilters,
+    getNotasByParams,
+  } = useNotasFiscaisVendas();
 
-  const handleApply = () => {
-    const newFilters = { ...pendingFilters, currentPage: 1 };
-    setAppliedFilters(newFilters);
+  const { data: response, isLoading } = getNotasByParams();
+
+  useEffect(() => {
+    setLocalSearch(queryParams.search || '');
+  }, [queryParams.search]);
+
+  const handleSearch = useCallback(() => {
+    const newFilters = { ...queryParams, search: localSearch, currentPage: 1 };
     updateUrl(newFilters);
-  };
-
-  const resetFilters = () => {
-    setPendingFilters(defaultFilters);
-    setAppliedFilters(defaultFilters);
-    const params = new URLSearchParams();
-    router.replace(`?${params.toString()}`);
-  };
-
-  const handleSort = (field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    const newFilters = { ...appliedFilters, sortField: field, sortDirection: newDirection as SortDirection, currentPage: 1 };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  };
-
-  const handlePageChange = (page: number) => {
-    const newFilters = { ...appliedFilters, currentPage: page };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  };
-
-  const handleItemsPerPageChange = (itemsPerPage: number) => {
-    const newFilters = { ...appliedFilters, itemsPerPage, currentPage: 1 };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  };
+  }, [queryParams, localSearch, updateUrl]);
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
       data: data.data,
       total: Number(data.total),
-      produtos: data.produtos.map((p: { produtoId: string, quantidade: string, unidade: string, precoUnitario: string }) => ({
+      produtos: data.produtos.map((p) => ({
         notaFiscalId: 0,
         produtoId: Number(p.produtoId),
         quantidade: Number(p.quantidade),
@@ -191,12 +102,15 @@ const NotasVendasPage: FC = () => {
     setSelectedNota(nota);
     editForm.setValue('data', nota.data.split('T')[0]);
     editForm.setValue('total', nota.total.toString());
-    editForm.setValue('produtos', nota.produtos?.map(p => ({
-      produtoId: p.produtoId.toString(),
-      quantidade: p.quantidade.toString(),
-      unidade: p.unidade,
-      precoUnitario: p.precoUnitario.toString(),
-    })) || []);
+    editForm.setValue(
+      'produtos',
+      nota.produtos?.map((p) => ({
+        produtoId: p.produtoId.toString(),
+        quantidade: p.quantidade.toString(),
+        unidade: p.unidade,
+        precoUnitario: p.precoUnitario.toString(),
+      })) || []
+    );
     setIsEditModalOpen(true);
   };
 
@@ -212,87 +126,77 @@ const NotasVendasPage: FC = () => {
     setSelectedNota(null);
   };
 
-  const getActiveFilters = () => {
-    const active = [];
-    if (appliedFilters.search) {
-      active.push({ label: 'Pesquisa', value: appliedFilters.search });
-    }
-    return active;
-  };
-
-  const handleRemoveFilter = (index: number) => {
-    const activeFilters = getActiveFilters();
-    const filterToRemove = activeFilters[index];
-
-    let newFilters = { ...appliedFilters };
-    switch (filterToRemove.label) {
-      case 'Pesquisa':
-        newFilters = { ...newFilters, search: '' };
-        break;
-    }
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  };
-
-  // resetFilters defined above
+  if (isLoading) return <>Carregando...</>;
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-2xl font-bold">Notas Fiscais de Venda</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              Notas Fiscais de Venda
+            </CardTitle>
             <CardDescription>Gerencie as notas fiscais de venda</CardDescription>
           </div>
           <Button onClick={() => setIsCreateModalOpen(true)}>Nova Nota</Button>
         </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-          <CardDescription>Filtre as notas por ID</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <FilterContainer
-            title=""
-            description=""
-            onReset={resetFilters}
-            onApply={handleApply}
-          >
-            <TextFilter
-              value={pendingFilters.search}
-              onChange={(search) => setPendingFilters(prev => ({ ...prev, search }))}
-              placeholder="Pesquisar por ID..."
-              label="Pesquisa"
-              description="Digite o ID da nota"
-            />
-          </FilterContainer>
+      {/* Search Bar */}
+      <Card className="border-blue-100 shadow-sm">
+        <CardContent className="p-4">
+          <div className="relative flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Pesquisar notas fiscais..."
+                value={localSearch}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setLocalSearch(e.target.value);
+                }}
+                className="pl-10 pr-4 rounded-xl border-blue-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-md transition-all duration-200 hover:shadow-lg"
+              />
+              {localSearch && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  onClick={() => {
+                    setLocalSearch('');
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            <Button onClick={handleSearch} variant="default" size="sm">
+              Buscar Notas
+            </Button>
+            <Button onClick={resetFilters} variant="outline" size="sm">
+              Limpar Filtros
+            </Button>
+          </div>
         </CardContent>
       </Card>
-
-      <ActiveFilters
-        filters={getActiveFilters()}
-        onRemoveFilter={handleRemoveFilter}
-        onClearAll={resetFilters}
-      />
 
       <Card>
         <CardContent className="pt-6 space-y-6">
           <NotaFiscalVendaTable
-            items={notas}
-            filterValues={appliedFilters}
+            items={response?.data || []}
             onSort={handleSort}
             onEdit={openEditModal}
-            onDelete={openDeleteModal}
+            onDelete={(id) => {
+              const nota = response?.data?.find((n) => n.id === id.id);
+              if (nota) openDeleteModal(nota);
+            }}
           />
 
           <Pagination
-            currentPage={appliedFilters.currentPage}
-            totalPages={Math.ceil((total || 0) / appliedFilters.itemsPerPage)}
-            itemsPerPage={appliedFilters.itemsPerPage}
-            totalItems={total || 0}
-            startIndex={(appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage}
+            currentPage={queryParams.currentPage}
+            totalPages={Math.ceil((response?.total || 0) / queryParams.itemsPerPage)}
+            itemsPerPage={queryParams.itemsPerPage}
+            totalItems={response?.total || 0}
+            startIndex={(queryParams.currentPage - 1) * queryParams.itemsPerPage}
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}
           />

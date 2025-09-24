@@ -18,10 +18,6 @@ import { NotaDetails } from '../common/NotaDetails';
 
 interface NotaFiscalVendaTableProps {
   items: NotaFiscalVenda[];
-  filterValues: {
-    sortField: string;
-    sortDirection: 'asc' | 'desc';
-  };
   onSort: (field: string) => void;
   onEdit: (nota: NotaFiscalVenda) => void;
   onDelete: (nota: NotaFiscalVenda) => void;
@@ -29,7 +25,6 @@ interface NotaFiscalVendaTableProps {
 
 export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
   items,
-  filterValues,
   onSort,
   onEdit,
   onDelete,
@@ -79,11 +74,7 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
               >
                 <div className="flex items-center space-x-1">
                   <span>ID</span>
-                  <SortIcon 
-                    field="id" 
-                    currentSortField={filterValues.sortField} 
-                    currentSortDirection={filterValues.sortDirection} 
-                  />
+          
                 </div>
               </TableHead>
               <TableHead 
@@ -92,11 +83,6 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
               >
                 <div className="flex items-center space-x-1">
                   <span>Total</span>
-                  <SortIcon 
-                    field="total" 
-                    currentSortField={filterValues.sortField} 
-                    currentSortDirection={filterValues.sortDirection} 
-                  />
                 </div>
               </TableHead>
               <TableHead 
@@ -105,11 +91,6 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
               >
                 <div className="flex items-center space-x-1">
                   <span>Data</span>
-                  <SortIcon 
-                    field="data" 
-                    currentSortField={filterValues.sortField} 
-                    currentSortDirection={filterValues.sortDirection} 
-                  />
                 </div>
               </TableHead>
               <TableHead>Produtos</TableHead>

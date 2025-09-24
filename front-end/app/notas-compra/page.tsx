@@ -2,35 +2,18 @@
 
 import { FC, useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { FilterValues, SortDirection } from '@/types/interfaces/entities';
-import { useForm, FormProvider } from 'react-hook-form';
-import { NotaFiscalCompra } from '@/types/interfaces/entities';
+import { FilterValues, SortDirection, NotaFiscalCompra } from '@/types/interfaces/entities';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { TextFilter } from '@/app/_components/filtros/TextFilter';
 import { FilterContainer } from '@/app/_components/common/FilterContainer';
 import { NotaFiscalCompraTable } from '@/app/_components/nota-fiscal-compra/NotaFiscalCompraTable';
-import { NotaFiscalCompraForm } from '@/app/_components/nota-fiscal-compra/NotaFiscalCompraForm';
 import { useNotaFiscalCompra } from '@/app/_components/hooks/useNotaFiscalCompra';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
-import { notaFiscalCompraSchema } from '../_components/validation'
-import { Modal } from '../_components/Modal';
+import { notaFiscalCompraSchema } from '../_components/validation';
 import { ModalCreateNotaCompra } from '../_components/modals/notas-compras/ModalCreateNotaCompra';
 import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEditeNotaCompra';
 import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
@@ -39,11 +22,10 @@ const NotasCompraPage: FC = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  /** Filtros padrão */
   const defaultFilters: FilterValues = {
     currentPage: 1,
     itemsPerPage: 10,
-    sortField: 'data',
-    sortDirection: 'desc' as SortDirection,
     search: '',
     quantidadeMin: '',
     quantidadeMax: '',
@@ -51,14 +33,14 @@ const NotasCompraPage: FC = () => {
     precoMax: '',
   };
 
+  /** Extrai filtros da URL */
   const getFiltersFromParams = useCallback((): FilterValues => {
     const params = new URLSearchParams(searchParams.toString());
     return {
       ...defaultFilters,
       currentPage: parseInt(params.get('page') || defaultFilters.currentPage.toString()) || defaultFilters.currentPage,
       itemsPerPage: parseInt(params.get('limit') || defaultFilters.itemsPerPage.toString()) || defaultFilters.itemsPerPage,
-      sortField: params.get('sortField') || defaultFilters.sortField,
-      sortDirection: (params.get('sortDirection') as SortDirection) || defaultFilters.sortDirection,
+
       search: params.get('search') || defaultFilters.search,
       quantidadeMin: params.get('quantidadeMin') || defaultFilters.quantidadeMin,
       quantidadeMax: params.get('quantidadeMax') || defaultFilters.quantidadeMax,
@@ -67,6 +49,7 @@ const NotasCompraPage: FC = () => {
     };
   }, [searchParams]);
 
+  /** Estados de filtros aplicados e pendentes */
   const [appliedFilters, setAppliedFilters] = useState<FilterValues>(getFiltersFromParams());
   const [pendingFilters, setPendingFilters] = useState<FilterValues>(appliedFilters);
 
@@ -74,20 +57,28 @@ const NotasCompraPage: FC = () => {
     setPendingFilters(appliedFilters);
   }, [appliedFilters]);
 
-  const { notas, total, filters: hookFilters, isLoading, handleCreate, handleEdit, handleDelete } = useNotaFiscalCompra(appliedFilters);
+  /** Hook da entidade */
+  const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras } = useNotaFiscalCompra();
+  const { data: responseNotas , isLoading, error } = getNotasFiscaisCompras()
 
-  const { fornecedores } = useFornecedor(defaultFilters);
+  /** Fornecedores (para selects no formulário) */
+  const { getAllFornecedores } = useFornecedor();
+  const { data: responsefornecedores, isLoading: isLoadingFornecedor, error: errorFornecedor } = getAllFornecedores()
+
+  /** Estados de modais */
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedNota, setSelectedNota] = useState<NotaFiscalCompra | null>(null);
+
+  /** Forms */
   const createForm = useForm<notaFiscalCompraSchema>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
       fornecedorId: '',
       total: '',
       produtos: [],
-    }
+    },
   });
 
   const editForm = useForm<notaFiscalCompraSchema>({
@@ -96,43 +87,25 @@ const NotasCompraPage: FC = () => {
       fornecedorId: '',
       total: '',
       produtos: [],
-    }
+    },
   });
 
+  /** Atualiza URL com filtros */
   const updateUrl = useCallback((newFilters: FilterValues) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', newFilters.currentPage.toString());
     params.set('limit', newFilters.itemsPerPage.toString());
-    params.set('sortField', newFilters.sortField);
-    params.set('sortDirection', newFilters.sortDirection);
-    if (newFilters.search) {
-      params.set('search', newFilters.search);
-    } else {
-      params.delete('search');
-    }
-    if (newFilters.quantidadeMin) {
-      params.set('quantidadeMin', newFilters.quantidadeMin);
-    } else {
-      params.delete('quantidadeMin');
-    }
-    if (newFilters.quantidadeMax) {
-      params.set('quantidadeMax', newFilters.quantidadeMax);
-    } else {
-      params.delete('quantidadeMax');
-    }
-    if (newFilters.precoMin) {
-      params.set('precoMin', newFilters.precoMin);
-    } else {
-      params.delete('precoMin');
-    }
-    if (newFilters.precoMax) {
-      params.set('precoMax', newFilters.precoMax);
-    } else {
-      params.delete('precoMax');
-    }
+
+    newFilters.search ? params.set('search', newFilters.search) : params.delete('search');
+    newFilters.quantidadeMin ? params.set('quantidadeMin', newFilters.quantidadeMin) : params.delete('quantidadeMin');
+    newFilters.quantidadeMax ? params.set('quantidadeMax', newFilters.quantidadeMax) : params.delete('quantidadeMax');
+    newFilters.precoMin ? params.set('precoMin', newFilters.precoMin) : params.delete('precoMin');
+    newFilters.precoMax ? params.set('precoMax', newFilters.precoMax) : params.delete('precoMax');
+
     router.replace(`?${params.toString()}`);
   }, [router, searchParams]);
 
+  /** Filtros */
   const handleApply = () => {
     const newFilters = { ...pendingFilters, currentPage: 1 };
     setAppliedFilters(newFilters);
@@ -142,15 +115,7 @@ const NotasCompraPage: FC = () => {
   const resetFilters = () => {
     setPendingFilters(defaultFilters);
     setAppliedFilters(defaultFilters);
-    const params = new URLSearchParams();
-    router.replace(`?${params.toString()}`);
-  };
-
-  const handleSort = (field: string) => {
-    const newDirection = appliedFilters.sortField === field && appliedFilters.sortDirection === 'asc' ? 'desc' : 'asc';
-    const newFilters = { ...appliedFilters, sortField: field, sortDirection: newDirection as SortDirection, currentPage: 1 };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
+    router.replace(`?`);
   };
 
   const handlePageChange = (page: number) => {
@@ -165,6 +130,7 @@ const NotasCompraPage: FC = () => {
     updateUrl(newFilters);
   };
 
+  /** CRUD */
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
       data: data.data,
@@ -220,11 +186,10 @@ const NotasCompraPage: FC = () => {
     setSelectedNota(null);
   };
 
+  /** Filtros ativos */
   const getActiveFilters = () => {
     const active = [];
-    if (appliedFilters.search) {
-      active.push({ label: 'Pesquisa', value: appliedFilters.search });
-    }
+    if (appliedFilters.search) active.push({ label: 'Pesquisa', value: appliedFilters.search });
     return active;
   };
 
@@ -233,19 +198,17 @@ const NotasCompraPage: FC = () => {
     const filterToRemove = activeFilters[index];
 
     let newFilters = { ...appliedFilters };
-    switch (filterToRemove.label) {
-      case 'Pesquisa':
-        newFilters = { ...newFilters, search: '' };
-        break;
-    }
+    if (filterToRemove.label === 'Pesquisa') newFilters.search = '';
     setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
 
-  // resetFilters defined above
+  if (isLoading || isLoadingFornecedor) return <>Carregando...</>
+  if (error || errorFornecedor) return <>Error</>
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
@@ -256,20 +219,16 @@ const NotasCompraPage: FC = () => {
         </CardHeader>
       </Card>
 
+      {/* Filtros */}
       <Card>
         <CardHeader>
           <CardTitle>Filtros</CardTitle>
           <CardDescription>Filtre as notas por ID ou fornecedor</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <FilterContainer
-            title=""
-            description=""
-            onReset={resetFilters}
-            onApply={handleApply}
-          >
+          <FilterContainer onReset={resetFilters} onApply={handleApply}>
             <TextFilter
-              value={pendingFilters.search}
+              value={pendingFilters.search || ""}
               onChange={(search) => setPendingFilters(prev => ({ ...prev, search }))}
               placeholder="Pesquisar por ID ou fornecedor..."
               label="Pesquisa"
@@ -279,27 +238,27 @@ const NotasCompraPage: FC = () => {
         </CardContent>
       </Card>
 
+      {/* Filtros ativos */}
       <ActiveFilters
         filters={getActiveFilters()}
         onRemoveFilter={handleRemoveFilter}
         onClearAll={resetFilters}
       />
 
+      {/* Tabela + Paginação */}
       <Card>
         <CardContent className="pt-6 space-y-6">
           <NotaFiscalCompraTable
-            items={notas}
-            filterValues={appliedFilters}
-            onSort={handleSort}
+            items={responseNotas?.notas || []}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
           />
 
           <Pagination
             currentPage={appliedFilters.currentPage}
-            totalPages={Math.ceil((total || 0) / appliedFilters.itemsPerPage)}
+            totalPages={Math.ceil((responseNotas?.total || 0) / appliedFilters.itemsPerPage)}
             itemsPerPage={appliedFilters.itemsPerPage}
-            totalItems={total || 0}
+            totalItems={responseNotas?.total || 0}
             startIndex={(appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage}
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}
@@ -307,25 +266,23 @@ const NotasCompraPage: FC = () => {
         </CardContent>
       </Card>
 
-      {/* Create Dialog */}
+      {/* Modais */}
       <ModalCreateNotaCompra
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
         createForm={createForm}
         handleSubmitCreate={handleSubmitCreate}
-        fornecedores={fornecedores}
+        fornecedores={responsefornecedores || []}
       />
 
-      {/* Edit Dialog */}
       <ModalEditNotaCompra
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
         editForm={editForm}
         handleSubmitEdit={handleSubmitEdit}
-        fornecedores={fornecedores}
+        fornecedores={responsefornecedores || []}
       />
 
-      {/* Delete Dialog */}
       <ModalDeleteNotaCompra
         isDeleteModalOpen={isDeleteModalOpen}
         setIsDeleteModalOpen={setIsDeleteModalOpen}

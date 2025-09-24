@@ -12,190 +12,207 @@ export const useFornecedor = () => {
   const queryClient = useQueryClient();
   const router = useRouter()
   const searchParams = useSearchParams();
-  
+
   const getFiltersFromParams = useCallback(() => {
-     const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams.toString());
 
-     const currentPage = Number(params.get('page')) || defaultFilters.currentPage
-     const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage
-     const search = params.get('search')
+    const currentPage = Number(params.get('page')) || defaultFilters.currentPage
+    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage
+    const search = params.get('search')
 
-     params.set('page', String(currentPage))
-     params.set('limit', String(itemsPerPage))
+    params.set('page', String(currentPage))
+    params.set('limit', String(itemsPerPage))
 
-     if (search)
-       params.set('search', String(search))
+    if (search)
+      params.set('search', String(search))
 
-     return {
-       currentPage,
-       itemsPerPage,
-       search: search || "",
-       toString: params.toString()
-     };
- 
-   }, [searchParams]);
+    return {
+      currentPage,
+      itemsPerPage,
+      search: search || "",
+      toString: params.toString()
+    };
 
-   const appliedFilters = getFiltersFromParams()
-   const paramsToString = appliedFilters.toString
+  }, [searchParams]);
 
-   // Moved to top level
-   const fornecedorQuery = useQuery<{ fornecedores: Fornecedor[]; total: number }>({
-     queryKey: ['fornecedores', paramsToString],
-     queryFn: async () => {
-       const response = await fetch(`/api/fornecedor/findPerPage?${paramsToString}`);
-       
-       if (!response.ok) {
-         throw new Error('Failed to fetch fornecedores');
-       }
-       const result = await response.json();
+  const appliedFilters = getFiltersFromParams()
+  const paramsToString = appliedFilters.toString
 
-       return result;
-     },
-   })
+  // Moved to top level
+  const fornecedorQuery = useQuery<{ fornecedores: Fornecedor[]; total: number }>({
+    queryKey: ['fornecedores', paramsToString],
+    queryFn: async () => {
+      const response = await fetch(`/api/fornecedor/findPerPage?${paramsToString}`);
 
-   const createMutation = useMutation({
-     mutationFn: async (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
-       const response = await fetch('/api/fornecedor/create', {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify(fornecedor),
-       });
-       if (!response.ok) {
-         throw new Error('Failed to create fornecedor');
-       }
-       const result = await response.json();
-       if (!result.success) {
-         throw new Error(result.error || 'Failed to create fornecedor');
-       }
-       return result.data;
-     },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
-     },
-   });
+      if (!response.ok) {
+        throw new Error('Failed to fetch fornecedores');
+      }
+      const result = await response.json();
 
-   const handleCreate = (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
-     createMutation.mutate(fornecedor);
-   };
+      return result;
+    },
+  })
 
-   const editMutation = useMutation({
-     mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Fornecedor, 'id' | 'compras'>> }) => {
-       const response = await fetch(`/api/fornecedor/update/${id}`, {
-         method: 'PUT',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify(updates),
-       });
-       if (!response.ok) {
-         throw new Error('Failed to update fornecedor');
-       }
-       const result = await response.json();
-       if (!result.success) {
-         throw new Error(result.error || 'Failed to update fornecedor');
-       }
-       return result.data;
-     },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
-     },
-   });
+  const getAllFornecedores = () => {
+    return useQuery<Fornecedor[]>({
+      queryKey: ['fornecedores'],
+      queryFn: async () => {
+        const response = await fetch(`/api/fornecedor/findAll`);
 
-   const handleEdit = (id: number, updates: Partial<Omit<Fornecedor, 'id' | 'compras'>>) => {
-     editMutation.mutate({ id, updates });
-   };
+        if (!response.ok) {
+          throw new Error('Failed to fetch fornecedores');
+        }
+        const result = await response.json();
 
-   const deleteMutation = useMutation({
-     mutationFn: async (id: number) => {
-       const response = await fetch(`/api/fornecedor/delete/${id}`, {
-         method: 'DELETE',
-       });
-       if (!response.ok) {
-         throw new Error('Failed to delete fornecedor');
-       }
-       const result = await response.json();
-       if (!result.success) {
-         throw new Error(result.error || 'Failed to delete fornecedor');
-       }
-       return result;
-     },
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
-     },
-   });
+        return result;
+      },
+    })
+  }
 
-   const handleDelete = (id: number) => {
-     deleteMutation.mutate(id);
-   };
+  const createMutation = useMutation({
+    mutationFn: async (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
+      const response = await fetch('/api/fornecedor/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fornecedor),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create fornecedor');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create fornecedor');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
+    },
+  });
 
-   const getActiveFilters = () => {
-     const active = [];
-     if (appliedFilters.search) {
-       active.push({ label: 'Nome', value: appliedFilters.search });
-     }
-     return active;
-   };
+  const handleCreate = (fornecedor: Omit<Fornecedor, 'id' | 'compras'>) => {
+    createMutation.mutate(fornecedor);
+  };
 
-   const updateUrl = useCallback((newFilters: FilterValues) => {
-     const params = new URLSearchParams(searchParams.toString());
-     params.set('page', newFilters.currentPage.toString());
-     params.set('limit', newFilters.itemsPerPage.toString());
+  const editMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Fornecedor, 'id' | 'compras'>> }) => {
+      const response = await fetch(`/api/fornecedor/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update fornecedor');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update fornecedor');
+      }
+      return result.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
+    },
+  });
 
-     if (newFilters.search) {
-       params.set('search', newFilters.search);
-     } else {
-       params.delete('search');
-     }
+  const handleEdit = (id: number, updates: Partial<Omit<Fornecedor, 'id' | 'compras'>>) => {
+    editMutation.mutate({ id, updates });
+  };
 
-     router.replace(`?${params.toString()}`);
-   }, [router, searchParams]);
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/fornecedor/delete/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete fornecedor');
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to delete fornecedor');
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
+    },
+  });
 
-   const handleApply = () => {
-     const newFilters = { ...appliedFilters, currentPage: 1 };
-     updateUrl(newFilters);
-   };
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
+  };
 
-   const handleRemoveFilter = (index: number) => {
-     const activeFilters = getActiveFilters();
-     const filterToRemove = activeFilters[index];
+  const getActiveFilters = () => {
+    const active = [];
+    if (appliedFilters.search) {
+      active.push({ label: 'Nome', value: appliedFilters.search });
+    }
+    return active;
+  };
 
-     let newFilters = { ...appliedFilters };
-     switch (filterToRemove.label) {
-       case 'Nome':
-         newFilters = { ...newFilters, search: '' };
-         break;
-     }
-     updateUrl(newFilters);
-   };
+  const updateUrl = useCallback((newFilters: FilterValues) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newFilters.currentPage.toString());
+    params.set('limit', newFilters.itemsPerPage.toString());
 
-   const resetFilters = () => {
-     const params = new URLSearchParams();
-     router.replace(`?${params.toString()}`);
-   };
+    if (newFilters.search) {
+      params.set('search', newFilters.search);
+    } else {
+      params.delete('search');
+    }
 
-   const handleSort = (field: string) => {};
+    router.replace(`?${params.toString()}`);
+  }, [router, searchParams]);
 
-   const handlePageChange = (page: number) => {
-     const newFilters = { ...appliedFilters, currentPage: page };
-     updateUrl(newFilters);
-   };
+  const handleApply = () => {
+    const newFilters = { ...appliedFilters, currentPage: 1 };
+    updateUrl(newFilters);
+  };
 
-   const handleItemsPerPageChange = (itemsPerPage: number) => {
-     const newFilters = { ...appliedFilters, itemsPerPage, currentPage: 1 };
-     updateUrl(newFilters);
-   };
+  const handleRemoveFilter = (index: number) => {
+    const activeFilters = getActiveFilters();
+    const filterToRemove = activeFilters[index];
 
-   return {
-     fornecedorQuery,
-     handleCreate,
-     handleEdit,
-     handleDelete,
-     handleApply,
-     handleRemoveFilter,
-     resetFilters,
-     handleSort,
-     handlePageChange,
-     handleItemsPerPageChange,
-     updateUrl,
-     getActiveFilters,
-     appliedFilters
-   };
+    let newFilters = { ...appliedFilters };
+    switch (filterToRemove.label) {
+      case 'Nome':
+        newFilters = { ...newFilters, search: '' };
+        break;
+    }
+    updateUrl(newFilters);
+  };
+
+  const resetFilters = () => {
+    const params = new URLSearchParams();
+    router.replace(`?${params.toString()}`);
+  };
+
+  const handleSort = (field: string) => { };
+
+  const handlePageChange = (page: number) => {
+    const newFilters = { ...appliedFilters, currentPage: page };
+    updateUrl(newFilters);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    const newFilters = { ...appliedFilters, itemsPerPage, currentPage: 1 };
+    updateUrl(newFilters);
+  };
+
+  return {
+    fornecedorQuery,
+    appliedFilters,
+    getAllFornecedores,
+    handleCreate,
+    handleEdit,
+    handleDelete,
+    handleApply,
+    handleRemoveFilter,
+    resetFilters,
+    handleSort,
+    handlePageChange,
+    handleItemsPerPageChange,
+    updateUrl,
+    getActiveFilters,
+  };
 };
