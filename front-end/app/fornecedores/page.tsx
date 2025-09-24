@@ -42,7 +42,8 @@ const FornecedoresPage: FC = () => {
     handlePageChange,
     handleSort,
     updateUrl,
-    appliedFilters
+    appliedFilters,
+    resetFilters
   } = useFornecedor();
 
   const { data: response, isLoading, error } = fornecedorQuery;
@@ -146,6 +147,9 @@ const FornecedoresPage: FC = () => {
             </div>
             <Button onClick={handleSearch} variant="default" size="sm">
               Buscar Fornecedores
+            </Button>
+            <Button onClick={resetFilters} variant="outline" size="sm">
+              Limpar Filtros
             </Button>
           </div>
         </CardContent>

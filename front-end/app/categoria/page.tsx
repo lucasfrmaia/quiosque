@@ -137,6 +137,9 @@ const CategoriaPage: FC = () => {
             <Button onClick={handleSearch} variant="default" size="sm">
               Buscar Categorias
             </Button>
+            <Button onClick={resetFilters} variant="outline" size="sm">
+              Limpar Filtros
+            </Button>
           </div>
         </CardContent>
       </Card>
