@@ -16,19 +16,19 @@ export function ModalCreateNotaCompra({ isCreateModalOpen, setIsCreateModalOpen,
     return (
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>Nova Nota Fiscal de Compra</DialogTitle>
-                    <DialogDescription>Crie uma nova nota fiscal de compra.</DialogDescription>
-                </DialogHeader>
-                <FormProvider {...createForm}>
-                    <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+                <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Nova Nota Fiscal de Compra</DialogTitle>
+                        <DialogDescription>Crie uma nova nota fiscal de compra.</DialogDescription>
+                    </DialogHeader>
+                    <FormProvider {...createForm}>
                         <NotaFiscalCompraForm fornecedores={fornecedores} />
-                    </form>
-                </FormProvider>
-                <DialogFooter>
-                    <Button type="submit">Criar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
+                    </FormProvider>
+                    <DialogFooter>
+                        <Button type="submit">Criar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
     )

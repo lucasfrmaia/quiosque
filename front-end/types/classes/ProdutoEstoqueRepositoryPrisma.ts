@@ -76,6 +76,7 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
         produto: true
       }
     });
+
     return produtoEstoques.map(pe => ({
       id: pe.id,
       preco: pe.preco,
@@ -85,6 +86,7 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produtoId: pe.produtoId,
       produto: this.mapProduto(pe.produto)
     }));
+
   }
 
   async findPerPage(filters: FilterValues) {
