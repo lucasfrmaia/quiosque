@@ -24,6 +24,7 @@ export const CategoryTable: FC<CategoryTableProps> = ({
       sortKey: 'name',
       render: (item: Category) => item.name,
       sortable: true,
+      sorter: (a: Category, b: Category) => a.name.localeCompare(b.name),
     },
     {
       key: 'produtos',

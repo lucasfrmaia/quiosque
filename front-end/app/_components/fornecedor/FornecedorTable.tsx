@@ -30,6 +30,7 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       sortKey: 'nome',
       render: (item: Fornecedor) => item.nome,
       sortable: true,
+      sorter: (a: Fornecedor, b: Fornecedor) => a.nome.localeCompare(b.nome),
     },
     {
       key: 'cnpj',
@@ -37,6 +38,7 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       sortKey: 'cnpj',
       render: (item: Fornecedor) => item.cnpj || 'N/A',
       sortable: true,
+      sorter: (a: Fornecedor, b: Fornecedor) => (a.cnpj || '').localeCompare(b.cnpj || ''),
     },
     {
       key: 'telefone',
@@ -44,6 +46,7 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       sortKey: 'telefone',
       render: (item: Fornecedor) => item.telefone || 'N/A',
       sortable: true,
+      sorter: (a: Fornecedor, b: Fornecedor) => (a.telefone || '').localeCompare(b.telefone || ''),
     },
     {
       key: 'email',
@@ -51,6 +54,7 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       sortKey: 'email',
       render: (item: Fornecedor) => item.email || 'N/A',
       sortable: true,
+      sorter: (a: Fornecedor, b: Fornecedor) => (a.email || '').localeCompare(b.email || ''),
     },
   ];
 

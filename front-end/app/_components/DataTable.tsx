@@ -20,6 +20,7 @@ interface Column<T> {
   sortKey?: string;
   render: (item: T) => React.ReactNode;
   sortable?: boolean;
+  sorter?: (a: T, b: T) => number;
 }
 
 interface DataTableProps<T> {
@@ -54,8 +55,19 @@ export const DataTable = <T extends { id: number }>({
     onSort(field);
   };
 
-  const sortedItems = items.sort((a, b) => {
+  const getSorter = (columnKey: string) => {
+    const column = columns.find(c => (c.sortKey || c.key) === columnKey);
+    return column?.sorter;
+  };
+
+  const sortedItems = [...items].sort((a, b) => {
     if (!sortField) return 0;
+    const sorter = getSorter(sortField);
+    if (sorter) {
+      const result = sorter(a, b);
+      return sortDirection === 'asc' ? result : -result;
+    }
+    // Default sorter
     const aValue = (a as any)[sortField];
     const bValue = (b as any)[sortField];
     if (aValue < bValue) {
@@ -96,24 +108,27 @@ export const DataTable = <T extends { id: number }>({
       <Table>
         <TableHeader>
           <TableRow>
-            {columns.map((column) => (
-              <TableHead
-                key={column.key}
-                className={column.sortable ? 'cursor-pointer select-none' : ''}
-                onClick={() => column.sortable && handleSort(column.sortKey || column.key)}
-              >
-                <div className="flex items-center space-x-1">
-                  <span>{column.header}</span>
-                  {column.sortable && sortField === (column.sortKey || column.key) && (
-                    <SortIcon
-                      field={column.sortKey || column.key}
-                      currentSortField={sortField || ''}
-                      currentSortDirection={sortDirection}
-                    />
-                  )}
-                </div>
-              </TableHead>
-            ))}
+            {columns.map((column) => {
+              const columnSortKey = column.sortKey || column.key;
+              return (
+                <TableHead
+                  key={column.key}
+                  className={column.sortable ? 'cursor-pointer select-none' : ''}
+                  onClick={() => column.sortable && handleSort(columnSortKey)}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>{column.header}</span>
+                    {column.sortable && sortField === columnSortKey && (
+                      <SortIcon
+                        field={columnSortKey}
+                        currentSortField={sortField || ''}
+                        currentSortDirection={sortDirection}
+                      />
+                    )}
+                  </div>
+                </TableHead>
+              );
+            })}
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
