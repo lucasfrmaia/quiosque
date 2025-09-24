@@ -26,7 +26,6 @@ import {
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { ProdutoTable } from '@/app/_components/produto/ProdutoTable';
-import { ProdutoForm, ProdutoFormData } from '@/app/_components/produto/ProdutoForm';
 import { useProduto } from '@/app/_components/hooks/useProduto';
 
 import { useCategory } from '@/app/_components/hooks/useCategory';
@@ -34,6 +33,7 @@ import { Filter, Search, X } from 'lucide-react';
 import { ModalCreateProduct } from '../_components/modals/product/ModalCreateProdutct';
 import { ModalUpdateProduct } from '../_components/modals/product/ModalUpadteProduct';
 import { ModalDeleteProduct } from '../_components/modals/product/ModalDeleteProduct';
+import { ProdutoSchema } from '@/types/validation';
 
 const ProdutoPage: FC = () => {
 
@@ -42,30 +42,24 @@ const ProdutoPage: FC = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    resetFilters,
-    handleApply,
     updateUrl,
-    getActiveFilters,
     getProdutosByParams,
     handleItemsPerPageChange,
     handlePageChange,
-    handleRemoveFilter,
     handleSort
   } = useProduto();
   const { getAllCategories } = useCategory();
-  
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterValues, setFilterValues] = useState({
     categoryId: undefined as number | undefined,
   });
 
   const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
-
   const { data, isLoading, error } = getProdutosByParams()
 
   useEffect(() => {
@@ -77,13 +71,14 @@ const ProdutoPage: FC = () => {
   useEffect(() => {
     setSearchInput(appliedFilters.search || '');
   }, [appliedFilters.search]);
-  const { data: categories, isLoading: isLoadingCategories, error: erroCategories } = getAllCategories()
 
-  const createForm = useForm<ProdutoFormData>({
-    defaultValues: { nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' }
+  const { data: categories, isLoading: isLoadingCategories, error: erroCategories } = getAllCategories()
+  const createForm = useForm<ProdutoSchema>({
+    defaultValues: { nome: '', categoriaId: -1, ativo: true, tipo: 'INSUMO', descricao: '', imagemUrl: '' }
   });
-  const editForm = useForm<ProdutoFormData>({
-    defaultValues: { nome: '', categoriaId: '', ativo: 'true', tipo: 'INSUMO', descricao: '', imagemUrl: '' }
+
+  const editForm = useForm<ProdutoSchema>({
+    defaultValues: { nome: '', categoriaId: -1, ativo: true, tipo: 'INSUMO', descricao: '', imagemUrl: '' }
   });
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
@@ -91,7 +86,7 @@ const ProdutoPage: FC = () => {
       nome: data.nome,
       descricao: data.descricao || null,
       imagemUrl: data.imagemUrl || null,
-      ativo: data.ativo === 'true',
+      ativo: data.ativo === true,
       tipo: data.tipo,
       categoriaId: Number(data.categoriaId),
     });
@@ -105,7 +100,7 @@ const ProdutoPage: FC = () => {
       nome: data.nome,
       descricao: data.descricao || null,
       imagemUrl: data.imagemUrl || null,
-      ativo: data.ativo === 'true',
+      ativo: data.ativo === true,
       tipo: data.tipo,
       categoriaId: Number(data.categoriaId),
     });
@@ -117,8 +112,8 @@ const ProdutoPage: FC = () => {
   const openEditModal = (produto: Produto) => {
     setSelectedProduto(produto);
     editForm.setValue('nome', produto.nome);
-    editForm.setValue('categoriaId', produto.categoriaId?.toString() || '');
-    editForm.setValue('ativo', produto.ativo.toString());
+    editForm.setValue('categoriaId', produto.categoriaId || -1);
+    editForm.setValue('ativo', produto.ativo);
     editForm.setValue('tipo', produto.tipo);
     editForm.setValue('descricao', produto.descricao || '');
     editForm.setValue('imagemUrl', produto.imagemUrl || '');
@@ -271,10 +266,11 @@ const ProdutoPage: FC = () => {
         <CardContent className="pt-6 space-y-6">
           <ProdutoTable
             items={data?.produtos || []}
+            filterValues={appliedFilters}
             onSort={handleSort}
             onEdit={openEditModal}
-            onDelete={(id) => {
-              const produto = data?.produtos.find(p => p.id === id);
+            onDelete={(product) => {
+              const produto = data?.produtos.find(p => p.id === product.id);
               if (produto) openDeleteModal(produto);
             }}
           />

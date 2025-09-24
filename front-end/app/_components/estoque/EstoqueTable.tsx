@@ -7,7 +7,7 @@ interface EstoqueTableProps {
   filterValues: FilterValues;
   onSort: (field: string) => void;
   onEdit: (item: ProdutoEstoque) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: ProdutoEstoque) => void;
 }
 
 export const EstoqueTable: FC<EstoqueTableProps> = ({

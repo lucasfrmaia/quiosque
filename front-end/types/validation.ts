@@ -23,20 +23,19 @@ export const fornecedorSchema = z.object({
 export const produtoEstoqueSchema = z.object({
   preco: z.number().min(0, 'Preço deve ser positivo'),
   quantidade: z.number().min(0, 'Quantidade deve ser positiva'),
-  dataValidade: z.string().optional(),
+  dataValidade: z.date().optional(),
   unidade: z.string().min(1, 'Unidade é obrigatória'),
   produtoId: z.number(),
 });
 
 export const notaFiscalCompraSchema = z.object({
   data: z.string().min(1, 'Data é obrigatória'),
-  total: z.number().min(0, 'Total deve ser positivo'),
   fornecedorId: z.number(),
   produtos: z.array(z.object({
-    produtoId: z.number(),
-    quantidade: z.number().min(1, 'Quantidade deve ser positiva'),
+    produtoId: z.string(),
+    quantidade: z.string().min(1, 'Quantidade deve ser positiva'),
     unidade: z.string().min(1, 'Unidade é obrigatória'),
-    precoUnitario: z.number().min(0, 'Preço unitário deve ser positivo'),
+    precoUnitario: z.string().min(0, 'Preço unitário deve ser positivo'),
   })).min(1, 'Pelo menos um produto é obrigatório'),
 });
 
@@ -50,3 +49,15 @@ export const notaFiscalVendaSchema = z.object({
     precoUnitario: z.number().min(0, 'Preço unitário deve ser positivo'),
   })).min(1, 'Pelo menos um produto é obrigatório'),
 });
+
+export type NotaFiscalCompraSchema = z.infer<typeof notaFiscalCompraSchema>;
+
+export type NotaFiscalVendaSchema = z.infer<typeof notaFiscalVendaSchema>;
+
+export type CategorySchema = z.infer<typeof categorySchema>
+
+export type ProdutoSchema = z.infer<typeof produtoSchema>
+
+export type EstoqueSchema = z.infer<typeof produtoEstoqueSchema>
+
+export type FornecedorSchema = z.infer<typeof fornecedorSchema>

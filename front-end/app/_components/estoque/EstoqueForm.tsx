@@ -11,21 +11,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Produto } from '@/types/interfaces/entities';
+import { EstoqueSchema } from '@/types/validation';
 
-export interface EstoqueFormData {
-  preco: string;
-  quantidade: string;
-  dataValidade: string;
-  unidade: string;
-  produtoId: string;
-}
 
 interface EstoqueFormProps {
   produtos: Produto[];
 }
 
 export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
-  const { control } = useFormContext<EstoqueFormData>();
+  const { control } = useFormContext<EstoqueSchema>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -37,7 +31,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           control={control}
           name="produtoId"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={String(field.value)} onValueChange={field.onChange}>
               <SelectTrigger id="produtoId" className="col-span-3">
                 <SelectValue placeholder="Selecione um produto" />
               </SelectTrigger>

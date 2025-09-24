@@ -14,6 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useProduto } from '../hooks/useProduto';
 import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto } from '@/types/interfaces/entities';
+import { NotaFiscalCompraSchema } from '@/types/validation';
 
 interface NotaFiscalCompraFormData {
   data: string;
@@ -32,7 +33,7 @@ interface NotaFiscalCompraFormProps {
 }
 
 export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedores, editing = false }) => {
-  const { control, register } = useFormContext<NotaFiscalCompraFormData>();
+  const { control, register } = useFormContext<NotaFiscalCompraSchema>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "produtos"
@@ -48,8 +49,6 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
   const filteredProdutos = produtos.filter((p: Produto) =>
     p.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const selectedProduto = produtos.find((p: Produto) => p.id.toString() === selectedProdutoId);
 
   const handleAddProduto = () => {
     if (!selectedProdutoId || !quantidade || !precoUnitario) return;
@@ -92,7 +91,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
           control={control}
           name="fornecedorId"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={String(field.value)} onValueChange={field.onChange}>
               <SelectTrigger id="fornecedorId" className="col-span-3">
                 <SelectValue placeholder="Selecione um fornecedor" />
               </SelectTrigger>

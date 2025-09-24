@@ -15,12 +15,12 @@ import {
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { NotaFiscalVendaTable } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaTable';
-import { NotaFiscalVendaFormData } from '@/app/_components/nota-fiscal-venda/NotaFiscalVendaForm';
 import { useNotasFiscaisVendas } from '@/app/_components/hooks/useNotasFiscalVendas';
 
 import { ModalCreateNotaVenda } from '../_components/modals/nota-vendas/ModalCreateNotaVenda';
 import { ModalEditNotaVenda } from '../_components/modals/nota-vendas/ModalEditNotaVenda';
 import { ModalDeleteNotaVenda } from '../_components/modals/nota-vendas/ModalDeleteNotaVenda';
+import { NotaFiscalVendaSchema } from '@/types/validation';
 
 const NotasVendasPage: FC = () => {
 
@@ -47,17 +47,15 @@ const NotasVendasPage: FC = () => {
   const [selectedNota, setSelectedNota] = useState<NotaFiscalVenda | null>(null);
   const [localSearch, setLocalSearch] = useState('');
 
-  const createForm = useForm<NotaFiscalVendaFormData>({
+  const createForm = useForm<NotaFiscalVendaSchema>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
-      total: '',
       produtos: [],
     },
   });
-  const editForm = useForm<NotaFiscalVendaFormData>({
+  const editForm = useForm<NotaFiscalVendaSchema>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
-      total: '',
       produtos: [],
     },
   });
@@ -100,14 +98,14 @@ const NotasVendasPage: FC = () => {
   const openEditModal = (nota: NotaFiscalVenda) => {
     setSelectedNota(nota);
     editForm.setValue('data', nota.data.toDateString());
-    editForm.setValue('total', nota.total.toString());
+    editForm.setValue('total', nota.total)
     editForm.setValue(
       'produtos',
       nota.produtos?.map((p) => ({
-        produtoId: p.produtoId.toString(),
-        quantidade: p.quantidade.toString(),
+        produtoId: p.produtoId,
+        quantidade: p.quantidade,
         unidade: p.unidade,
-        precoUnitario: p.precoUnitario.toString(),
+        precoUnitario: p.precoUnitario,
       })) || []
     );
     setIsEditModalOpen(true);

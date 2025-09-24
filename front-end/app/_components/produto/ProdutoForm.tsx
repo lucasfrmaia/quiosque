@@ -12,15 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Produto } from '@/types/interfaces/entities';
 import { Category } from '@/types/interfaces/entities';
-
-export interface ProdutoFormData {
-  nome: string;
-  descricao: string;
-  imagemUrl: string;
-  categoriaId: string;
-  ativo: string;
-  tipo: 'INSUMO' | 'CARDAPIO';
-}
+import { ProdutoSchema } from '@/types/validation';
 
 interface ProdutoFormProps {
   categories: Category[];
@@ -28,7 +20,7 @@ interface ProdutoFormProps {
 }
 
 export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false }) => {
-  const { control } = useFormContext<ProdutoFormData>();
+  const { control } = useFormContext<ProdutoSchema>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -76,7 +68,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
           control={control}
           name="categoriaId"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={String(field.value)} onValueChange={field.onChange}>
               <SelectTrigger id="categoriaId" className="col-span-3">
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
@@ -100,7 +92,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
           control={control}
           name="ativo"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={String(field.value)} onValueChange={field.onChange}>
               <SelectTrigger id="ativo" className="col-span-3">
                 <SelectValue placeholder="Selecione se está ativo" />
               </SelectTrigger>

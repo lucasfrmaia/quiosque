@@ -17,7 +17,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Pagination } from '@/app/_components/Pagination';
-import { EstoqueForm, EstoqueFormData } from '@/app/_components/estoque/EstoqueForm';
 import { EstoqueTable } from '@/app/_components/estoque/EstoqueTable';
 import { useEstoque } from '@/app/_components/hooks/useEstoque';
 import { useCategory } from '@/app/_components/hooks/useCategory';
@@ -27,6 +26,7 @@ import { ModalEditEstoque } from '../_components/modals/estoque/ModalEditEstoque
 import { ModalDeleteEstoque } from '../_components/modals/estoque/ModalDeleteEstoque';
 import { useProduto } from '../_components/hooks/useProduto';
 import { Filter, ChevronDown, Search, X } from 'lucide-react';
+import { EstoqueSchema } from '@/types/validation';
 
 const EstoquePage: FC = () => {
   const {
@@ -59,7 +59,6 @@ const EstoquePage: FC = () => {
     categoryId: null as number | null,
     precoMin: '0',
     precoMax: '1000',
-    sortOption: 'default' as 'default' | 'asc' | 'desc',
   });
 
   const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
@@ -71,9 +70,8 @@ const EstoquePage: FC = () => {
       categoryId: appliedFilters.categoryId || null,
       precoMin: appliedFilters.precoMin || '0',
       precoMax: appliedFilters.precoMax || '1000',
-      sortOption: appliedFilters.sortField ? (appliedFilters.sortDirection === 'asc' ? 'asc' : 'desc') : 'default',
     });
-  }, [appliedFilters.categoryId, appliedFilters.precoMin, appliedFilters.precoMax, appliedFilters.sortField, appliedFilters.sortDirection]);
+  }, [appliedFilters.categoryId, appliedFilters.precoMin, appliedFilters.precoMax]);
 
   useEffect(() => {
     setSearchInput(appliedFilters.search || '');
@@ -85,8 +83,6 @@ const EstoquePage: FC = () => {
       categoryId: filterValues.categoryId,
       precoMin: filterValues.precoMin,
       precoMax: filterValues.precoMax,
-      sortField: filterValues.sortOption === 'default' ? undefined : 'preco',
-      sortDirection: filterValues.sortOption === 'default' ? undefined : (filterValues.sortOption as SortDirection),
       currentPage: 1,
     };
     updateUrl(newFilters);
@@ -98,28 +94,27 @@ const EstoquePage: FC = () => {
       categoryId: null,
       precoMin: '0',
       precoMax: '1000',
-      sortOption: 'default',
     });
     resetFilters();
   };
 
-  const createForm = useForm<EstoqueFormData>({
+  const createForm = useForm<EstoqueSchema>({
     defaultValues: {
-      preco: '',
-      quantidade: '',
-      dataValidade: '',
+      preco: 0,
+      quantidade: 0,
+      dataValidade: new Date(),
       unidade: '',
-      produtoId: '',
+      produtoId: -1,
     },
   });
 
-  const editForm = useForm<EstoqueFormData>({
+  const editForm = useForm<EstoqueSchema>({
     defaultValues: {
-      preco: '',
-      quantidade: '',
-      dataValidade: '',
+      preco: 0,
+      quantidade: 0,
+      dataValidade: new Date(),
       unidade: '',
-      produtoId: '',
+      produtoId: -1,
     },
   });
 
@@ -151,11 +146,11 @@ const EstoquePage: FC = () => {
 
   const openEditModal = (item: ProdutoEstoque) => {
     setSelectedItem(item);
-    editForm.setValue('preco', item.preco.toString());
-    editForm.setValue('quantidade', item.quantidade.toString());
-    editForm.setValue('dataValidade', item.dataValidade || '');
+    editForm.setValue('preco', item.preco);
+    editForm.setValue('quantidade', item.quantidade);
+    editForm.setValue('dataValidade', item.dataValidade || new Date());
     editForm.setValue('unidade', item.unidade);
-    editForm.setValue('produtoId', item.produtoId.toString());
+    editForm.setValue('produtoId', item.produtoId);
     setIsEditModalOpen(true);
   };
 
@@ -294,21 +289,6 @@ const EstoquePage: FC = () => {
                 <span>R$ {Number(filterValues.precoMax).toFixed(0)}</span>
               </div>
             </div>
-
-            {/* Sort Select */}
-            <div className="space-y-2">
-              <Label>Ordenar por</Label>
-              <Select value={filterValues.sortOption} onValueChange={(value) => setFilterValues({ ...filterValues, sortOption: value as 'default' | 'asc' | 'desc' })}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Padrão" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Padrão</SelectItem>
-                  <SelectItem value="asc">Preço: Menor para Maior</SelectItem>
-                  <SelectItem value="desc">Preço: Maior para Menor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={handleClearFilters}>
@@ -328,10 +308,11 @@ const EstoquePage: FC = () => {
         <CardContent className="pt-6">
           <EstoqueTable
             items={response?.estoque || []}
+            filterValues={appliedFilters}
             onSort={() => {}}
             onEdit={openEditModal}
-            onDelete={(id) => {
-              const item = response?.estoque.find((i: ProdutoEstoque) => i.id === id);
+            onDelete={(produtoEstoque) => {
+              const item = response?.estoque.find((i: ProdutoEstoque) => i.id === produtoEstoque.id);
               if (item) openDeleteModal(item);
             }}
           />

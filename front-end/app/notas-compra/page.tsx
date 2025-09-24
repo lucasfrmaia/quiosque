@@ -11,28 +11,14 @@ import { NotaFiscalCompraTable } from '@/app/_components/nota-fiscal-compra/Nota
 import { useNotaFiscalCompra } from '@/app/_components/hooks/useNotaFiscalCompra';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
-import { notaFiscalCompraSchema } from '../_components/validation';
 import { ModalCreateNotaCompra } from '../_components/modals/notas-compras/ModalCreateNotaCompra';
 import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEditeNotaCompra';
 import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { NotaFiscalCompraSchema } from '@/types/validation';
 
 const NotasCompraPage: FC = () => {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  /** Filtros padrão */
-  const defaultFilters: FilterValues = {
-    currentPage: 1,
-    itemsPerPage: 10,
-    search: '',
-    quantidadeMin: '',
-    quantidadeMax: '',
-    precoMin: '',
-    precoMax: '',
-  };
-
   /** Extrai filtros da URL */
   const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras, updateUrl, resetFilters, queryParams } = useNotaFiscalCompra();
   const { data: responseNotas, isLoading, error } = getNotasFiscaisCompras()
@@ -55,20 +41,18 @@ const NotasCompraPage: FC = () => {
   const [selectedNota, setSelectedNota] = useState<NotaFiscalCompra | null>(null);
 
   /** Forms */
-  const createForm = useForm<notaFiscalCompraSchema>({
+  const createForm = useForm<NotaFiscalCompraSchema>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
-      fornecedorId: '',
-      total: '',
+      fornecedorId: -1,
       produtos: [],
     },
   });
 
-  const editForm = useForm<notaFiscalCompraSchema>({
+  const editForm = useForm<NotaFiscalCompraSchema>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
-      fornecedorId: '',
-      total: '',
+      fornecedorId: -1,
       produtos: [],
     },
   });
@@ -98,7 +82,6 @@ const NotasCompraPage: FC = () => {
     handleCreate({
       data: new Date(data.data),
       fornecedorId: Number(data.fornecedorId),
-      total: Number(data.total),
       produtos: data.produtos.map(p => ({
         notaFiscalId: 0,
         produtoId: Number(p.produtoId),
@@ -116,8 +99,8 @@ const NotasCompraPage: FC = () => {
     handleEdit(selectedNota.id, {
       data: new Date(data.data),
       fornecedorId: Number(data.fornecedorId),
-      total: Number(data.total),
     });
+
     setIsEditModalOpen(false);
     setSelectedNota(null);
     editForm.reset();
@@ -126,8 +109,7 @@ const NotasCompraPage: FC = () => {
   const openEditModal = (nota: NotaFiscalCompra) => {
     setSelectedNota(nota);
     editForm.setValue('data', nota.data.toDateString());
-    editForm.setValue('fornecedorId', nota.fornecedorId.toString());
-    editForm.setValue('total', nota.total.toString());
+    editForm.setValue('fornecedorId', nota.fornecedorId);
     editForm.setValue('produtos', nota.produtos?.map(p => ({
       produtoId: p.produtoId.toString(),
       quantidade: p.quantidade.toString(),

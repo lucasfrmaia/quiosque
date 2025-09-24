@@ -15,12 +15,12 @@ import {
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { CategoryTable } from '@/app/_components/categoria/CategoryTable';
-import { CategoryFormData } from '@/app/_components/categoria/CategoryForm';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
 import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
 import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
+import { CategorySchema } from '@/types/validation';
 
 const CategoriaPage: FC = () => {
 
@@ -30,8 +30,8 @@ const CategoriaPage: FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [localSearch, setLocalSearch] = useState('');
 
-  const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
-  const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
+  const createForm = useForm<CategorySchema>({ defaultValues: { name: '' } });
+  const editForm = useForm<CategorySchema>({ defaultValues: { name: '' } });
 
   const {
     queryParams,

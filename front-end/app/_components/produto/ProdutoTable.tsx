@@ -7,7 +7,7 @@ interface ProdutoTableProps {
   filterValues: FilterValues;
   onSort: (field: string) => void;
   onEdit: (item: Produto) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: Produto) => void;
 }
 
 export const ProdutoTable: FC<ProdutoTableProps> = ({

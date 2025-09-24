@@ -14,13 +14,13 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { FornecedorForm, FornecedorFormData } from '@/app/_components/fornecedor/FornecedorForm';
 import { FornecedorTable } from '@/app/_components/fornecedor/FornecedorTable';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 
 import { ModalCreateFornecedor } from '../_components/modals/fornecedores/ModalCreateFornecedor';
 import { ModalEditFornecedor } from '../_components/modals/fornecedores/ModalEditFornecedor';
 import { ModalDeleteFornecedor } from '../_components/modals/fornecedores/ModalDeleteFornecedor';
+import { FornecedorSchema } from '@/types/validation';
 
 const FornecedoresPage: FC = () => {
 
@@ -30,8 +30,8 @@ const FornecedoresPage: FC = () => {
   const [selectedFornecedor, setSelectedFornecedor] = useState<Fornecedor | null>(null);
   const [localSearch, setLocalSearch] = useState('');
 
-  const createForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
-  const editForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
+  const createForm = useForm<FornecedorSchema>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
+  const editForm = useForm<FornecedorSchema>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
 
   const {
     fornecedorQuery,

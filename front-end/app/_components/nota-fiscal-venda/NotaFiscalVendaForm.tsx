@@ -8,24 +8,14 @@ import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { NotaFiscalVenda, ProdutoVenda, ProdutoEstoque } from '@/types/interfaces/entities';
-
-export interface NotaFiscalVendaFormData {
-  data: string;
-  total: string;
-  produtos: Array<{
-    produtoId: string;
-    quantidade: string;
-    unidade: string;
-    precoUnitario: string;
-  }>;
-}
+import { NotaFiscalVendaSchema } from '@/types/validation';
 
 interface NotaFiscalVendaFormProps {
   editing?: boolean;
 }
 
 export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = false }) => {
-  const { register, watch, setValue } = useFormContext<NotaFiscalVendaFormData>();
+  const { register, watch, setValue } = useFormContext<NotaFiscalVendaSchema>();
   const produtos = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control: useFormContext().control,
@@ -183,7 +173,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
           {fields.map((field, index) => {
             const produtoVenda = produtos[index];
             if (!produtoVenda) return null;
-            const estoqueItem = allEstoque?.find((e) => e.produto?.id?.toString() === produtoVenda.produtoId);
+            const estoqueItem = allEstoque?.find((e) => e.produto?.id === produtoVenda.produtoId);
             const produto = estoqueItem?.produto;
             if (!estoqueItem || !produto) return null;
 
