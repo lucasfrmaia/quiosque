@@ -56,9 +56,11 @@ export const useNotaFiscalCompra = () => {
       queryKey: ['notaFiscalCompra', queryString],
       queryFn: async () => {
         const response = await fetch(`/api/nota-fiscal-compra/findPerPage?${queryString}`);
-        if (!response.ok) throw new Error('Erro ao buscar notas fiscais de compra');
         const result = await response.json();
-        if (!result.success) throw new Error(result.error || 'Erro ao buscar notas fiscais de compra');
+
+        if (!result.ok)
+           throw new Error(result.error || 'Erro ao buscar notas fiscais de compra');
+          
         return result;
       },
     });

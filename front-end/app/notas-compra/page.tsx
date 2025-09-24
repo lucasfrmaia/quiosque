@@ -96,7 +96,7 @@ const NotasCompraPage: FC = () => {
   /** CRUD */
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      data: data.data,
+      data: new Date(data.data),
       fornecedorId: Number(data.fornecedorId),
       total: Number(data.total),
       produtos: data.produtos.map(p => ({
@@ -114,7 +114,7 @@ const NotasCompraPage: FC = () => {
   const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedNota) return;
     handleEdit(selectedNota.id, {
-      data: data.data,
+      data: new Date(data.data),
       fornecedorId: Number(data.fornecedorId),
       total: Number(data.total),
     });
@@ -125,7 +125,7 @@ const NotasCompraPage: FC = () => {
 
   const openEditModal = (nota: NotaFiscalCompra) => {
     setSelectedNota(nota);
-    editForm.setValue('data', nota.data.split('T')[0]);
+    editForm.setValue('data', nota.data.toDateString());
     editForm.setValue('fornecedorId', nota.fornecedorId.toString());
     editForm.setValue('total', nota.total.toString());
     editForm.setValue('produtos', nota.produtos?.map(p => ({
@@ -166,8 +166,14 @@ const NotasCompraPage: FC = () => {
     updateUrl(newFilters);
   };
 
- if (isLoading || isLoadingFornecedor) return <>Carregando...</>
- if (error || errorFornecedor) return <>Error</>
+ if (isLoading || isLoadingFornecedor) {
+    return <>Carregando...</>
+ }
+
+ if (error || errorFornecedor) {
+    console.error(error, "ou", errorFornecedor)
+    return <>Error!</>
+ }
 
   return (
     <div className="container mx-auto py-6 space-y-6">

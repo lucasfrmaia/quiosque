@@ -33,8 +33,8 @@ const NotasVendasPage: FC = () => {
     handleEdit,
     resetFilters,
     updateUrl,
-    handleSort,
     getNotasByParams,
+    handleSort
   } = useNotasFiscaisVendas();
 
   const { data: response, isLoading, error } = getNotasByParams();
