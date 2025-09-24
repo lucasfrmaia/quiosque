@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { INotaFiscalCompraRepository } from '../interfaces/repositories';
-import { NotaFiscalCompra, ProdutoCompra, Produto, Fornecedor } from '../interfaces/entities';
+import { NotaFiscalCompra, ProdutoCompra, Produto, Fornecedor, FilterValues } from '../interfaces/entities';
 
 export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraRepository {
   private prisma: PrismaClient;
@@ -142,11 +142,23 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<NotaFiscalCompra[]> {
-    const skip = (page - 1) * limit;
+  async findPerPage(filters: FilterValues) {
+    const { currentPage, itemsPerPage, search } = filters;
+    const skip = (currentPage - 1) * itemsPerPage;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { data: { contains: search, mode: 'insensitive' } },
+        { total: { contains: search, mode: 'insensitive' } },
+        { fornecedor: { nome: { contains: search, mode: 'insensitive' } } }
+      ];
+    }
+
     const notasFiscais = await this.prisma.notaFiscalCompra.findMany({
+      where,
       skip,
-      take: limit,
+      take: itemsPerPage,
       include: {
         fornecedor: true,
         produtos: {
@@ -157,7 +169,7 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         }
       }
     });
-    return notasFiscais.map(nf => ({
+    const notas = notasFiscais.map(nf => ({
       id: nf.id,
       data: nf.data.toISOString(),
       total: nf.total,
@@ -165,6 +177,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
       fornecedor: this.mapFornecedor(nf.fornecedor),
       produtos: this.mapProdutoCompras(nf.produtos)
     }));
+
+    const total = await this.prisma.notaFiscalCompra.count({ where });
+
+    return { notas, total };
   }
 
   async update(id: number, notaFiscal: Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>>): Promise<NotaFiscalCompra> {

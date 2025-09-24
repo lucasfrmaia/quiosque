@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IProdutoEstoqueRepository } from '../interfaces/repositories';
-import { ProdutoEstoque, Produto } from '../interfaces/entities';
+import { ProdutoEstoque, Produto, FilterValues } from '../interfaces/entities';
 
 export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository {
   private prisma: PrismaClient;
@@ -18,7 +18,11 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       ativo: produto.ativo,
       tipo: produto.tipo,
       categoriaId: produto.categoriaId,
-      categoria: produto.categoria,
+      categoria: produto.categoria ? {
+        id: produto.categoria.id,
+        name: produto.categoria.name,
+        produtos: []
+      } : null,
       estoques: [],
       compras: [],
       vendas: []
@@ -83,13 +87,65 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
     }));
   }
 
-  async findPerPage(page: number, limit: number) {
-    const skip = (page - 1) * limit;
+  async findPerPage(filters: FilterValues) {
+    const { currentPage, itemsPerPage, search, categoryId, precoMin, precoMax, quantidadeMin, quantidadeMax } = filters;
+    const skip = (currentPage - 1) * itemsPerPage;
+    const where: any = {};
+
+    if (search) {
+      where.produto = {
+        nome: {
+          contains: search,
+          mode: 'insensitive'
+        }
+      };
+    }
+
+    if (categoryId !== undefined && categoryId !== null) {
+      where.produto = {
+        ...where.produto,
+        categoriaId: categoryId
+      };
+    }
+
+    if (precoMin) {
+      where.preco = {
+        ...where.preco,
+        gte: parseFloat(precoMin)
+      };
+    }
+
+    if (precoMax) {
+      where.preco = {
+        ...where.preco,
+        lte: parseFloat(precoMax)
+      };
+    }
+
+    if (quantidadeMin) {
+      where.quantidade = {
+        ...where.quantidade,
+        gte: parseFloat(quantidadeMin)
+      };
+    }
+
+    if (quantidadeMax) {
+      where.quantidade = {
+        ...where.quantidade,
+        lte: parseFloat(quantidadeMax)
+      };
+    }
+
     const produtoEstoques = await this.prisma.produtoEstoque.findMany({
+      where,
       skip,
-      take: limit,
+      take: itemsPerPage,
       include: {
-        produto: true
+        produto: {
+          include: {
+            categoria: true
+          }
+        }
       }
     });
 
@@ -103,9 +159,11 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       produto: this.mapProduto(pe.produto)
     }));
 
+    const total = await this.prisma.produtoEstoque.count({ where });
+
     return {
       estoque: estoque,
-      total: await this.prisma.produtoEstoque.count()
+      total
     }
   }
 

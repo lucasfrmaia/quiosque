@@ -1,15 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { repositoryFactory } from '@/types/RepositoryFactory';
+import { FilterValues } from '@/types/interfaces/entities';
 
 export async function GET(request: NextRequest) {
   try {
-    const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10');
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+    const { searchParams } = request.nextUrl;
+    const currentPage = parseInt(searchParams.get('page') || '1');
+    const itemsPerPage = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || undefined;
+    const categoryParam = searchParams.get('category');
+    const categoryId = categoryParam ? parseInt(categoryParam) : undefined;
+
+    if (isNaN(currentPage) || isNaN(itemsPerPage) || currentPage < 1 || itemsPerPage < 1) {
       return NextResponse.json({ success: false, error: 'Invalid page or limit' }, { status: 400 });
     }
-    const produtos = await repositoryFactory.produtoRepository.findPerPage(page, limit);
-    return NextResponse.json(produtos);
+
+    const filters: FilterValues = {
+      currentPage,
+      itemsPerPage,
+      search,
+      categoryId,
+      quantidadeMin: undefined,
+      quantidadeMax: undefined,
+      precoMin: undefined,
+      precoMax: undefined,
+    };
+
+    const result = await repositoryFactory.produtoRepository.findPerPage(filters);
+    return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
   }

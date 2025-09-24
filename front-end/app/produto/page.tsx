@@ -64,6 +64,8 @@ const ProdutoPage: FC = () => {
     categoryId: undefined as number | undefined,
   });
 
+  const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
+
   const { data, isLoading, error } = getProdutosByParams()
 
   useEffect(() => {
@@ -71,6 +73,10 @@ const ProdutoPage: FC = () => {
       categoryId: appliedFilters.categoryId ?? undefined,
     });
   }, [appliedFilters.categoryId]);
+
+  useEffect(() => {
+    setSearchInput(appliedFilters.search || '');
+  }, [appliedFilters.search]);
   const { data: categories, isLoading: isLoadingCategories, error: erroCategories } = getAllCategories()
 
   const createForm = useForm<ProdutoFormData>({
@@ -172,19 +178,17 @@ const ProdutoPage: FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Pesquisar produtos..."
-                value={appliedFilters.search || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const newFilters = { ...appliedFilters, search: e.target.value, currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
-                  updateUrl(newFilters);
-                }}
+                value={searchInput}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
                 className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
               />
-              {appliedFilters.search && (
+              {searchInput && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                   onClick={() => {
+                    setSearchInput('');
                     const newFilters = { ...appliedFilters, search: '', currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
                     updateUrl(newFilters);
                   }}
@@ -192,6 +196,18 @@ const ProdutoPage: FC = () => {
                   <X className="h-3 w-3" />
                 </Button>
               )}
+              <Button
+                variant="default"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600"
+                onClick={() => {
+                  const newFilters = { ...appliedFilters, search: searchInput, currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
+                  updateUrl(newFilters);
+                }}
+              >
+                <Search className="h-4 w-4 mr-1" />
+                Buscar
+              </Button>
             </div>
             <Button
               variant="outline"

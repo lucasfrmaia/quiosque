@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserRepository } from '../interfaces/repositories';
-import { User } from '../interfaces/entities';
+import { User, FilterValues } from '../interfaces/entities';
 
 export class UserRepositoryPrisma implements IUserRepository {
   private prisma: PrismaClient;
@@ -9,66 +9,62 @@ export class UserRepositoryPrisma implements IUserRepository {
     this.prisma = prisma;
   }
 
-  async findPerPage(page: number, limit: number): Promise<User[]> {
-    const skip = (page - 1) * limit;
-    const users = await this.prisma.user.findMany({
-      skip,
-      take: limit
-    });
-    return users.map(u => ({
-      id: u.id,
-      name: u.name,
-      password: u.password
-    }));
-  }
-
   async create(user: Omit<User, 'id'>): Promise<User> {
     const createdUser = await this.prisma.user.create({
-      data: user,
+      data: user
     });
-    return {
-      id: createdUser.id,
-      name: createdUser.name,
-      password: createdUser.password
-    };
+    return createdUser;
   }
 
   async findById(id: number): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: { id }
     });
-    if (!user) return null;
-    return {
-      id: user.id,
-      name: user.name,
-      password: user.password
-    };
+    return user;
   }
 
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany();
-    return users.map((user) => ({
-      id: user.id,
-      name: user.name,
-      password: user.password
-    }));
+    return users;
+  }
+
+  async findPerPage(filters: FilterValues) {
+    const { currentPage, itemsPerPage, search } = filters;
+    const skip = (currentPage - 1) * itemsPerPage;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const users = await this.prisma.user.findMany({
+      where,
+      skip,
+      take: itemsPerPage
+    });
+
+    const total = await this.prisma.user.count({ where });
+
+    return {
+      users,
+      total
+    };
   }
 
   async update(id: number, user: Partial<Omit<User, 'id'>>): Promise<User> {
     const updatedUser = await this.prisma.user.update({
       where: { id },
-      data: user,
+      data: user
     });
-    return {
-      id: updatedUser.id,
-      name: updatedUser.name,
-      password: updatedUser.password
-    };
+    return updatedUser;
   }
 
   async delete(id: number): Promise<void> {
     await this.prisma.user.delete({
-      where: { id },
+      where: { id }
     });
   }
 }

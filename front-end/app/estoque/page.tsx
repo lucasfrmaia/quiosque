@@ -62,6 +62,8 @@ const EstoquePage: FC = () => {
     sortOption: 'default' as 'default' | 'asc' | 'desc',
   });
 
+  const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
+
   const { estoqueQuery: { data: response, isLoading, error } = {} } = useEstoque();
 
   useEffect(() => {
@@ -72,6 +74,10 @@ const EstoquePage: FC = () => {
       sortOption: appliedFilters.sortField ? (appliedFilters.sortDirection === 'asc' ? 'asc' : 'desc') : 'default',
     });
   }, [appliedFilters.categoryId, appliedFilters.precoMin, appliedFilters.precoMax, appliedFilters.sortField, appliedFilters.sortDirection]);
+
+  useEffect(() => {
+    setSearchInput(appliedFilters.search || '');
+  }, [appliedFilters.search]);
 
   const handleApplyFilters = () => {
     const newFilters = {
@@ -188,20 +194,34 @@ const EstoquePage: FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Pesquisar produtos..."
-                value={appliedFilters.search || ''}
-                onChange={(e) => updateUrl({ ...appliedFilters, search: e.target.value, currentPage: 1 })}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
               />
-              {appliedFilters.search && (
+              {searchInput && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => updateUrl({ ...appliedFilters, search: '', currentPage: 1 })}
+                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  onClick={() => {
+                    setSearchInput('');
+                    updateUrl({ ...appliedFilters, search: '', currentPage: 1 });
+                  }}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               )}
+              <Button
+                variant="default"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600"
+                onClick={() => {
+                  updateUrl({ ...appliedFilters, search: searchInput, currentPage: 1 });
+                }}
+              >
+                <Search className="h-4 w-4 mr-1" />
+                Buscar
+              </Button>
             </div>
             <Button
               variant="outline"

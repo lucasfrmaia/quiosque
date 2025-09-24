@@ -94,6 +94,4 @@ export interface FilterValues {
   precoMin?: string;
   precoMax?: string;
   categoryId?: number | null;
-  sortField?: string;
-  sortDirection?: SortDirection;
 }

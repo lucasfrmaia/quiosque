@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IFornecedorRepository } from '../interfaces/repositories';
-import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto } from '../interfaces/entities';
+import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto, FilterValues } from '../interfaces/entities';
 
 export class FornecedorRepositoryPrisma implements IFornecedorRepository {
   private prisma: PrismaClient;
@@ -150,17 +150,51 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
     }));
   }
 
-  async findPerPage(page: number, limit: number) {
-    const skip = (page - 1) * limit;
+  async findPerPage(filters: FilterValues) {
+    const { currentPage, itemsPerPage, search } = filters;
+    const skip = (currentPage - 1) * itemsPerPage;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { nome: { contains: search, mode: 'insensitive' } },
+        { cnpj: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { telefone: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
     const data = await this.prisma.fornecedor.findMany({
+      where,
       skip,
-      take: limit,
+      take: itemsPerPage,
+      include: {
+        compras: {
+          include: {
+            produtos: {
+              include: {
+                produto: true,
+                notaFiscal: true
+              }
+            }
+          }
+        }
+      }
     });
 
-    const total = await this.prisma.fornecedor.count()
-    
+    const fornecedores = data.map(f => ({
+      id: f.id,
+      nome: f.nome,
+      cnpj: f.cnpj,
+      telefone: f.telefone,
+      email: f.email,
+      compras: this.mapCompras(f.compras)
+    }));
+
+    const total = await this.prisma.fornecedor.count({ where });
+
     return {
-      fornecedores: data,
+      fornecedores,
       total
     };
   }

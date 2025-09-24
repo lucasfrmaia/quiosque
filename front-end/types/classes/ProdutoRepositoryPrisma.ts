@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IProdutoRepository } from '../interfaces/repositories';
-import { Produto, Category, ProdutoEstoque, ProdutoCompra, ProdutoVenda, NotaFiscalCompra, NotaFiscalVenda, Fornecedor } from '../interfaces/entities';
+import { Produto, Category, ProdutoEstoque, ProdutoCompra, ProdutoVenda, NotaFiscalCompra, NotaFiscalVenda, Fornecedor, FilterValues } from '../interfaces/entities';
 
 export class ProdutoRepositoryPrisma implements IProdutoRepository {
   private prisma: PrismaClient;
@@ -198,23 +198,37 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     return produtos;
   }
 
-  async findPerPage(page: number, limit: number) {
-    const skip = (page - 1) * limit;
+  async findPerPage(filters: FilterValues) {
+    const { currentPage, itemsPerPage, search, categoryId } = filters;
+    const skip = (currentPage - 1) * itemsPerPage;
+    const where: any = {};
+
+    if (search) {
+      where.nome = {
+        contains: search,
+        mode: 'insensitive'
+      };
+    }
+
+    if (categoryId !== undefined && categoryId !== null) {
+      where.categoriaId = categoryId;
+    }
+
     const response = await this.prisma.produto.findMany({
+      where,
       skip,
-      take: limit,
+      take: itemsPerPage,
       include: {
         categoria: true
       }
     });
 
-    const total = await this.prisma.produto.count()
+    const total = await this.prisma.produto.count();
 
     return {
       produtos: response,
-      total
+      total: total
     }
-
   }
 
   async update(id: number, produto: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>): Promise<Produto> {

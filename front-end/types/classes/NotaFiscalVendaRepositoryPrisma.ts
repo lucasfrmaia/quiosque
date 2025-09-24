@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { INotaFiscalVendaRepository } from '../interfaces/repositories';
-import { NotaFiscalVenda, ProdutoVenda, Produto } from '../interfaces/entities';
+import { NotaFiscalVenda, ProdutoVenda, Produto, FilterValues } from '../interfaces/entities';
 
 export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaRepository {
   private prisma: PrismaClient;
@@ -122,11 +122,22 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<NotaFiscalVenda[]> {
-    const skip = (page - 1) * limit;
+  async findPerPage(filters: FilterValues) {
+    const { currentPage, itemsPerPage, search } = filters;
+    const skip = (currentPage - 1) * itemsPerPage;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { data: { contains: search, mode: 'insensitive' } },
+        { total: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
     const notasFiscais = await this.prisma.notaFiscalVenda.findMany({
+      where,
       skip,
-      take: limit,
+      take: itemsPerPage,
       include: {
         produtos: {
           include: {
@@ -136,12 +147,16 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
         }
       }
     });
-    return notasFiscais.map(nf => ({
+    const notas = notasFiscais.map(nf => ({
       id: nf.id,
       data: nf.data.toISOString(),
       total: nf.total,
       produtos: this.mapProdutoVendas(nf.produtos)
     }));
+
+    const total = await this.prisma.notaFiscalVenda.count({ where });
+
+    return { notas, total };
   }
 
   async update(id: number, notaFiscal: Partial<Omit<NotaFiscalVenda, 'id' | 'produtos'>>): Promise<NotaFiscalVenda> {
