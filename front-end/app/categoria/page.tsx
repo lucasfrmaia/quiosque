@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState  } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { Category } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ const CategoriaPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [localSearch, setLocalSearch] = useState('');
 
   const createForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
   const editForm = useForm<CategoryFormData>({ defaultValues: { name: '' } });
@@ -49,6 +50,15 @@ const CategoriaPage: FC = () => {
   } = useCategory()
 
   const { data: response, isLoading } = getCategoriesByParams()
+
+  useEffect(() => {
+    setLocalSearch(queryParams.search || '');
+  }, [queryParams.search]);
+
+  const handleSearch = useCallback(() => {
+    const newFilters = { ...queryParams, search: localSearch, currentPage: 1 };
+    updateUrl(newFilters);
+  }, [queryParams, localSearch, updateUrl]);
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate(data);
@@ -105,27 +115,28 @@ const CategoriaPage: FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Pesquisar categorias..."
-                value={queryParams.search || ''}
+                value={localSearch}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const newFilters = { ...queryParams, search: e.target.value, currentPage: 1 };
-                  updateUrl(newFilters);
+                  setLocalSearch(e.target.value);
                 }}
                 className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
               />
-              {queryParams.search && (
+              {localSearch && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                   onClick={() => {
-                    const newFilters = { ...queryParams, search: '', currentPage: 1 };
-                    updateUrl(newFilters);
+                    setLocalSearch('');
                   }}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               )}
             </div>
+            <Button onClick={handleSearch} variant="default" size="sm">
+              Buscar Categorias
+            </Button>
           </div>
         </CardContent>
       </Card>
