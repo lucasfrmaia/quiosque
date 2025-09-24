@@ -157,44 +157,23 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
 
     if (search) {
       where.OR = [
-        { nome: { contains: search, mode: 'insensitive' } },
-        { cnpj: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { telefone: { contains: search, mode: 'insensitive' } }
+        { nome: { contains: search } },
+        { cnpj: { contains: search } },
+        { email: { contains: search } },
+        { telefone: { contains: search } }
       ];
     }
 
     const data = await this.prisma.fornecedor.findMany({
       where,
-      skip,
+      skip: skip,
       take: itemsPerPage,
-      include: {
-        compras: {
-          include: {
-            produtos: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            }
-          }
-        }
-      }
     });
 
-    const fornecedores = data.map(f => ({
-      id: f.id,
-      nome: f.nome,
-      cnpj: f.cnpj,
-      telefone: f.telefone,
-      email: f.email,
-      compras: this.mapCompras(f.compras)
-    }));
-
-    const total = await this.prisma.fornecedor.count({ where });
+    const total = await this.prisma.fornecedor.count();
 
     return {
-      fornecedores,
+      fornecedores: data,
       total
     };
   }
@@ -216,6 +195,7 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
         }
       }
     });
+    
     return {
       id: updatedFornecedor.id,
       nome: updatedFornecedor.nome,

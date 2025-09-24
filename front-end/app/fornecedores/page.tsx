@@ -28,6 +28,7 @@ const FornecedoresPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFornecedor, setSelectedFornecedor] = useState<Fornecedor | null>(null);
+  const [localSearch, setLocalSearch] = useState('');
 
   const createForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
   const editForm = useForm<FornecedorFormData>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
@@ -45,6 +46,15 @@ const FornecedoresPage: FC = () => {
   } = useFornecedor();
 
   const { data: response, isLoading, error } = fornecedorQuery;
+
+  useEffect(() => {
+    setLocalSearch(appliedFilters.search || '');
+  }, [appliedFilters.search]);
+
+  const handleSearch = useCallback(() => {
+    const newFilters = { ...appliedFilters, search: localSearch, currentPage: 1 };
+    updateUrl(newFilters);
+  }, [appliedFilters, localSearch, updateUrl]);
 
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
@@ -115,27 +125,28 @@ const FornecedoresPage: FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Pesquisar fornecedores..."
-                value={appliedFilters.search || ''}
+                value={localSearch}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const newFilters = { ...appliedFilters, search: e.target.value, currentPage: 1 };
-                  updateUrl(newFilters);
+                  setLocalSearch(e.target.value);
                 }}
                 className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
               />
-              {appliedFilters.search && (
+              {localSearch && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                   onClick={() => {
-                    const newFilters = { ...appliedFilters, search: '', currentPage: 1 };
-                    updateUrl(newFilters);
+                    setLocalSearch('');
                   }}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               )}
             </div>
+            <Button onClick={handleSearch} variant="default" size="sm">
+              Buscar Fornecedores
+            </Button>
           </div>
         </CardContent>
       </Card>

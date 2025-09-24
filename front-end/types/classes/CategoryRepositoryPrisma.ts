@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ICategoryRepository } from '../interfaces/repositories';
-import { Category, Produto } from '../interfaces/entities';
+import { Category, Produto, FilterValues } from '../interfaces/entities';
 
 export class CategoryRepositoryPrisma implements ICategoryRepository {
   private prisma: PrismaClient;
@@ -101,19 +101,28 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
     }));
   }
 
-  async findPerPage(page: number, limit: number): Promise<{ categories: Category[], total: number}> {
-    const skip = (page - 1) * limit;
-    const categories = await this.prisma.category.findMany({
-      skip,
-      take: limit
-    });
-    const total = await this.prisma.category.count()
-    
-    return {
-      categories: categories,
-      total: total
-    };
-  }
+  async findPerPage(filters: FilterValues): Promise<{ categories: Category[], total: number }> {
+      const { currentPage, itemsPerPage, search } = filters;
+      const skip = (currentPage - 1) * itemsPerPage;
+      const where: any = {};
+  
+      if (search) {
+        where.name = { contains: search, mode: 'insensitive' };
+      }
+  
+      const categories = await this.prisma.category.findMany({
+        where,
+        skip,
+        take: itemsPerPage
+      });
+  
+      const total = await this.prisma.category.count({ where });
+      
+      return {
+        categories: categories.map(c => ({ id: c.id, name: c.name })),
+        total
+      };
+    }
 
   async update(id: number, category: Partial<Omit<Category, 'id' | 'produtos'>>): Promise<Category> {
     const updatedCategory = await this.prisma.category.update({

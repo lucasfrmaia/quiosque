@@ -8,8 +8,6 @@ export async function GET(request: NextRequest) {
     const currentPage = parseInt(searchParams.get('page') || '1');
     const itemsPerPage = parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || undefined;
-    const categoryParam = searchParams.get('category');
-    const categoryId = categoryParam ? parseInt(categoryParam) : undefined;
 
     if (isNaN(currentPage) || isNaN(itemsPerPage) || currentPage < 1 || itemsPerPage < 1) {
       return NextResponse.json({ success: false, error: 'Invalid page or limit' }, { status: 400 });
@@ -19,11 +17,6 @@ export async function GET(request: NextRequest) {
       currentPage,
       itemsPerPage,
       search,
-      categoryId,
-      quantidadeMin: undefined,
-      quantidadeMax: undefined,
-      precoMin: undefined,
-      precoMax: undefined,
     };
 
     const result = await repositoryFactory.produtoRepository.findPerPage(filters);
