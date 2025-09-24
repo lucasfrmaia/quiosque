@@ -107,7 +107,7 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
       const where: any = {};
   
       if (search) {
-        where.name = { contains: search, mode: 'insensitive' };
+        where.name = { contains: search };
       }
   
       const categories = await this.prisma.category.findMany({
@@ -116,10 +116,10 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
         take: itemsPerPage
       });
   
-      const total = await this.prisma.category.count({ where });
+      const total = await this.prisma.category.count();
       
       return {
-        categories: categories.map(c => ({ id: c.id, name: c.name })),
+        categories: categories,
         total
       };
     }

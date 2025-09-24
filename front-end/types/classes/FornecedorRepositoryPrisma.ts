@@ -181,19 +181,7 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
   async update(id: number, fornecedor: Partial<Omit<Fornecedor, 'id' | 'compras'>>): Promise<Fornecedor> {
     const updatedFornecedor = await this.prisma.fornecedor.update({
       where: { id },
-      data: fornecedor,
-      include: {
-        compras: {
-          include: {
-            produtos: {
-              include: {
-                produto: true,
-                notaFiscal: true
-              }
-            }
-          }
-        }
-      }
+      data: fornecedor
     });
     
     return {
@@ -202,7 +190,6 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
       cnpj: updatedFornecedor.cnpj,
       telefone: updatedFornecedor.telefone,
       email: updatedFornecedor.email,
-      compras: this.mapCompras(updatedFornecedor.compras)
     };
   }
 
