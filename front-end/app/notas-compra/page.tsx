@@ -108,7 +108,7 @@ const NotasCompraPage: FC = () => {
 
   const openEditModal = (nota: NotaFiscalCompra) => {
     setSelectedNota(nota);
-    editForm.setValue('data', nota.data.toDateString());
+    editForm.setValue('data', nota.data.toLocaleString());
     editForm.setValue('fornecedorId', nota.fornecedorId);
     editForm.setValue('produtos', nota.produtos?.map(p => ({
       produtoId: p.produtoId.toString(),

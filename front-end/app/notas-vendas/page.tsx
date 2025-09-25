@@ -97,7 +97,7 @@ const NotasVendasPage: FC = () => {
 
   const openEditModal = (nota: NotaFiscalVenda) => {
     setSelectedNota(nota);
-    editForm.setValue('data', nota.data.toDateString());
+    editForm.setValue('data', nota.data.toLocaleString());
     editForm.setValue('total', nota.total)
     editForm.setValue(
       'produtos',
