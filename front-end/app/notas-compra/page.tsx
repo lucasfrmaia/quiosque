@@ -218,8 +218,8 @@ const NotasCompraPage: FC = () => {
             filterValues={appliedFilters}
             onSort={() => { }}
             onEdit={openEditModal}
-            onDelete={(id) => {
-              const nota = responseNotas?.notas?.find(nota => nota.id === id);
+            onDelete={(notaSelected) => {
+              const nota = responseNotas?.notas?.find(nota => nota.id === notaSelected.id);
               if (nota) openDeleteModal(nota);
             }}
           />

@@ -12,7 +12,7 @@ interface NotaFiscalCompraTableProps {
   filterValues: FilterValues;
   onSort: (field: string) => void;
   onEdit: (nota: NotaFiscalCompra) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: NotaFiscalCompra) => void;
 }
 
 export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
@@ -75,7 +75,7 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
         filterValues={filterValues}
         onSort={onSort}
         onEdit={onEdit}
-        onDelete={(nota) => onDelete(nota.id)}
+        onDelete={onDelete}
         onView={openDetails}
         emptyMessage="Nenhuma nota fiscal de compra encontrada."
       />

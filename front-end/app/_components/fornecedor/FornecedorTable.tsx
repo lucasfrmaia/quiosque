@@ -6,8 +6,8 @@ interface FornecedorTableProps {
   items: Fornecedor[];
   filterValues: FilterValues;
   onSort: (field: string) => void;
-  onEdit: (item: Fornecedor) => void;
-  onDelete: (id: number) => void;
+  onEdit: (fornecedor: Fornecedor) => void;
+  onDelete: (fornecedor: Fornecedor) => void;
 }
 
 export const FornecedorTable: FC<FornecedorTableProps> = ({

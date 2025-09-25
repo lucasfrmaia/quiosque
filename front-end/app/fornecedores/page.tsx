@@ -162,8 +162,8 @@ const FornecedoresPage: FC = () => {
             filterValues={appliedFilters}
             onSort={handleSort}
             onEdit={openEditModal}
-            onDelete={(id) => {
-              const fornecedor = response?.fornecedores.find((f: Fornecedor) => f.id === id);
+            onDelete={(fornecedorSelected) => {
+              const fornecedor = response?.fornecedores.find((f: Fornecedor) => f.id === fornecedorSelected.id);
               if (fornecedor) openDeleteModal(fornecedor);
             }}
           />

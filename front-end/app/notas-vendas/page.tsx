@@ -184,8 +184,8 @@ const NotasVendasPage: FC = () => {
             filterValues={appliedFilters}
             onSort={handleSort}
             onEdit={openEditModal}
-            onDelete={(id) => {
-              const nota = response?.notas?.find((n) => n.id === id.id);
+            onDelete={(notaSelected) => {
+              const nota = response?.notas?.find((n) => n.id === notaSelected.id);
               if (nota) openDeleteModal(nota);
             }}
           />

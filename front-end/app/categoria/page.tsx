@@ -152,8 +152,8 @@ const CategoriaPage: FC = () => {
             filterValues={queryParams}
             onSort={handleSort}
             onEdit={openEditModal}
-            onDelete={(id) => {
-              const category = response?.categories?.find(c => c.id === id);
+            onDelete={(ctg) => {
+              const category = response?.categories?.find(c => c.id === ctg.id);
               if (category) openDeleteModal(category);
             }}
           />

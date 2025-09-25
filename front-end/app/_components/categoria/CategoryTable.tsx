@@ -7,7 +7,7 @@ interface CategoryTableProps {
   filterValues: FilterValues;
   onSort: (field: string) => void;
   onEdit: (item: Category) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: Category) => void;
 }
 
 export const CategoryTable: FC<CategoryTableProps> = ({
