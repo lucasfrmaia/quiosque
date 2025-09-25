@@ -16,19 +16,19 @@ export function ModalEditNotaCompra({ isEditModalOpen, setIsEditModalOpen, editF
     return (
         <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
             <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>Editar Nota Fiscal de Compra</DialogTitle>
-                    <DialogDescription>Edite a nota fiscal de compra.</DialogDescription>
-                </DialogHeader>
-                <FormProvider {...editForm}>
-                    <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+                <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
+                    <DialogHeader>
+                        <DialogTitle>Editar Nota Fiscal de Compra</DialogTitle>
+                        <DialogDescription>Edite a nota fiscal de compra.</DialogDescription>
+                    </DialogHeader>
+                    <FormProvider {...editForm}>
                         <NotaFiscalCompraForm fornecedores={fornecedores} editing={true} />
-                    </form>
-                </FormProvider>
-                <DialogFooter>
-                    <Button type="submit">Salvar</Button>
-                    <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                </DialogFooter>
+                    </FormProvider>
+                    <DialogFooter>
+                        <Button type="submit">Salvar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+                    </DialogFooter>
+                </form>
             </DialogContent>
         </Dialog>
     )
