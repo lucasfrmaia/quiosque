@@ -1,4 +1,6 @@
 import { FC, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Box } from 'lucide-react';
 import { NotaFiscalVenda, FilterValues } from '@/types/interfaces/entities';
 import { DataTable } from '../DataTable';
 import {
@@ -32,16 +34,32 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
 
   const columns = [
     {
-      key: 'id',
-      header: 'ID',
-      render: (item: NotaFiscalVenda) => item.id,
-      sortable: true,
-      sorter: (a: NotaFiscalVenda, b: NotaFiscalVenda) => a.id - b.id,
+      key: 'imagem',
+      header: 'Imagem',
+      render: (item: NotaFiscalVenda) => (
+        <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
+          <Box className="h-6 w-6 text-gray-400" />
+        </div>
+      ),
+      sortable: false,
+    },
+    {
+      key: 'nome',
+      header: 'Nome',
+      render: (item: NotaFiscalVenda) => (
+        <div className="space-y-1">
+          <div className="font-bold text-sm">Nota Fiscal #{item.id}</div>
+        </div>
+      ),
+      sortable: false,
     },
     {
       key: 'total',
       header: 'Total',
-      render: (item: NotaFiscalVenda) => `R$ ${item.total.toFixed(2)}`,
+      sortKey: 'total',
+      render: (item: NotaFiscalVenda) => (
+        <div className="font-bold text-sm">R$ {item.total.toFixed(2)}</div>
+      ),
       sortable: true,
       sorter: (a: NotaFiscalVenda, b: NotaFiscalVenda) => a.total - b.total,
     },
@@ -54,8 +72,21 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
     },
     {
       key: 'produtos',
-      header: 'Produtos',
+      header: 'Estoque',
       render: (item: NotaFiscalVenda) => item.produtos?.length || 0,
+      sortable: false,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (item: NotaFiscalVenda) => (
+        <Badge
+          variant="default"
+          className="bg-green-100 text-green-800"
+        >
+          Ativo
+        </Badge>
+      ),
       sortable: false,
     },
   ];

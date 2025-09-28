@@ -1,4 +1,6 @@
 import { FC, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Box } from 'lucide-react';
 import { NotaFiscalCompra, FilterValues } from '@/types/interfaces/entities';
 import { DataTable } from '../DataTable';
 import {
@@ -32,23 +34,34 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
 
   const columns = [
     {
-      key: 'id',
-      header: 'ID',
-      render: (item: NotaFiscalCompra) => item.id,
-      sortable: true,
-      sorter: (a: NotaFiscalCompra, b: NotaFiscalCompra) => a.id - b.id,
+      key: 'imagem',
+      header: 'Imagem',
+      render: (item: NotaFiscalCompra) => (
+        <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
+          <Box className="h-6 w-6 text-gray-400" />
+        </div>
+      ),
+      sortable: false,
     },
     {
       key: 'fornecedor',
       header: 'Fornecedor',
-      render: (item: NotaFiscalCompra) => item.fornecedor?.nome || 'N/A',
+      sortKey: 'fornecedor.nome',
+      render: (item: NotaFiscalCompra) => (
+        <div className="space-y-1">
+          <div className="font-bold text-sm">{item.fornecedor?.nome || 'N/A'}</div>
+        </div>
+      ),
       sortable: true,
       sorter: (a: NotaFiscalCompra, b: NotaFiscalCompra) => (a.fornecedor?.nome || '').localeCompare(b.fornecedor?.nome || ''),
     },
     {
       key: 'total',
       header: 'Total',
-      render: (item: NotaFiscalCompra) => `R$ ${item.total.toFixed(2)}`,
+      sortKey: 'total',
+      render: (item: NotaFiscalCompra) => (
+        <div className="font-bold text-sm">R$ {item.total.toFixed(2)}</div>
+      ),
       sortable: true,
       sorter: (a: NotaFiscalCompra, b: NotaFiscalCompra) => a.total - b.total,
     },
@@ -61,8 +74,21 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
     },
     {
       key: 'produtos',
-      header: 'Produtos',
+      header: 'Estoque',
       render: (item: NotaFiscalCompra) => item.produtos?.length || 0,
+      sortable: false,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (item: NotaFiscalCompra) => (
+        <Badge
+          variant="default"
+          className="bg-green-100 text-green-800"
+        >
+          Ativo
+        </Badge>
+      ),
       sortable: false,
     },
   ];

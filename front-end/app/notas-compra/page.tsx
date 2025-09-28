@@ -14,7 +14,7 @@ import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
 import { ModalCreateNotaCompra } from '../_components/modals/notas-compras/ModalCreateNotaCompra';
 import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEditeNotaCompra';
 import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
-import { Search, X } from 'lucide-react';
+import { FileText, Plus, Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { NotaFiscalCompraSchema } from '@/types/validation';
 
@@ -159,49 +159,64 @@ const NotasCompraPage: FC = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl font-bold">Notas Fiscais de Compra</CardTitle>
-            <CardDescription>Gerencie as notas fiscais de compra</CardDescription>
-          </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>Nova Nota</Button>
-        </CardHeader>
-      </Card>
+      <div className="flex flex-row items-center justify-between mb-6">
+        <div className="flex items-center">
+          <FileText className="h-8 w-8 text-green-500 mr-3" />
+          <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Notas Fiscais de Compra</h1>
+        </div>
+        <Button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+        >
+          <Plus className="h-4 w-4" />
+          Adicionar Nota Fiscal de Compra
+        </Button>
+      </div>
 
       {/* Filtros */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="relative flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Pesquisar por ID ou fornecedor..."
-                value={localSearch}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
-                className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
-              />
-              {localSearch && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => setLocalSearch('')}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              )}
-            </div>
-            <Button onClick={handleSearch} variant="default" size="sm">
+      <div className="mx-auto max-w-4xl mb-6">
+        <div className="relative flex items-center justify-center gap-4">
+          <div className="relative flex-1 max-w-2xl">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Pesquisar notas por ID, fornecedor ou data..."
+              value={localSearch}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
+              className="pl-10 pr-4 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 shadow-sm hover:border-green-300 transition-all duration-200"
+            />
+            {localSearch && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-12 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => {
+                  setLocalSearch('');
+                  const newFilters = { ...appliedFilters, search: '', currentPage: 1 };
+                  updateUrl(newFilters);
+                }}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            )}
+            <Button
+              variant="default"
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+              onClick={handleSearch}
+            >
+              <Search className="h-4 w-4 mr-1" />
               Buscar
             </Button>
-            <Button onClick={resetFilters} variant="outline" size="sm">
-              Limpar Filtros
-            </Button>
           </div>
-        </CardContent>
-      </Card>
+          <Button
+            variant="outline"
+            onClick={resetFilters}
+            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            Limpar Filtros
+          </Button>
+        </div>
+      </div>
 
       {/* Filtros ativos */}
       <ActiveFilters
