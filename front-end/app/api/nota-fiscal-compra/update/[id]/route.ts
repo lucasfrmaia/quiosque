@@ -5,7 +5,7 @@ import { NotaFiscalCompra } from '@/types/interfaces/entities';
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
 
-    const { id } = (params);
+    const { id } = await params;
     const numberid = Number(id)
     
     const updates = await request.json() as Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>>;

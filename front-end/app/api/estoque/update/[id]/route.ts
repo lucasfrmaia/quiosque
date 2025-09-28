@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   try {
 
-    const { id } = (params);
+    const { id } = await params;
     const numberid = Number(id)
 
     if (isNaN(numberid)) {

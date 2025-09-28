@@ -5,7 +5,7 @@ import { NotaFiscalVenda } from '@/types/interfaces/entities';
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
 
-    const { id } = (params);
+    const { id } = await params;
     const numberid = Number(id)
 
     if (isNaN(numberid)) {

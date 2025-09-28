@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { NotaFiscalCompra, NotaFiscalVenda, ProdutoCompra, ProdutoVenda } from '@/types/interfaces/entities';
+import { Button } from '@/components/ui/button';
 
 interface NotaDetailsProps {
   nota: NotaFiscalCompra | NotaFiscalVenda;
