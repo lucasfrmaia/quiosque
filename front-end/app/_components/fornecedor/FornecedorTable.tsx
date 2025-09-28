@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Box } from 'lucide-react';
 import { Fornecedor, FilterValues } from '@/types/interfaces/entities';
 import { DataTable } from '../DataTable';
 
@@ -19,16 +21,24 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
 }) => {
   const columns = [
     {
-      key: 'id',
-      header: 'ID',
-      render: (item: Fornecedor) => item.id,
+      key: 'imagem',
+      header: 'Imagem',
+      render: (item: Fornecedor) => (
+        <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
+          <Box className="h-6 w-6 text-gray-400" />
+        </div>
+      ),
       sortable: false,
     },
     {
       key: 'nome',
       header: 'Nome',
       sortKey: 'nome',
-      render: (item: Fornecedor) => item.nome,
+      render: (item: Fornecedor) => (
+        <div className="space-y-1">
+          <div className="font-bold text-sm">{item.nome}</div>
+        </div>
+      ),
       sortable: true,
       sorter: (a: Fornecedor, b: Fornecedor) => a.nome.localeCompare(b.nome),
     },
@@ -55,6 +65,19 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       render: (item: Fornecedor) => item.email || 'N/A',
       sortable: true,
       sorter: (a: Fornecedor, b: Fornecedor) => (a.email || '').localeCompare(b.email || ''),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (item: Fornecedor) => (
+        <Badge
+          variant="default"
+          className="bg-green-100 text-green-800"
+        >
+          Ativo
+        </Badge>
+      ),
+      sortable: false,
     },
   ];
 

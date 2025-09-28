@@ -29,7 +29,7 @@ import { ProdutoTable } from '@/app/_components/produto/ProdutoTable';
 import { useProduto } from '@/app/_components/hooks/useProduto';
 
 import { useCategory } from '@/app/_components/hooks/useCategory';
-import { Filter, Search, X } from 'lucide-react';
+import { Box, Filter, Plus, Search, X } from 'lucide-react';
 import { ModalCreateProduct } from '../_components/modals/product/ModalCreateProdutct';
 import { ModalUpdateProduct } from '../_components/modals/product/ModalUpadteProduct';
 import { ModalDeleteProduct } from '../_components/modals/product/ModalDeleteProduct';
@@ -155,66 +155,68 @@ const ProdutoPage: FC = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl font-bold">Produtos</CardTitle>
-            <CardDescription>Gerencie os produtos do sistema</CardDescription>
-          </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>Novo Produto</Button>
-        </CardHeader>
-      </Card>
+      <div className="flex flex-row items-center justify-between mb-6">
+        <div className="flex items-center">
+          <Box className="h-8 w-8 text-green-500 mr-3" />
+          <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Produtos</h1>
+        </div>
+        <Button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-green-500 hover:bg-green-600 text-white flex items-center gap-2 px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+        >
+          <Plus className="h-4 w-4" />
+          Adicionar Produto
+        </Button>
+      </div>
 
       {/* Search Bar */}
-      <Card className="border-green-100 shadow-sm">
-        <CardContent className="p-4">
-          <div className="relative flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Pesquisar produtos..."
-                value={searchInput}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
-                className="pl-10 pr-4 rounded-xl border-green-200 focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-200 hover:shadow-lg"
-              />
-              {searchInput && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-9 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => {
-                    setSearchInput('');
-                    const newFilters = { ...appliedFilters, search: '', currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
-                    updateUrl(newFilters);
-                  }}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              )}
+      <div className="mx-auto max-w-4xl mb-6">
+        <div className="relative flex items-center justify-center gap-4">
+          <div className="relative flex-1 max-w-2xl">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Pesquisar produtos por nome, descrição ou categoria..."
+              value={searchInput}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchInput(e.target.value)}
+              className="pl-10 pr-4 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 shadow-sm hover:border-green-300 transition-all duration-200"
+            />
+            {searchInput && (
               <Button
-                variant="default"
+                variant="ghost"
                 size="sm"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600"
+                className="absolute right-12 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                 onClick={() => {
-                  const newFilters = { ...appliedFilters, search: searchInput, currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
+                  setSearchInput('');
+                  const newFilters = { ...appliedFilters, search: '', currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
                   updateUrl(newFilters);
                 }}
               >
-                <Search className="h-4 w-4 mr-1" />
-                Buscar
+                <X className="h-3 w-3" />
               </Button>
-            </div>
+            )}
             <Button
-              variant="outline"
-              onClick={() => setIsFilterOpen(true)}
-              className="rounded-xl border-green-300 hover:bg-green-50 hover:border-green-400 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+              variant="default"
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+              onClick={() => {
+                const newFilters = { ...appliedFilters, search: searchInput, currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
+                updateUrl(newFilters);
+              }}
             >
-              <Filter className="h-4 w-4" />
-              Filtros
+              <Search className="h-4 w-4 mr-1" />
+              Buscar
             </Button>
           </div>
-        </CardContent>
-      </Card>
+          <Button
+            variant="outline"
+            onClick={() => setIsFilterOpen(true)}
+            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <Filter className="h-4 w-4" />
+            Filtros
+          </Button>
+        </div>
+      </div>
 
       {/* Filters Dialog */}
       <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>

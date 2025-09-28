@@ -36,7 +36,12 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
   }
 
   async findAll(): Promise<Produto[]> {
-    const produtos = await this.prisma.produto.findMany();
+    const produtos = await this.prisma.produto.findMany({
+      include: {
+        categoria: true,
+        estoques: true
+      }
+    });
 
     return produtos;
   }
@@ -62,7 +67,8 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
       skip,
       take: itemsPerPage,
       include: {
-        categoria: true
+        categoria: true,
+        estoques: true
       }
     });
 

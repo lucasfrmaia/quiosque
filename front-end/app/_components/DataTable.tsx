@@ -1,7 +1,12 @@
 'use client';
 
 import { FC, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+} from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -81,84 +86,137 @@ export const DataTable = <T extends { id: number }>({
     return 0;
   });
 
-  if (sortedItems.length === 0) {
-    return (
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {columns.map((column) => (
-                <TableHead key={column.key}>{column.header}</TableHead>
-              ))}
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={columns.length + 1} className="h-24 text-center">
-                {emptyMessage}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
-    );
-  }
+  // Empty state handled in return
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column) => {
-              const columnSortKey = column.sortKey || column.key;
-              return (
-                <TableHead
-                  key={column.key}
-                  className={column.sortable ? 'cursor-pointer select-none' : ''}
-                  onClick={() => column.sortable && handleSort(columnSortKey)}
-                >
-                  <div className="flex items-center space-x-1">
-                    <span>{column.header}</span>
-                    {column.sortable && sortField === columnSortKey && (
-                      <SortIcon
-                        field={columnSortKey}
-                        currentSortField={sortField || ''}
-                        currentSortDirection={sortDirection}
-                      />
-                    )}
+    <>
+      {/* Mobile Cards View */}
+      <div className="block md:hidden space-y-4">
+        {sortedItems.map((item) => (
+          <Card key={item.id} className="shadow-sm border-gray-200">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                {columns.map((column) => (
+                  <div key={column.key} className="space-y-1">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      {column.header}
+                    </span>
+                    <div className="text-sm">{column.render(item)}</div>
                   </div>
+                ))}
+              </div>
+              <div className="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+                {onView && (
+                  <Button variant="outline" size="sm" onClick={() => onView(item)}>
+                    Ver
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEdit(item)}
+                  className="text-purple-600 hover:bg-purple-50 border-purple-200 hover:border-purple-300 transition-all duration-200"
+                  aria-label="Editar item"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => onDelete(item)}
+                  className="text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                  aria-label="Excluir item"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block">
+        <div className="rounded-md border overflow-hidden shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                {columns.map((column) => {
+                  const columnSortKey = column.sortKey || column.key;
+                  return (
+                    <TableHead
+                      key={column.key}
+                      className={`${column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''} px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 ${column.key === 'imagem' ? 'w-20' : ''}`}
+                      onClick={() => column.sortable && handleSort(columnSortKey)}
+                    >
+                      <div className="flex items-center space-x-1">
+                        <span>{column.header}</span>
+                        {column.sortable && sortField === columnSortKey && (
+                          <SortIcon
+                            field={columnSortKey}
+                            currentSortField={sortField || ''}
+                            currentSortDirection={sortDirection}
+                          />
+                        )}
+                      </div>
+                    </TableHead>
+                  );
+                })}
+                <TableHead className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                  Ações
                 </TableHead>
-              );
-            })}
-            <TableHead className="text-right">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedItems.map((item) => (
-            <TableRow key={item.id} className="hover:bg-accent/50">
-              {columns.map((column) => (
-                <TableCell key={column.key}>{column.render(item)}</TableCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedItems.map((item) => (
+                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100">
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.key}
+                      className={`px-4 py-4 text-sm ${column.key === 'imagem' ? 'text-center p-2' : 'align-top'}`}
+                    >
+                      {column.render(item)}
+                    </TableCell>
+                  ))}
+                  <TableCell className="text-right px-4 py-4">
+                    <div className="flex justify-end space-x-2">
+                      {onView && (
+                        <Button variant="outline" size="sm" onClick={() => onView(item)}>
+                          Ver
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEdit(item)}
+                        className="text-purple-600 hover:bg-purple-50 border-purple-200 hover:border-purple-300 transition-all duration-200"
+                        aria-label="Editar item"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => onDelete(item)}
+                        className="text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                        aria-label="Excluir item"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
               ))}
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                  {onView && (
-                    <Button variant="outline" size="sm" onClick={() => onView(item)}>
-                      Ver
-                    </Button>
-                  )}
-                  <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => onDelete(item)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {sortedItems.length === 0 && (
+        <div className="rounded-md border p-8 text-center text-gray-500">
+          {emptyMessage}
+        </div>
+      )}
+    </>
   );
 };
