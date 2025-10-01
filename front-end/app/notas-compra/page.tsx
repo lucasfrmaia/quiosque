@@ -6,21 +6,33 @@ import { FilterValues, SortDirection, NotaFiscalCompra } from '@/types/interface
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { Pagination } from '@/app/_components/Pagination';
 import { NotaFiscalCompraTable } from '@/app/_components/nota-fiscal-compra/NotaFiscalCompraTable';
 import { useNotaFiscalCompra } from '@/app/_components/hooks/useNotaFiscalCompra';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';
+import { DateRangeFilter } from '@/app/_components/filtros/DateRangeFilter';
+import { SearchableSelect, Option } from '@/app/_components/common/SearchableSelect';
 import { ModalCreateNotaCompra } from '../_components/modals/notas-compras/ModalCreateNotaCompra';
 import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEditeNotaCompra';
 import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
-import { FileText, Plus, Search, X } from 'lucide-react';
+import { FileText, Plus, Search, X, Filter, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { NotaFiscalCompraSchema } from '@/types/validation';
 
 const NotasCompraPage: FC = () => {
   /** Extrai filtros da URL */
-  const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras, updateUrl, resetFilters, queryParams } = useNotaFiscalCompra();
+  const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras, updateUrl, resetFilters, queryParams, getActiveFilters, handleRemoveFilter } = useNotaFiscalCompra();
   const { data: responseNotas, isLoading, error } = getNotasFiscaisCompras()
 
   const { getAllFornecedores } = useFornecedor();
@@ -39,6 +51,25 @@ const NotasCompraPage: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedNota, setSelectedNota] = useState<NotaFiscalCompra | null>(null);
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterValues, setFilterValues] = useState({
+    dateStart: '',
+    dateEnd: '',
+    totalMin: '0',
+    totalMax: '10000',
+    fornecedorId: '',
+  });
+
+  useEffect(() => {
+    setFilterValues({
+      dateStart: appliedFilters.dateStart || '',
+      dateEnd: appliedFilters.dateEnd || '',
+      totalMin: appliedFilters.totalMin || '0',
+      totalMax: appliedFilters.totalMax || '10000',
+      fornecedorId: appliedFilters.fornecedorId || '',
+    });
+  }, [appliedFilters.dateStart, appliedFilters.dateEnd, appliedFilters.totalMin, appliedFilters.totalMax, appliedFilters.fornecedorId]);
 
   /** Forms */
   const createForm = useForm<NotaFiscalCompraSchema>({
@@ -62,6 +93,34 @@ const NotasCompraPage: FC = () => {
     setAppliedFilters(newFilters);
     updateUrl(newFilters);
   }, [appliedFilters, localSearch, updateUrl]);
+
+  const handleApplyFilters = () => {
+    const newFilters = {
+      ...appliedFilters,
+      dateStart: filterValues.dateStart,
+      dateEnd: filterValues.dateEnd,
+      totalMin: filterValues.totalMin,
+      totalMax: filterValues.totalMax,
+      fornecedorId: filterValues.fornecedorId,
+      currentPage: 1,
+    };
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
+    setIsFilterOpen(false);
+  };
+
+  const handleClearFilters = () => {
+    setFilterValues({
+      dateStart: '',
+      dateEnd: '',
+      totalMin: '0',
+      totalMax: '10000',
+      fornecedorId: '',
+    });
+    const newFilters = { ...appliedFilters, dateStart: '', dateEnd: '', totalMin: '', totalMax: '', fornecedorId: '', currentPage: 1 };
+    setAppliedFilters(newFilters);
+    updateUrl(newFilters);
+  };
 
   /** Atualiza URL com filtros */
 
@@ -132,23 +191,6 @@ const NotasCompraPage: FC = () => {
     setSelectedNota(null);
   };
 
-  /** Filtros ativos */
-  const getActiveFilters = () => {
-    const active = [];
-    if (appliedFilters.search) active.push({ label: 'Pesquisa', value: appliedFilters.search });
-    return active;
-  };
-
-  const handleRemoveFilter = (index: number) => {
-    const activeFilters = getActiveFilters();
-    const filterToRemove = activeFilters[index];
-
-    let newFilters = { ...appliedFilters };
-    if (filterToRemove.label === 'Pesquisa') newFilters.search = '';
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  };
-
  if (isLoading || isLoadingFornecedor) {
     return <>Carregando...</>
  }
@@ -157,6 +199,8 @@ const NotasCompraPage: FC = () => {
     console.error(error, "ou", errorFornecedor)
     return <>Error!</>
  }
+
+  const activeFilters = getActiveFilters();
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -193,6 +237,7 @@ const NotasCompraPage: FC = () => {
                 onClick={() => {
                   setLocalSearch('');
                   const newFilters = { ...appliedFilters, search: '', currentPage: 1 };
+                  setAppliedFilters(newFilters);
                   updateUrl(newFilters);
                 }}
               >
@@ -211,7 +256,15 @@ const NotasCompraPage: FC = () => {
           </div>
           <Button
             variant="outline"
-            onClick={resetFilters}
+            onClick={() => setIsFilterOpen(true)}
+            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <Filter className="h-4 w-4" />
+            Filtros
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleClearFilters}
             className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
           >
             Limpar Filtros
@@ -221,10 +274,75 @@ const NotasCompraPage: FC = () => {
 
       {/* Filtros ativos */}
       <ActiveFilters
-        filters={getActiveFilters()}
+        filters={activeFilters}
         onRemoveFilter={handleRemoveFilter}
-        onClearAll={resetFilters}
+        onClearAll={handleClearFilters}
       />
+
+      {/* Filters Dialog */}
+      <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+        <DialogContent className="max-w-md sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Filtros</DialogTitle>
+            <DialogDescription>Ajuste os filtros para encontrar as notas ideais.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {/* Fornecedor Filter */}
+            <div className="space-y-2">
+              <Label>Fornecedor</Label>
+              <SearchableSelect
+                options={responsefornecedores?.map(f => ({ id: f.id, name: f.nome })) || []}
+                value={filterValues.fornecedorId ? { id: filterValues.fornecedorId, name: responsefornecedores?.find(f => f.id.toString() === filterValues.fornecedorId)?.nome || '' } : null}
+                onChange={(option) => setFilterValues({ ...filterValues, fornecedorId: option ? option.id.toString() : '' })}
+                placeholder="Selecione um fornecedor"
+              />
+            </div>
+
+            {/* Date Range Filter */}
+            <DateRangeFilter
+              startDate={filterValues.dateStart}
+              endDate={filterValues.dateEnd}
+              onStartDateChange={(value) => setFilterValues({ ...filterValues, dateStart: value })}
+              onEndDateChange={(value) => setFilterValues({ ...filterValues, dateEnd: value })}
+              label="Período"
+              description="Selecione o intervalo de datas das notas fiscais"
+            />
+
+            {/* Total Range Slider */}
+            <div className="space-y-2">
+              <Label>Faixa de Total (R$)</Label>
+              <Slider
+                value={[Number(filterValues.totalMin), Number(filterValues.totalMax)]}
+                onValueChange={(value) =>
+                  setFilterValues({
+                    ...filterValues,
+                    totalMin: value[0].toString(),
+                    totalMax: value[1].toString(),
+                  })
+                }
+                max={10000}
+                step={100}
+                className="w-full"
+              />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>R$ {Number(filterValues.totalMin).toFixed(0)}</span>
+                <span>R$ {Number(filterValues.totalMax).toFixed(0)}</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={handleClearFilters}>
+              Limpar Filtros
+            </Button>
+            <Button onClick={handleApplyFilters} className="bg-green-500 hover:bg-green-600">
+              Aplicar
+            </Button>
+            <Button variant="outline" onClick={() => setIsFilterOpen(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Tabela + Paginação */}
       <Card>

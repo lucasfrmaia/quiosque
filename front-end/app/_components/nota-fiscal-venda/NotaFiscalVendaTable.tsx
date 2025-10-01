@@ -114,7 +114,7 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
               <DialogTitle className="text-2xl font-bold text-gray-900">Detalhes da Nota Fiscal</DialogTitle>
             </DialogHeader>
             <HeaderNotaModal nota={selectedNota} />
-            <NotaDetails nota={selectedNota} isCompra={false} />
+            <NotaDetails nota={selectedNota} />
           </DialogContent>
         </Dialog>
       )}

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,20 +12,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SearchableSelect } from '../common/SearchableSelect';
 import { useProduto } from '../hooks/useProduto';
 import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto } from '@/types/interfaces/entities';
 import { NotaFiscalCompraSchema } from '@/types/validation';
+import { Package, X } from 'lucide-react';
 
-interface NotaFiscalCompraFormData {
-  data: string;
-  fornecedorId: string;
-  produtos: Array<{
-    produtoId: string;
-    quantidade: string;
-    unidade: string;
-    precoUnitario: string;
-  }>;
-}
 
 interface NotaFiscalCompraFormProps {
   fornecedores: Fornecedor[];
@@ -33,158 +26,198 @@ interface NotaFiscalCompraFormProps {
 }
 
 export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedores, editing = false }) => {
-  const { control, register } = useFormContext<NotaFiscalCompraSchema>();
+  const { control, register, watch } = useFormContext<NotaFiscalCompraSchema>();
+  const produtosWatch = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control,
     name: "produtos"
   });
 
-  const { allProdutosQuery: { data: produtos = [] } } = useProduto();
+  const { allProdutosQuery: { data: allProdutos = [] } } = useProduto();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProdutoId, setSelectedProdutoId] = useState('');
+  const [selectedProduto, setSelectedProduto] = useState<any | null>(null);
   const [quantidade, setQuantidade] = useState('');
   const [precoUnitario, setPrecoUnitario] = useState('');
-
-  const filteredProdutos = produtos.filter((p: Produto) =>
-    p.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const produtoOptions = allProdutos.map(p => ({ name: p.nome, ...p }));
 
   const handleAddProduto = () => {
-    if (!selectedProdutoId || !quantidade || !precoUnitario) return;
-
-    const produto = produtos.find((p: Produto) => p.id.toString() === selectedProdutoId);
-    if (!produto) return;
+    if (!selectedProduto || !quantidade || !precoUnitario) return;
 
     append({
-      produtoId: selectedProdutoId,
+      produtoId: selectedProduto.id.toString(),
       quantidade,
-      unidade: 'Unidade', // Default since not in Produto
+      unidade: 'Unidade',
       precoUnitario
     });
 
-    setSelectedProdutoId('');
+    setSelectedProduto(null);
     setQuantidade('');
     setPrecoUnitario('');
-    setSearchTerm('');
   };
 
+  const total = produtosWatch.reduce((sum, produto) => {
+    return sum + (parseFloat(produto.precoUnitario || '0') * parseFloat(produto.quantidade || '0'));
+  }, 0);
+
   return (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="data" className="text-right">
-          Data
-        </Label>
-        <Input
-          id="data"
-          type="date"
-          {...register('data')}
-          className="col-span-3"
-        />
-      </div>
+    <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+      {/* Informações Gerais */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Informações Gerais
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="data">Data da Compra</Label>
+              <Input
+                id="data"
+                type="date"
+                {...register('data')}
+                className="h-10"
+                defaultValue={new Date().toISOString().split('T')[0]}
+              />
+            </div>
 
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="fornecedorId" className="text-right">
-          Fornecedor
-        </Label>
-        <Controller
-          control={control}
-          name="fornecedorId"
-          render={({ field }) => (
-            <Select value={String(field.value)} onValueChange={field.onChange}>
-              <SelectTrigger id="fornecedorId" className="col-span-3">
-                <SelectValue placeholder="Selecione um fornecedor" />
-              </SelectTrigger>
-              <SelectContent>
-                {fornecedores.map((fornecedor) => (
-                  <SelectItem key={fornecedor.id} value={fornecedor.id.toString()}>
-                    {fornecedor.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        />
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="fornecedorId">Fornecedor</Label>
+              <Controller
+                control={control}
+                name="fornecedorId"
+                render={({ field }) => (
+                  <Select value={String(field.value)} onValueChange={field.onChange}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="Selecione um fornecedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fornecedores.map((fornecedor) => (
+                        <SelectItem key={fornecedor.id} value={fornecedor.id.toString()}>
+                          {fornecedor.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
 
-      <div>
-        <Label className="text-sm font-medium">Adicionar Produto</Label>
-        <div className="grid grid-cols-4 items-center gap-4 mt-2">
-          <Label className="text-right">Produto</Label>
-          <div className="col-span-3 space-y-2">
-            <Input
-              placeholder="Buscar produto..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Select value={selectedProdutoId} onValueChange={setSelectedProdutoId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um produto" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredProdutos.map((produto: Produto) => (
-                  <SelectItem key={produto.id} value={produto.id.toString()}>
-                    {produto.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label>Total Estimado</Label>
+              <div className="h-10 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-center">
+                <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4 mt-2">
-          <Label className="text-right">Quantidade</Label>
-          <Input
-            type="number"
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.target.value)}
-            placeholder="Quantidade"
-            className="col-span-3"
-          />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4 mt-2">
-          <Label className="text-right">Preço Unitário</Label>
-          <Input
-            type="number"
-            value={precoUnitario}
-            onChange={(e) => setPrecoUnitario(e.target.value)}
-            placeholder="Preço unitário"
-            className="col-span-3"
-            step="0.01"
-          />
-        </div>
-        <Button
-          type="button"
-          onClick={handleAddProduto}
-          className="mt-2"
-        >
-          Adicionar Produto
-        </Button>
-      </div>
+        </CardContent>
+      </Card>
 
+      {/* Adicionar Produtos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Adicionar Produtos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>Produto</Label>
+              <SearchableSelect
+                options={produtoOptions}
+                value={selectedProduto}
+                onChange={setSelectedProduto}
+                placeholder="Buscar produto..."
+                className="h-10"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Quantidade</Label>
+              <Input
+                type="number"
+                value={quantidade}
+                onChange={(e) => setQuantidade(e.target.value)}
+                placeholder="0"
+                className="h-10"
+                min="0"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Preço Unitário (R$)</Label>
+              <Input
+                type="number"
+                value={precoUnitario}
+                onChange={(e) => setPrecoUnitario(e.target.value)}
+                placeholder="0.00"
+                className="h-10"
+                step="0.01"
+                min="0"
+              />
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleAddProduto}
+            className="w-full h-10 bg-green-500 hover:bg-green-600"
+            disabled={!selectedProduto || !quantidade || !precoUnitario}
+          >
+            + Adicionar Produto
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Produtos Adicionados */}
       {fields.length > 0 && (
-        <div>
-          <Label className="text-sm font-medium">Produtos Adicionados</Label>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {fields.map((field, index) => {
-              const produto = produtos.find((p: Produto) => p.id.toString() === field.produtoId);
-              return (
-                <div key={field.id} className="flex items-center">
-                  <Badge variant="secondary" className="mr-1">
-                    {produto?.nome || 'Produto desconhecido'} - Qtd: {field.quantidade} - Preço: R$ {parseFloat(field.precoUnitario || '0').toFixed(2)}
-                  </Badge>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => remove(index)}
-                  >
-                    ×
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Produtos Selecionados ({fields.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {fields.map((field, index) => {
+                const produtoCompra = produtosWatch[index];
+                if (!produtoCompra) return null;
+                const produto = allProdutos.find(p => p.id.toString() === produtoCompra.produtoId);
+                if (!produto) return null;
+
+                const subtotal = parseFloat(produtoCompra.precoUnitario || '0') * parseFloat(produtoCompra.quantidade || '0');
+
+                return (
+                  <div key={field.id} className="flex items-center justify-between p-2">
+                    <Badge variant="secondary" className="mr-2">
+                      {produto.nome} • Qtd: {produtoCompra.quantidade} {produtoCompra.unidade} • R$ {parseFloat(produtoCompra.precoUnitario || '0').toFixed(2)}
+                    </Badge>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm font-semibold text-green-600 whitespace-nowrap">R$ {subtotal.toFixed(2)}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => remove(index)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-sm font-bold">
+                <span>Total Geral:</span>
+                <span className="text-green-600">R$ {total.toFixed(2)}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

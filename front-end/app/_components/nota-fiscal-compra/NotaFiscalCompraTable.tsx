@@ -77,8 +77,8 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
     },
     {
       key: 'produtos',
-      header: 'Estoque',
-      render: (item: NotaFiscalCompra) => item.produtos?.length || 0,
+      header: 'Total de Itens',
+      render: (item: NotaFiscalCompra) => item.total || 0,
       sortable: false,
     },
     {
@@ -115,7 +115,7 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
               <DialogTitle className="text-2xl font-bold text-gray-900">Detalhes da Nota Fiscal</DialogTitle>
             </DialogHeader>
             <HeaderNotaModal nota={selectedNota} />
-            <NotaDetails nota={selectedNota} isCompra={false} />
+            <NotaDetails nota={selectedNota} />
           </DialogContent>
         </Dialog>
       )}

@@ -18,6 +18,11 @@ export const useNotaFiscalCompra = () => {
     quantidadeMax: '',
     precoMin: '',
     precoMax: '',
+    dateStart: '',
+    dateEnd: '',
+    totalMin: '',
+    totalMax: '',
+    fornecedorId: '',
   };
 
   // Extrair filtros da URL
@@ -32,6 +37,11 @@ export const useNotaFiscalCompra = () => {
       quantidadeMax: params.get('quantidadeMax') || defaultFilters.quantidadeMax,
       precoMin: params.get('precoMin') || defaultFilters.precoMin,
       precoMax: params.get('precoMax') || defaultFilters.precoMax,
+      dateStart: params.get('dateStart') || defaultFilters.dateStart,
+      dateEnd: params.get('dateEnd') || defaultFilters.dateEnd,
+      totalMin: params.get('totalMin') || defaultFilters.totalMin,
+      totalMax: params.get('totalMax') || defaultFilters.totalMax,
+      fornecedorId: params.get('fornecedorId') || defaultFilters.fornecedorId,
     };
   }, [searchParams]);
 
@@ -46,6 +56,11 @@ export const useNotaFiscalCompra = () => {
     if (queryParams.quantidadeMax) params.set('quantidadeMax', queryParams.quantidadeMax);
     if (queryParams.precoMin) params.set('precoMin', queryParams.precoMin);
     if (queryParams.precoMax) params.set('precoMax', queryParams.precoMax);
+    if (queryParams.dateStart) params.set('dateStart', queryParams.dateStart);
+    if (queryParams.dateEnd) params.set('dateEnd', queryParams.dateEnd);
+    if (queryParams.totalMin) params.set('totalMin', queryParams.totalMin);
+    if (queryParams.totalMax) params.set('totalMax', queryParams.totalMax);
+    if (queryParams.fornecedorId) params.set('fornecedorId', queryParams.fornecedorId);
     
     return params.toString();
   }, [queryParams]);
@@ -77,6 +92,11 @@ export const useNotaFiscalCompra = () => {
       if (newFilters.quantidadeMax) params.set('quantidadeMax', newFilters.quantidadeMax);
       if (newFilters.precoMin) params.set('precoMin', newFilters.precoMin);
       if (newFilters.precoMax) params.set('precoMax', newFilters.precoMax);
+      if (newFilters.dateStart) params.set('dateStart', newFilters.dateStart);
+      if (newFilters.dateEnd) params.set('dateEnd', newFilters.dateEnd);
+      if (newFilters.totalMin) params.set('totalMin', newFilters.totalMin);
+      if (newFilters.totalMax) params.set('totalMax', newFilters.totalMax);
+      if (newFilters.fornecedorId) params.set('fornecedorId', newFilters.fornecedorId);
       router.replace(`?${params.toString()}`);
     },
     [router]
@@ -101,6 +121,11 @@ export const useNotaFiscalCompra = () => {
     if (queryParams.quantidadeMax) active.push({ label: 'Qtd Máx', value: queryParams.quantidadeMax });
     if (queryParams.precoMin) active.push({ label: 'Preço Mín', value: queryParams.precoMin });
     if (queryParams.precoMax) active.push({ label: 'Preço Máx', value: queryParams.precoMax });
+    if (queryParams.dateStart) active.push({ label: 'Data Início', value: new Date(queryParams.dateStart).toLocaleDateString('pt-BR') });
+    if (queryParams.dateEnd) active.push({ label: 'Data Fim', value: new Date(queryParams.dateEnd).toLocaleDateString('pt-BR') });
+    if (queryParams.totalMin) active.push({ label: 'Total Mín', value: `R$ ${queryParams.totalMin}` });
+    if (queryParams.totalMax) active.push({ label: 'Total Máx', value: `R$ ${queryParams.totalMax}` });
+    if (queryParams.fornecedorId) active.push({ label: 'Fornecedor', value: queryParams.fornecedorId });
     return active;
   }, [queryParams]);
 
@@ -123,6 +148,21 @@ export const useNotaFiscalCompra = () => {
         break;
       case 'Preço Máx':
         newFilters.precoMax = '';
+        break;
+      case 'Data Início':
+        newFilters.dateStart = '';
+        break;
+      case 'Data Fim':
+        newFilters.dateEnd = '';
+        break;
+      case 'Total Mín':
+        newFilters.totalMin = '';
+        break;
+      case 'Total Máx':
+        newFilters.totalMax = '';
+        break;
+      case 'Fornecedor':
+        newFilters.fornecedorId = '';
         break;
     }
     updateUrl(newFilters);

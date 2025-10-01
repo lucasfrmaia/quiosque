@@ -7,8 +7,11 @@ import { useFieldArray } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SearchableSelect, Option } from '../common/SearchableSelect';
 import { NotaFiscalVenda, ProdutoVenda, ProdutoEstoque } from '@/types/interfaces/entities';
 import { NotaFiscalVendaSchema } from '@/types/validation';
+import { Package } from 'lucide-react';
 
 interface NotaFiscalVendaFormProps {
   editing?: boolean;
@@ -22,10 +25,8 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
     name: "produtos"
   });
 
-  const [search, setSearch] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedEstoqueId, setSelectedEstoqueId] = useState<string | null>(null);
-  const [pendingQuantity, setPendingQuantity] = useState('1');
+  const [selectedEstoque, setSelectedEstoque] = useState<Option | null>(null);
+  const [pendingQuantity, setPendingQuantity] = useState(1);
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -46,159 +47,164 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
     },
   });
 
-
   if (isLoading)
     return <>Carregando...</>
 
   if (error)
     return <>Error!</>
 
-  const filteredEstoque = allEstoque?.filter((estoque) =>
-    estoque.produto?.nome?.toLowerCase().includes(search.toLowerCase()) || false
-  );
+  const estoqueOptions: Option[] = allEstoque?.map(estoque => ({
+    name: `${estoque.produto?.nome || 'Sem nome'} (Estoque: ${estoque.quantidade})`,
+    ...estoque
+  })) || [];
+
+  const handleAddProduto = () => {
+    if (!selectedEstoque || pendingQuantity < 1) return;
+
+    const estoque = allEstoque?.find(e => e.id === selectedEstoque.id);
+    if (!estoque || !estoque.produto) return;
+
+    append({
+      produtoId: estoque.produto.id,
+      quantidade: pendingQuantity,
+      unidade: estoque.unidade || 'Unidade',
+      precoUnitario: estoque.preco || 0,
+    });
+
+    setSelectedEstoque(null);
+    setPendingQuantity(1);
+  };
+
+  const total = produtos.reduce((sum, produto) => {
+    return sum + (produto.precoUnitario * produto.quantidade);
+  }, 0);
 
   return (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="data" className="text-right">
-          Data
-        </Label>
-        <Input
-          id="data"
-          type="date"
-          {...register('data')}
-          className="col-span-3"
-        />
-      </div>
-
-      <div>
-        <Label className="text-sm font-medium">Produtos</Label>
-
-        {/* Searchable Product Select */}
-        <div className="relative mt-2">
-          <Input
-            placeholder="Buscar produto pelo nome..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setIsOpen(true);
-            }}
-            onFocus={() => setIsOpen(true)}
-            onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-            className="w-full"
-          />
-          {isOpen && (
-            <div className="absolute z-50 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto mt-1">
-              {isLoading ? (
-                <div className="p-3 text-gray-500">Carregando produtos...</div>
-              ) : (filteredEstoque?.length || 0) > 0 ? (
-                filteredEstoque?.map((estoque) => (
-                  <div
-                    key={estoque.id}
-                    className="p-3 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                    onClick={() => {
-                      setSelectedEstoqueId(estoque.id.toString());
-                      setSearch(estoque.produto?.nome || '');
-                      setIsOpen(false);
-                    }}
-                  >
-                    <div>
-                      <div className="font-medium">{estoque.produto?.nome}</div>
-                      <div className="text-sm text-gray-500">
-                        Estoque: {estoque.quantidade} | Preço: R$ {estoque.preco || 0}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : search ? (
-                <div className="p-3 text-gray-500">Nenhum produto encontrado.</div>
-              ) : (
-                <div className="p-3 text-gray-500">Digite para buscar produtos.</div>
-              )}
+    <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+      {/* Informações Gerais */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Informações Gerais
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="data">Data da Venda</Label>
+              <Input
+                id="data"
+                type="date"
+                {...register('data')}
+                className="h-10"
+                defaultValue={new Date().toISOString().split('T')[0]}
+              />
             </div>
-          )}
-        </div>
 
-        <div className="flex items-center gap-2 mt-2">
-          {selectedEstoqueId ? (
-            <>
+            <div className="space-y-2">
+              <Label>Total Estimado</Label>
+              <div className="h-10 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-center">
+                <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Adicionar Produtos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5" />
+            Adicionar Produtos do Estoque
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Produto do Estoque</Label>
+              <SearchableSelect
+                options={estoqueOptions}
+                value={selectedEstoque}
+                onChange={setSelectedEstoque}
+                placeholder="Buscar produto no estoque..."
+                className="h-10"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Quantidade</Label>
               <Input
                 type="number"
                 value={pendingQuantity}
-                onChange={(e) => setPendingQuantity(e.target.value)}
-                placeholder="Quantidade"
+                onChange={(e) => setPendingQuantity(parseInt(e.target.value) || 1)}
+                placeholder="1"
+                className="h-10"
                 min="1"
-                className="flex-1"
               />
-              <Button
-                type="button"
-                onClick={() => {
-                  const estoque = allEstoque?.find((e) => e.id.toString() === selectedEstoqueId);
-                  if (estoque && pendingQuantity && estoque.produto) {
-                    append({
-                      produtoId: estoque.produto.id.toString(),
-                      quantidade: pendingQuantity,
-                      unidade: estoque.unidade || 'Unidade',
-                      precoUnitario: (estoque.preco || 0).toString(),
-                    });
-                    setSelectedEstoqueId(null);
-                    setPendingQuantity('1');
-                    setSearch('');
-                  }
-                }}
-                disabled={!pendingQuantity || parseFloat(pendingQuantity) < 1}
-              >
-                Adicionar
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedEstoqueId(null);
-                  setPendingQuantity('1');
-                  setSearch('');
-                }}
-              >
-                Limpar
-              </Button>
-            </>
-          ) : (
-            <p className="text-sm text-gray-500 flex-1">Selecione um produto acima para adicionar.</p>
-          )}
-        </div>
+            </div>
+          </div>
 
-        {/* Added Products Badges */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {fields.map((field, index) => {
-            const produtoVenda = produtos[index];
-            if (!produtoVenda) return null;
-            const estoqueItem = allEstoque?.find((e) => e.produto?.id === produtoVenda.produtoId);
-            const produto = estoqueItem?.produto;
-            if (!estoqueItem || !produto) return null;
+          <Button
+            type="button"
+            onClick={handleAddProduto}
+            className="w-full h-10 bg-green-500 hover:bg-green-600"
+            disabled={!selectedEstoque || pendingQuantity < 1}
+          >
+            + Adicionar Produto
+          </Button>
+        </CardContent>
+      </Card>
 
-            return (
-              <Badge key={field.id} variant="secondary" className="flex items-center gap-1 px-3 py-1 text-xs">
-                <span className="flex-1 min-w-0 truncate">
-                  {produto.nome} - {produtoVenda.quantidade} x R$ {produtoVenda.precoUnitario}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-4 w-4 p-0 ml-1"
-                  onClick={() => remove(index)}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            );
-          })}
-          {produtos.length === 0 && (
-            <p className="text-sm text-gray-500">Nenhum produto adicionado.</p>
-          )}
-        </div>
-      </div>
+      {/* Produtos Adicionados */}
+      {fields.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Produtos Selecionados ({fields.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {fields.map((field, index) => {
+                const produtoVenda = produtos[index];
+                if (!produtoVenda) return null;
+                const estoqueItem = allEstoque?.find((e) => e.produto?.id === produtoVenda.produtoId);
+                const produto = estoqueItem?.produto;
+                if (!estoqueItem || !produto) return null;
+
+                const subtotal = produtoVenda.precoUnitario * produtoVenda.quantidade;
+
+                return (
+                  <div key={field.id} className="flex items-center justify-between p-2">
+                    <Badge variant="secondary" className="mr-2">
+                      {produto.nome} • Qtd: {produtoVenda.quantidade} {produtoVenda.unidade} • R$ {produtoVenda.precoUnitario.toFixed(2)}
+                    </Badge>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm font-semibold text-green-600 whitespace-nowrap">R$ {subtotal.toFixed(2)}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => remove(index)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-sm font-bold">
+                <span>Total Geral:</span>
+                <span className="text-green-600">R$ {total.toFixed(2)}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

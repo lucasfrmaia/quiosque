@@ -24,7 +24,7 @@ export function ModalCreateNotaVenda({ isCreateModalOpen, createForm, setIsCreat
                     </FormProvider>
                     <DialogFooter>
                         <Button type="submit">Criar</Button>
-                        <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

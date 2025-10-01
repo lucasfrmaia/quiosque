@@ -8,10 +8,10 @@ import { X, Calendar, User, Package, DollarSign, Receipt } from 'lucide-react';
 
 interface NotaDetailsProps {
   nota: NotaFiscalCompra | NotaFiscalVenda;
-  isCompra: boolean
 }
 
-export const NotaDetails: FC<NotaDetailsProps> = ({ nota, isCompra }) => {
+export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
+  const isCompra = 'fornecedorId' in nota
   const produtos = isCompra
     ? (nota as NotaFiscalCompra).produtos as ProdutoCompra[]
     : (nota as NotaFiscalVenda).produtos as ProdutoVenda[];
@@ -30,7 +30,7 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota, isCompra }) => {
               <Package className="h-5 w-5 text-gray-600" />
               Informações Gerais
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-600 flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
@@ -87,7 +87,6 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota, isCompra }) => {
                               {produto.produto?.descricao && (
                                 <p className="text-sm text-gray-500">{produto.produto.descricao}</p>
                               )}
-                              <p className="text-xs text-gray-400">{produto.unidade}</p>
                             </div>
                           </TableCell>
                           <TableCell className="text-right font-semibold text-gray-900">

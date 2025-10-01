@@ -98,4 +98,5 @@ export interface FilterValues {
   dateEnd?: string;
   totalMin?: string;
   totalMax?: string;
+  fornecedorId?: string;
 }
