@@ -94,4 +94,8 @@ export interface FilterValues {
   precoMin?: string;
   precoMax?: string;
   categoryId?: number | null;
+  dateStart?: string;
+  dateEnd?: string;
+  totalMin?: string;
+  totalMax?: string;
 }

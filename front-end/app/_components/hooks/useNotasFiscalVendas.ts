@@ -1,12 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { NotaFiscalVenda, ProdutoVenda, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const defaultFilters: FilterValues = {
   currentPage: 1,
-  itemsPerPage: 5,
+  itemsPerPage: 10,
   search: '',
+  dateStart: '',
+  dateEnd: '',
+  totalMin: '',
+  totalMax: '',
 };
 
 export const useNotasFiscaisVendas = () => {
@@ -14,44 +18,49 @@ export const useNotasFiscaisVendas = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const getFiltersFromParams = useCallback(() => {
+  // Extrair filtros da URL
+  const queryParams = useMemo((): FilterValues => {
     const params = new URLSearchParams(searchParams.toString());
-
-    const currentPage = Number(params.get('page')) || defaultFilters.currentPage;
-    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage;
-    const search = params.get('search') || defaultFilters.search;
-
-    params.set('page', String(currentPage));
-    params.set('limit', String(itemsPerPage));
-    params.set('search', String(search));
-
     return {
-      currentPage,
-      itemsPerPage,
-      search,
-      toString: params.toString(),
+      ...defaultFilters,
+      currentPage: parseInt(params.get('page') || defaultFilters.currentPage.toString(), 10),
+      itemsPerPage: parseInt(params.get('limit') || defaultFilters.itemsPerPage.toString(), 10),
+      search: params.get('search') || defaultFilters.search,
+      dateStart: params.get('dateStart') || defaultFilters.dateStart,
+      dateEnd: params.get('dateEnd') || defaultFilters.dateEnd,
+      totalMin: params.get('totalMin') || defaultFilters.totalMin,
+      totalMax: params.get('totalMax') || defaultFilters.totalMax,
     };
   }, [searchParams]);
 
-  const queryParams = getFiltersFromParams();
-  const paramsToString = queryParams.toString;
+  // Montar query string
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set('page', queryParams.currentPage.toString());
+    params.set('limit', queryParams.itemsPerPage.toString());
+
+    if (queryParams.search) params.set('search', queryParams.search);
+    if (queryParams.dateStart) params.set('dateStart', queryParams.dateStart);
+    if (queryParams.dateEnd) params.set('dateEnd', queryParams.dateEnd);
+    if (queryParams.totalMin) params.set('totalMin', queryParams.totalMin);
+    if (queryParams.totalMax) params.set('totalMax', queryParams.totalMax);
+    
+    return params.toString();
+  }, [queryParams]);
 
   // Buscar notas fiscais com paginação e filtros
-  const getNotasByParams = () => {
-    return useQuery<{ notas: NotaFiscalVenda[]; total: number }>({
-      queryKey: ['notas', paramsToString],
+  const getNotasByParams = () =>
+    useQuery<{ notas: NotaFiscalVenda[]; total: number }>({
+      queryKey: ['notas', queryString],
       queryFn: async () => {
-        const response = await fetch(`/api/nota-fiscal-venda/findPerPage?${paramsToString}`);
-
+        const response = await fetch(`/api/nota-fiscal-venda/findPerPage?${queryString}`);
         if (!response.ok) {
           throw new Error('Failed to fetch notas fiscais de venda');
         }
-
         const result = await response.json();
         return result;
       },
     });
-  };
 
   // Buscar todas sem paginação
   const getAllNotas = () => {
@@ -90,7 +99,7 @@ export const useNotasFiscaisVendas = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['notas'] });
     },
   });
 
@@ -125,7 +134,7 @@ export const useNotasFiscaisVendas = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['notas'] });
     },
   });
 
@@ -151,7 +160,7 @@ export const useNotasFiscaisVendas = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['notas'] });
     },
   });
 
@@ -160,37 +169,37 @@ export const useNotasFiscaisVendas = () => {
   };
 
   // Filtros ativos
-  const getActiveFilters = () => {
+  const getActiveFilters = useCallback(() => {
     const active = [];
-    if (queryParams.search) {
-      active.push({ label: 'Pesquisa', value: queryParams.search });
-    }
+    if (queryParams.search) active.push({ label: 'Pesquisa', value: queryParams.search });
+    if (queryParams.dateStart) active.push({ label: 'Data Início', value: new Date(queryParams.dateStart).toLocaleDateString('pt-BR') });
+    if (queryParams.dateEnd) active.push({ label: 'Data Fim', value: new Date(queryParams.dateEnd).toLocaleDateString('pt-BR') });
+    if (queryParams.totalMin) active.push({ label: 'Total Mín', value: `R$ ${queryParams.totalMin}` });
+    if (queryParams.totalMax) active.push({ label: 'Total Máx', value: `R$ ${queryParams.totalMax}` });
     return active;
-  };
+  }, [queryParams]);
 
   // Atualizar URL
   const updateUrl = useCallback(
     (newFilters: FilterValues) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams();
+      params.set('page', newFilters.currentPage.toString());
+      params.set('limit', newFilters.itemsPerPage.toString());
 
-      params.set('page', String(newFilters.currentPage));
-      params.set('limit', String(newFilters.itemsPerPage));
-
-      if (newFilters.search) {
-        params.set('search', newFilters.search);
-      } else {
-        params.delete('search');
-      }
-
+      if (newFilters.search) params.set('search', newFilters.search);
+      if (newFilters.dateStart) params.set('dateStart', newFilters.dateStart);
+      if (newFilters.dateEnd) params.set('dateEnd', newFilters.dateEnd);
+      if (newFilters.totalMin) params.set('totalMin', newFilters.totalMin);
+      if (newFilters.totalMax) params.set('totalMax', newFilters.totalMax);
+      
       router.replace(`?${params.toString()}`);
     },
-    [router, searchParams]
+    [router]
   );
 
-  const handleApply = () => {
-    const newFilters = { ...queryParams, currentPage: 1 };
-    updateUrl(newFilters);
-  };
+  const resetFilters = useCallback(() => {
+    updateUrl(defaultFilters);
+  }, [updateUrl]);
 
   const handleRemoveFilter = (index: number) => {
     const activeFilters = getActiveFilters();
@@ -199,16 +208,24 @@ export const useNotasFiscaisVendas = () => {
     let newFilters = { ...queryParams };
     switch (filterToRemove.label) {
       case 'Pesquisa':
-        newFilters = { ...newFilters, search: '' };
+        newFilters.search = '';
+        break;
+      case 'Data Início':
+        newFilters.dateStart = '';
+        break;
+      case 'Data Fim':
+        newFilters.dateEnd = '';
+        break;
+      case 'Total Mín':
+        newFilters.totalMin = '';
+        break;
+      case 'Total Máx':
+        newFilters.totalMax = '';
         break;
     }
     updateUrl(newFilters);
   };
 
-  const resetFilters = () => {
-    const params = new URLSearchParams();
-    router.replace(`?${params.toString()}`);
-  };
 
   const handleSort = (field: string) => {
     // implementar se quiser ordenação por campo específico
@@ -231,7 +248,6 @@ export const useNotasFiscaisVendas = () => {
     handleCreate,
     handleEdit,
     handleDelete,
-    handleApply,
     resetFilters,
     handlePageChange,
     handleItemsPerPageChange,

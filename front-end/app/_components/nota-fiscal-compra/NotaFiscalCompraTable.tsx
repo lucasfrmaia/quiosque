@@ -6,8 +6,11 @@ import { DataTable } from '../DataTable';
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { NotaDetails } from '../common/NotaDetails';
+import { HeaderNotaModal } from '../modals/HeaderNotaMotal';
 
 interface NotaFiscalCompraTableProps {
   items: NotaFiscalCompra[];
@@ -107,8 +110,12 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
       />
       {selectedNota && (
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <NotaDetails nota={selectedNota} isCompra={true} onClose={() => setIsDetailsOpen(false)} />
+           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-900">Detalhes da Nota Fiscal</DialogTitle>
+            </DialogHeader>
+            <HeaderNotaModal nota={selectedNota} />
+            <NotaDetails nota={selectedNota} isCompra={false} />
           </DialogContent>
         </Dialog>
       )}

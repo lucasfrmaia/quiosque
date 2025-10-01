@@ -1,13 +1,17 @@
 import { FC, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Box } from 'lucide-react';
+import { Box, Receipt, X } from 'lucide-react';
 import { NotaFiscalVenda, FilterValues } from '@/types/interfaces/entities';
 import { DataTable } from '../DataTable';
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { NotaDetails } from '../common/NotaDetails';
+import { Button } from '@/components/ui/button';
+import { HeaderNotaModal } from '../modals/HeaderNotaMotal';
 
 interface NotaFiscalVendaTableProps {
   items: NotaFiscalVenda[];
@@ -106,7 +110,11 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
       {selectedNota && (
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <NotaDetails nota={selectedNota} isCompra={false} onClose={() => setIsDetailsOpen(false)} />
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-gray-900">Detalhes da Nota Fiscal</DialogTitle>
+            </DialogHeader>
+            <HeaderNotaModal nota={selectedNota} />
+            <NotaDetails nota={selectedNota} isCompra={false} />
           </DialogContent>
         </Dialog>
       )}
