@@ -131,7 +131,7 @@ export const useNotaFiscalCompra = () => {
   // Mutations
   const createMutation = useMutation({
     mutationFn: async (
-      nota: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos' | 'total'> & {
+      nota: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & {
         produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[];
       }
     ) => {
@@ -148,7 +148,7 @@ export const useNotaFiscalCompra = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] }),
   });
 
-  const handleCreate = (nota: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos' | 'total'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }) => {
+  const handleCreate = (nota: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }) => {
     createMutation.mutate(nota);
   };
 

@@ -64,8 +64,8 @@ export const ProdutoTable: FC<ProdutoTableProps> = ({
       sortable: false,
     },
     {
-      key: 'Descrição',
-      header: 'Preço',
+      key: 'desc',
+      header: 'Descrição',
       render: (item: Produto) => <div className="text-gray-500 text-xs line-clamp-2">{item.descricao || 'Sem descrição'}</div>,
       sortable: false,
     },

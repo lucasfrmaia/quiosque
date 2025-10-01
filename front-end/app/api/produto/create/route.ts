@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const produto = await repositoryFactory.produtoRepository.create(body);
     return NextResponse.json({ success: true, data: produto }, { status: 201 });
   } catch (error: any) {
+    console.error(error)
     return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

@@ -82,6 +82,7 @@ const NotasCompraPage: FC = () => {
     handleCreate({
       data: new Date(data.data),
       fornecedorId: Number(data.fornecedorId),
+      total: data.produtos.reduce((acc, value) => acc + Number(value.precoUnitario), 0),
       produtos: data.produtos.map(p => ({
         notaFiscalId: 0,
         produtoId: Number(p.produtoId),

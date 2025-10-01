@@ -21,13 +21,9 @@ export const CategoryTable: FC<CategoryTableProps> = ({
 }) => {
   const columns = [
     {
-      key: 'imagem',
-      header: 'Imagem',
-      render: (item: Category) => (
-        <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
-          <Box className="h-6 w-6 text-gray-400" />
-        </div>
-      ),
+      key: 'id',
+      header: 'ID',
+      render: (item: Category) => item.id,
       sortable: false,
     },
     {
