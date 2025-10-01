@@ -1,7 +1,12 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { NotaFiscalVenda, ProdutoVenda, FilterValues } from '@/types/interfaces/entities';
+// Assumindo que você definirá os novos tipos neste arquivo ou similar
+import {
+  NotaFiscalVenda,
+  FilterValues,
+} from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { NotaFiscalCreatePayload, NotaFiscalEditPayload } from '@/types/types/types';
 
 const defaultFilters: FilterValues = {
   currentPage: 1,
@@ -44,7 +49,7 @@ export const useNotasFiscaisVendas = () => {
     if (queryParams.dateEnd) params.set('dateEnd', queryParams.dateEnd);
     if (queryParams.totalMin) params.set('totalMin', queryParams.totalMin);
     if (queryParams.totalMax) params.set('totalMax', queryParams.totalMax);
-    
+
     return params.toString();
   }, [queryParams]);
 
@@ -79,11 +84,7 @@ export const useNotasFiscaisVendas = () => {
 
   // Mutations
   const createMutation = useMutation({
-    mutationFn: async (
-      nota: Omit<NotaFiscalVenda, 'id' | 'produtos'> & {
-        produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal' | 'notaFiscalId'>[];
-      }
-    ) => {
+    mutationFn: async (nota: NotaFiscalCreatePayload) => {
       const response = await fetch('/api/nota-fiscal-venda/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,22 +104,12 @@ export const useNotasFiscaisVendas = () => {
     },
   });
 
-  const handleCreate = (
-    nota: Omit<NotaFiscalVenda, 'id' | 'produtos'> & {
-      produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal' | 'notaFiscalId'>[];
-    }
-  ) => {
+  const handleCreate = (nota: NotaFiscalCreatePayload) => {
     createMutation.mutate(nota);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({
-      id,
-      updates,
-    }: {
-      id: number;
-      updates: Partial<Omit<NotaFiscalVenda, 'id' | 'produtos'>>;
-    }) => {
+    mutationFn: async ({ id, updates }: NotaFiscalEditPayload) => {
       const response = await fetch(`/api/nota-fiscal-venda/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -139,8 +130,8 @@ export const useNotasFiscaisVendas = () => {
   });
 
   const handleEdit = (
-    id: number,
-    updates: Partial<Omit<NotaFiscalVenda, 'id' | 'produtos'>>
+    id: NotaFiscalEditPayload['id'],
+    updates: NotaFiscalEditPayload['updates']
   ) => {
     editMutation.mutate({ id, updates });
   };
@@ -191,7 +182,7 @@ export const useNotasFiscaisVendas = () => {
       if (newFilters.dateEnd) params.set('dateEnd', newFilters.dateEnd);
       if (newFilters.totalMin) params.set('totalMin', newFilters.totalMin);
       if (newFilters.totalMax) params.set('totalMax', newFilters.totalMax);
-      
+
       router.replace(`?${params.toString()}`);
     },
     [router]

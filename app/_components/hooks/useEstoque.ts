@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProdutoEstoque, Produto, FilterValues, SortDirection } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { EstoqueNewData, EstoqueUpdatePayload } from '@/types/types/types';
 
 const defaultFilters: FilterValues = {
   currentPage: 1,
@@ -15,7 +16,6 @@ export const useEstoque = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 🔹 Extrair filtros da URL
   const getFiltersFromParams = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -61,7 +61,6 @@ export const useEstoque = () => {
   const queryParams = getFiltersFromParams();
   const paramsToString = queryParams.toString;
 
-  // 🔹 Buscar estoque paginado - moved to top level
   const estoqueQuery = useQuery({
     queryKey: ['estoque', paramsToString],
     queryFn: async () => {
@@ -76,9 +75,8 @@ export const useEstoque = () => {
     },
   });
 
-  // 🔹 Criar estoque
   const createMutation = useMutation({
-    mutationFn: async (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
+    mutationFn: async (estoque: EstoqueNewData) => {
       const response = await fetch('/api/estoque/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,19 +91,15 @@ export const useEstoque = () => {
       queryClient.invalidateQueries({ queryKey: ['estoque', paramsToString] });
     },
   });
-  const handleCreate = (estoque: Omit<ProdutoEstoque, 'id' | 'produto'>) => {
+  const handleCreate = (estoque: EstoqueNewData) => {
     createMutation.mutate(estoque);
   };
 
-  // 🔹 Editar estoque
   const editMutation = useMutation({
     mutationFn: async ({
       id,
       updates,
-    }: {
-      id: number;
-      updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>;
-    }) => {
+    }: EstoqueUpdatePayload) => {
       const response = await fetch(`/api/estoque/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -121,13 +115,12 @@ export const useEstoque = () => {
     },
   });
   const handleEdit = (
-    id: number,
-    updates: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>
+    id: EstoqueUpdatePayload['id'],
+    updates: EstoqueUpdatePayload['updates']
   ) => {
     editMutation.mutate({ id, updates });
   };
 
-  // 🔹 Deletar estoque
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/estoque/delete/${id}`, { method: 'DELETE' });
@@ -144,7 +137,6 @@ export const useEstoque = () => {
     deleteMutation.mutate(id);
   };
 
-  // 🔹 Filtros ativos
   const getActiveFilters = () => {
     const active = [];
     if (queryParams.search) active.push({ label: 'Nome', value: queryParams.search });
@@ -158,7 +150,6 @@ export const useEstoque = () => {
     return active;
   };
 
-  // 🔹 Atualizar URL
   const updateUrl = useCallback(
     (newFilters: FilterValues) => {
       const params = new URLSearchParams(searchParams.toString());

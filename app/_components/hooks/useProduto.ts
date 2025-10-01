@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Produto, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ProdutoInsertData, ProdutoPatchData } from '@/types/types/types';
 
 const defaultFilters: FilterValues & { categoryId?: number } = {
   currentPage: 1,
@@ -15,7 +16,6 @@ export const useProduto = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 🔹 Extrai os filtros da URL
   const getFiltersFromParams = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -45,7 +45,6 @@ export const useProduto = () => {
   const queryParams = getFiltersFromParams();
   const paramsToString = queryParams.toString;
 
-  // 🔹 Buscar todos os produtos - moved to top level
   const allProdutosQuery = useQuery<Produto[]>({
     queryKey: ['produtos-all'],
     queryFn: async () => {
@@ -61,7 +60,6 @@ export const useProduto = () => {
     },
   });
 
-  // 🔹 Buscar produtos paginados
   const getProdutosByParams = () => {
     return useQuery<{ produtos: Produto[]; total: number }>({
       queryKey: ['produtos', paramsToString],
@@ -79,10 +77,9 @@ export const useProduto = () => {
     });
   };
 
-  // 🔹 Criar produto
   const createMutation = useMutation({
     mutationFn: async (
-      produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>
+      produto: ProdutoInsertData
     ) => {
       const response = await fetch('/api/produto/create', {
         method: 'POST',
@@ -105,22 +102,16 @@ export const useProduto = () => {
   });
 
   const handleCreate = (
-    produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>
+    produto: ProdutoInsertData
   ) => {
     createMutation.mutate(produto);
   };
 
-  // 🔹 Editar produto
   const editMutation = useMutation({
     mutationFn: async ({
       id,
       updates,
-    }: {
-      id: number;
-      updates: Partial<
-        Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>
-      >;
-    }) => {
+    }: ProdutoPatchData) => {
       const response = await fetch(`/api/produto/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -150,7 +141,6 @@ export const useProduto = () => {
     editMutation.mutate({ id, updates });
   };
 
-  // 🔹 Deletar produto
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/produto/delete/${id}`, {
@@ -175,7 +165,6 @@ export const useProduto = () => {
     deleteMutation.mutate(id);
   };
 
-  // 🔹 Filtros ativos
   const getActiveFilters = () => {
     const active = [];
     if (queryParams.search) {
@@ -187,7 +176,6 @@ export const useProduto = () => {
     return active;
   };
 
-  // 🔹 Atualizar URL
   const updateUrl = useCallback(
     (newFilters: FilterValues & { categoryId?: number }) => {
       const params = new URLSearchParams(searchParams.toString());

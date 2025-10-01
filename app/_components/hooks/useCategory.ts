@@ -2,7 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Category, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import { CategoryNewData, CategoryUpdateData } from '@/types/types/types';
 
 const defaultFilters: FilterValues = {
   currentPage: 1,
@@ -73,7 +73,7 @@ export const useCategory = () => {
   }
 
   const createMutation = useMutation({
-    mutationFn: async (category: Omit<Category, 'id' | 'produtos'>) => {
+    mutationFn: async (category: CategoryNewData) => {
       const response = await fetch('/api/category/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,14 +93,12 @@ export const useCategory = () => {
     },
   });
 
-  const handleCreate = (category: Omit<Category, 'id' | 'produtos'>) => {
+  const handleCreate = (category: CategoryNewData) => {
     createMutation.mutate(category);
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Omit<Category, 'id' | 'produtos'>> }) => {
-      console.log(id, updates)
-
+    mutationFn: async ({ id, updates }: CategoryUpdateData) => {
       const response = await fetch(`/api/category/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -120,7 +118,7 @@ export const useCategory = () => {
     },
   });
 
-  const handleEdit = (id: number, updates: Partial<Omit<Category, 'id' | 'produtos'>>) => {
+  const handleEdit = (id: CategoryUpdateData['id'], updates: CategoryUpdateData['updates']) => {
     editMutation.mutate({ id, updates });
   };
 
