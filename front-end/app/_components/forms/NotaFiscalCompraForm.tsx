@@ -36,8 +36,8 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
   const { allProdutosQuery: { data: allProdutos = [] } } = useProduto();
 
   const [selectedProduto, setSelectedProduto] = useState<any | null>(null);
-  const [quantidade, setQuantidade] = useState('');
-  const [precoUnitario, setPrecoUnitario] = useState('');
+  const [quantidade, setQuantidade] = useState(0);
+  const [precoUnitario, setPrecoUnitario] = useState(0);
   const produtoOptions = allProdutos.map(p => ({ name: p.nome, ...p }));
 
   const handleAddProduto = () => {
@@ -51,12 +51,12 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
     });
 
     setSelectedProduto(null);
-    setQuantidade('');
-    setPrecoUnitario('');
+    setQuantidade(9);
+    setPrecoUnitario(0);
   };
 
   const total = produtosWatch.reduce((sum, produto) => {
-    return sum + (parseFloat(produto.precoUnitario || '0') * parseFloat(produto.quantidade || '0'));
+    return sum + (produto.precoUnitario * produto.quantidade);
   }, 0);
 
   return (
@@ -140,7 +140,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
               <Input
                 type="number"
                 value={quantidade}
-                onChange={(e) => setQuantidade(e.target.value)}
+                onChange={(e) => setQuantidade(Number(e.target.value))}
                 placeholder="0"
                 className="h-10"
                 min="0"
@@ -152,7 +152,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
               <Input
                 type="number"
                 value={precoUnitario}
-                onChange={(e) => setPrecoUnitario(e.target.value)}
+                onChange={(e) => setPrecoUnitario(Number(e.target.value))}
                 placeholder="0.00"
                 className="h-10"
                 step="0.01"
@@ -189,12 +189,12 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
                 const produto = allProdutos.find(p => p.id.toString() === produtoCompra.produtoId);
                 if (!produto) return null;
 
-                const subtotal = parseFloat(produtoCompra.precoUnitario || '0') * parseFloat(produtoCompra.quantidade || '0');
+                const subtotal = produtoCompra.precoUnitario * produtoCompra.quantidade 
 
                 return (
                   <div key={field.id} className="flex items-center justify-between p-2">
                     <Badge variant="secondary" className="mr-2">
-                      {produto.nome} • Qtd: {produtoCompra.quantidade} {produtoCompra.unidade} • R$ {parseFloat(produtoCompra.precoUnitario || '0').toFixed(2)}
+                      {produto.nome} • Qtd: {produtoCompra.quantidade} {produtoCompra.unidade} • R$ {produtoCompra.precoUnitario.toFixed(2)}
                     </Badge>
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-semibold text-green-600 whitespace-nowrap">R$ {subtotal.toFixed(2)}</span>

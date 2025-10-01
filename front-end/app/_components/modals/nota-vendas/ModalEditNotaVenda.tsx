@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FormProvider } from "react-hook-form";
-import { NotaFiscalVendaForm } from "../../nota-fiscal-venda/NotaFiscalVendaForm";
+import { NotaFiscalVendaForm } from "../../forms/NotaFiscalVendaForm";
 
 interface ModalEditNotaVendaProps {
     isEditModalOpen: boolean;

@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Pagination } from '@/app/_components/Pagination';
-import { EstoqueTable } from '@/app/_components/estoque/EstoqueTable';
+import { EstoqueTable } from '@/app/_components/tables/EstoqueTable';
 import { useEstoque } from '@/app/_components/hooks/useEstoque';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 import { ActiveFilters } from '@/app/_components/filtros/ActiveFilters';

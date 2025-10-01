@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CategoryForm } from "../../categoria/CategoryForm";
+import { CategoryForm } from "../../forms/CategoryForm";
 
 interface ModalCreateCategoryProps {
     isCreateModalOpen: boolean;

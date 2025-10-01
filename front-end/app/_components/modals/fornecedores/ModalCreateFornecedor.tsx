@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FornecedorForm } from "../../fornecedor/FornecedorForm";
+import { FornecedorForm } from "../../forms/FornecedorForm";
 
 interface ModalCreateFornecedorProps {
     isCreateModalOpen: boolean;

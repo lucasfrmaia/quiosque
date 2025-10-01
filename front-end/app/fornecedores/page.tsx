@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { FornecedorTable } from '@/app/_components/fornecedor/FornecedorTable';
+import { FornecedorTable } from '@/app/_components/tables/FornecedorTable';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 
 import { ModalCreateFornecedor } from '../_components/modals/fornecedores/ModalCreateFornecedor';

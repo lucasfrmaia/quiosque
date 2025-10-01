@@ -25,7 +25,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { ProdutoTable } from '@/app/_components/produto/ProdutoTable';
+import { ProdutoTable } from '@/app/_components/tables/ProdutoTable';
 import { useProduto } from '@/app/_components/hooks/useProduto';
 
 import { useCategory } from '@/app/_components/hooks/useCategory';

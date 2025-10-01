@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FormProvider, UseFormReturn } from "react-hook-form";
-import { ProdutoForm, ProdutoFormData } from "../../produto/ProdutoForm";
+import { ProdutoForm, ProdutoFormData } from "../../forms/ProdutoForm";
 import { Category } from "@/types/interfaces/entities";
 
 interface ModalCreateProductProps {

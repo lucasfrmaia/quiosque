@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FormProvider } from "react-hook-form";
-import { NotaFiscalCompraForm } from "../../nota-fiscal-compra/NotaFiscalCompraForm";
+import { NotaFiscalCompraForm } from "../../forms/NotaFiscalCompraForm";
 import { Fornecedor } from "@/types/interfaces/entities";
 
 interface ModalEditNotaCompraProps {

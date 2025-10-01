@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FormProvider } from "react-hook-form";
-import { EstoqueForm } from "../../estoque/EstoqueForm";
+import { EstoqueForm } from "../../forms/EstoqueForm";
 import { Produto } from "@/types/interfaces/entities";
 
 interface ModalEstoqueCreateProps {

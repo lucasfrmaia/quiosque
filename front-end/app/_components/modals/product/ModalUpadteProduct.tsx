@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { FormProvider } from "react-hook-form"
-import { ProdutoForm } from "../../produto/ProdutoForm"
+import { ProdutoForm } from "../../forms/ProdutoForm"
 
 interface ModalUpdateProductProps {
   isEditModalOpen: boolean;

@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
-import { CategoryTable } from '@/app/_components/categoria/CategoryTable';
+import { CategoryTable } from '@/app/_components/tables/CategoryTable';
 import { useCategory } from '@/app/_components/hooks/useCategory';
 
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
