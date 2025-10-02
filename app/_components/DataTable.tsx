@@ -1,12 +1,9 @@
-'use client';
+"use client";
 
-import { FC, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
+import { FC, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -14,10 +11,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Edit, Trash2 } from 'lucide-react';
-import { SortIcon } from './SortIcon';
-import { FilterValues } from '@/types/interfaces/entities';
+} from "@/components/ui/table";
+import { Edit, Trash2 } from "lucide-react";
+import { SortIcon } from "./SortIcon";
+import { FilterValues } from "@/types/interfaces/entities";
 
 interface Column<T> {
   key: string;
@@ -32,10 +29,11 @@ interface DataTableProps<T> {
   items: T[];
   columns: Column<T>[];
   filterValues: FilterValues;
-  onSort: (field: string) => void;
-  onEdit: (item: T) => void;
-  onDelete: (item: T) => void;
-  onView?: (item: T) => void;
+  actions?: {
+    onEdit: (item: T) => void;
+    onDelete: (item: T) => void;
+    onView?: (item: T) => void;
+  };
   emptyMessage?: string;
 }
 
@@ -43,27 +41,23 @@ export const DataTable = <T extends { id: number }>({
   items,
   columns,
   filterValues,
-  onSort,
-  onEdit,
-  onDelete,
-  onView,
-  emptyMessage = 'Nenhum item encontrado.',
+  actions,
+  emptyMessage = "Nenhum item encontrado.",
 }: DataTableProps<T>) => {
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [sortField, setSortField] = useState<string | null>(null);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
-    onSort(field);
   };
 
   const getSorter = (columnKey: string) => {
-    const column = columns.find(c => (c.sortKey || c.key) === columnKey);
+    const column = columns.find((c) => (c.sortKey || c.key) === columnKey);
     return column?.sorter;
   };
 
@@ -72,16 +66,16 @@ export const DataTable = <T extends { id: number }>({
     const sorter = getSorter(sortField);
     if (sorter) {
       const result = sorter(a, b);
-      return sortDirection === 'asc' ? result : -result;
+      return sortDirection === "asc" ? result : -result;
     }
     // Default sorter
     const aValue = (a as any)[sortField];
     const bValue = (b as any)[sortField];
     if (aValue < bValue) {
-      return sortDirection === 'asc' ? -1 : 1;
+      return sortDirection === "asc" ? -1 : 1;
     }
     if (aValue > bValue) {
-      return sortDirection === 'asc' ? 1 : -1;
+      return sortDirection === "asc" ? 1 : -1;
     }
     return 0;
   });
@@ -106,15 +100,19 @@ export const DataTable = <T extends { id: number }>({
                 ))}
               </div>
               <div className="flex justify-end space-x-2 pt-2 border-t border-gray-100">
-                {onView && (
-                  <Button variant="outline" size="sm" onClick={() => onView(item)}>
+                {actions?.onView && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => actions.onView && actions?.onView(item)}
+                  >
                     Ver
                   </Button>
                 )}
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onEdit(item)}
+                  onClick={() => actions?.onEdit(item)}
                   className="text-purple-600 hover:bg-purple-50 border-purple-200 hover:border-purple-300 transition-all duration-200"
                   aria-label="Editar item"
                 >
@@ -123,7 +121,7 @@ export const DataTable = <T extends { id: number }>({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => onDelete(item)}
+                  onClick={() => actions?.onDelete(item)}
                   className="text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
                   aria-label="Excluir item"
                 >
@@ -146,15 +144,23 @@ export const DataTable = <T extends { id: number }>({
                   return (
                     <TableHead
                       key={column.key}
-                      className={`${column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''} px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 ${column.key === 'imagem' ? 'w-20' : ''}`}
-                      onClick={() => column.sortable && handleSort(columnSortKey)}
+                      className={`${
+                        column.sortable
+                          ? "cursor-pointer select-none hover:bg-gray-100"
+                          : ""
+                      } px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 ${
+                        column.key === "imagem" ? "w-20" : ""
+                      }`}
+                      onClick={() =>
+                        column.sortable && handleSort(columnSortKey)
+                      }
                     >
                       <div className="flex items-center space-x-1">
                         <span>{column.header}</span>
                         {column.sortable && sortField === columnSortKey && (
                           <SortIcon
                             field={columnSortKey}
-                            currentSortField={sortField || ''}
+                            currentSortField={sortField || ""}
                             currentSortDirection={sortDirection}
                           />
                         )}
@@ -162,49 +168,68 @@ export const DataTable = <T extends { id: number }>({
                     </TableHead>
                   );
                 })}
-                <TableHead className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
-                  Ações
-                </TableHead>
+
+                {actions && (
+                  <TableHead className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                    Ações
+                  </TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedItems.map((item) => (
-                <TableRow key={item.id} className="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100">
+                <TableRow
+                  key={item.id}
+                  className="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100"
+                >
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
-                      className={`px-4 py-4 text-sm ${column.key === 'imagem' ? 'text-center p-2' : 'align-top'}`}
+                      className={`px-4 py-4 text-sm ${
+                        column.key === "imagem"
+                          ? "text-center p-2"
+                          : "align-top"
+                      }`}
                     >
                       {column.render(item)}
                     </TableCell>
                   ))}
-                  <TableCell className="text-right px-4 py-4">
-                    <div className="flex justify-end space-x-2">
-                      {onView && (
-                        <Button variant="outline" size="sm" onClick={() => onView(item)}>
-                          Ver
+
+                  {actions && (
+                    <TableCell className="text-right px-4 py-4">
+                      <div className="flex justify-end space-x-2">
+                        {actions?.onView && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              actions.onView && actions?.onView(item)
+                            }
+                          >
+                            Ver
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => actions.onEdit(item)}
+                          className="text-purple-600 hover:bg-purple-50 border-purple-200 hover:border-purple-300 transition-all duration-200"
+                          aria-label="Editar item"
+                        >
+                          <Edit className="h-4 w-4" />
                         </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(item)}
-                        className="text-purple-600 hover:bg-purple-50 border-purple-200 hover:border-purple-300 transition-all duration-200"
-                        aria-label="Editar item"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => onDelete(item)}
-                        className="text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
-                        aria-label="Excluir item"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => actions.onDelete(item)}
+                          className="text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
+                          aria-label="Excluir item"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

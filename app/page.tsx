@@ -23,22 +23,12 @@ import { FilterValues } from '@/types/interfaces/entities';
 const Dashboard: FC = () => {
   // Basic metrics
   const { data: basicData, isLoading: basicLoading, error: basicError } = useRelatorio();
-
-  // Sales reports
-  const { data: vendasPeriodo } = useVendasPorPeriodo('monthly');
   const { data: produtosVendidos } = useProdutosMaisVendidos(5);
   const { data: vendasCategoria } = useVendasPorCategoria();
   const { data: margemProdutos } = useMargemLucroPorProduto(5);
-
-  // Stock reports
   const { data: posicaoEstoque } = usePosicaoEstoqueAtual();
-  const { data: curvaABC } = useCurvaABCEstoque();
-  const { data: giroEstoque } = useGiroEstoque();
   const { data: baixoEstoque } = useProdutosBaixoEstoque();
-  const { data: semGiro } = useProdutosSemGiro();
   const { data: proximaValidade } = useProdutosProximaValidade();
-
-  // Purchases reports
   const { data: comprasFornecedor } = useComprasPorFornecedor();
 
   
@@ -209,9 +199,6 @@ const Dashboard: FC = () => {
                 items={produtosVendidos?.slice(0, 5) || []}
                 columns={produtosVendidosColumns}
                 filterValues={emptyFilter}
-                onSort={noOp}
-                onEdit={noOp}
-                onDelete={noOp}
                 emptyMessage="Nenhum produto vendido encontrado."
               />
             </div>
@@ -226,9 +213,6 @@ const Dashboard: FC = () => {
                 items={vendasCategoria?.slice(0, 5) || []}
                 columns={vendasCategoriaColumns}
                 filterValues={emptyFilter}
-                onSort={noOp}
-                onEdit={noOp}
-                onDelete={noOp}
                 emptyMessage="Nenhuma venda por categoria encontrada."
               />
             </div>
@@ -243,9 +227,7 @@ const Dashboard: FC = () => {
                 items={margemProdutos || []}
                 columns={margemProdutosColumns}
                 filterValues={emptyFilter}
-                onSort={noOp}
-                onEdit={noOp}
-                onDelete={noOp}
+
                 emptyMessage="Nenhum dado de margem disponível."
               />
             </div>
@@ -271,9 +253,6 @@ const Dashboard: FC = () => {
                 items={posicaoEstoque?.slice(0, 5) || []}
                 columns={posicaoEstoqueColumns}
                 filterValues={emptyFilter}
-                onSort={noOp}
-                onEdit={noOp}
-                onDelete={noOp}
                 emptyMessage="Nenhum item em estoque."
               />
             </div>
@@ -288,9 +267,6 @@ const Dashboard: FC = () => {
                 items={baixoEstoque || []}
                 columns={baixoEstoqueColumns}
                 filterValues={emptyFilter}
-                onSort={noOp}
-                onEdit={noOp}
-                onDelete={noOp}
                 emptyMessage="Nenhum produto com baixo estoque."
               />
             </div>
@@ -305,9 +281,6 @@ const Dashboard: FC = () => {
                 items={proximaValidade || []}
                 columns={proximaValidadeColumns}
                 filterValues={emptyFilter}
-                onSort={noOp}
-                onEdit={noOp}
-                onDelete={noOp}
                 emptyMessage="Nenhum produto próximo da validade."
               />
             </div>
@@ -331,9 +304,6 @@ const Dashboard: FC = () => {
               items={comprasFornecedor?.slice(0, 5) || []}
               columns={comprasFornecedorColumns}
               filterValues={emptyFilter}
-              onSort={noOp}
-              onEdit={noOp}
-              onDelete={noOp}
               emptyMessage="Nenhuma compra registrada."
             />
           </div>

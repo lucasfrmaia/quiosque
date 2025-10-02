@@ -101,10 +101,11 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
         items={items}
         columns={columns}
         filterValues={filterValues}
-        onSort={onSort}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        onView={openDetails}
+        actions={{
+          onEdit,
+          onDelete,
+          onView: openDetails,
+        }}
         emptyMessage="Nenhuma nota fiscal de venda encontrada."
       />
       {selectedNota && (

@@ -103,9 +103,10 @@ export const EstoqueTable: FC<EstoqueTableProps> = ({
       items={items}
       columns={columns}
       filterValues={filterValues}
-      onSort={onSort}
-      onEdit={onEdit}
-      onDelete={onDelete}
+      actions={{
+        onEdit,
+        onDelete
+      }}
       emptyMessage="Nenhum item encontrado."
     />
   );

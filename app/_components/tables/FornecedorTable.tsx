@@ -86,9 +86,10 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       items={items}
       columns={columns}
       filterValues={filterValues}
-      onSort={onSort}
-      onEdit={onEdit}
-      onDelete={onDelete}
+      actions={{
+        onEdit,
+        onDelete
+      }}
       emptyMessage="Nenhum fornecedor encontrado."
     />
   );

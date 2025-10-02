@@ -64,9 +64,10 @@ export const CategoryTable: FC<CategoryTableProps> = ({
       items={items}
       columns={columns}
       filterValues={filterValues}
-      onSort={onSort}
-      onEdit={onEdit}
-      onDelete={onDelete}
+      actions={{
+        onEdit,
+        onDelete
+      }}
       emptyMessage="Nenhuma categoria encontrada."
     />
   );
