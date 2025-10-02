@@ -1,31 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FormProvider } from "react-hook-form";
 import { FornecedorForm } from "../../forms/FornecedorForm";
 
 interface ModalCreateFornecedorProps {
     isCreateModalOpen: boolean;
     createForm: any;
     setIsCreateModalOpen: (open: boolean) => void;
-    handleSubmitCreate: (e: React.FormEvent) => void;
+    onSubmit: (data: any) => void;
 }
 
-export function ModalCreateFornecedor({ isCreateModalOpen, setIsCreateModalOpen, createForm, handleSubmitCreate }: ModalCreateFornecedorProps) {
+export function ModalCreateFornecedor({ isCreateModalOpen, setIsCreateModalOpen, createForm, onSubmit }: ModalCreateFornecedorProps) {
     return (
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
-                <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-                    <DialogHeader>
-                        <DialogTitle>Novo Fornecedor</DialogTitle>
-                        <DialogDescription>Crie um novo fornecedor.</DialogDescription>
-                    </DialogHeader>
-                    <FornecedorForm register={createForm.register} />
-                    <DialogFooter>
-                        <Button type="submit">Criar</Button>
-                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                    </DialogFooter>
-                </form>
+                <FormProvider {...createForm}>
+                    <form onSubmit={createForm.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                        <DialogHeader>
+                            <DialogTitle>Novo Fornecedor</DialogTitle>
+                            <DialogDescription>Crie um novo fornecedor.</DialogDescription>
+                        </DialogHeader>
+                        <FornecedorForm />
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                            <Button type="submit">Criar</Button>
+                        </DialogFooter>
+                    </form>
+                </FormProvider>
             </DialogContent>
         </Dialog>
-
     )
 }

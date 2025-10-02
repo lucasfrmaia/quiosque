@@ -8,27 +8,27 @@ interface ModalCreateNotaCompraProps {
     isCreateModalOpen: boolean;
     setIsCreateModalOpen: (open: boolean) => void;
     createForm: any;
-    handleSubmitCreate: (e: any) => void;
+    onSubmit: (data: any) => void;
     fornecedores: Fornecedor[];
 }
 
-export function ModalCreateNotaCompra({ isCreateModalOpen, setIsCreateModalOpen, createForm, handleSubmitCreate, fornecedores }: ModalCreateNotaCompraProps) {
+export function ModalCreateNotaCompra({ isCreateModalOpen, setIsCreateModalOpen, createForm, onSubmit, fornecedores }: ModalCreateNotaCompraProps) {
     return (
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-2xl">
-                <form onSubmit={handleSubmitCreate} className="space-y-4 py-4">
-                    <DialogHeader>
-                        <DialogTitle>Nova Nota Fiscal de Compra</DialogTitle>
-                        <DialogDescription>Crie uma nova nota fiscal de compra.</DialogDescription>
-                    </DialogHeader>
-                    <FormProvider {...createForm}>
+                <FormProvider {...createForm}>
+                    <form onSubmit={createForm.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                        <DialogHeader>
+                            <DialogTitle>Nova Nota Fiscal de Compra</DialogTitle>
+                            <DialogDescription>Crie uma nova nota fiscal de compra.</DialogDescription>
+                        </DialogHeader>
                         <NotaFiscalCompraForm fornecedores={fornecedores} />
-                    </FormProvider>
-                    <DialogFooter>
-                        <Button type="submit">Criar</Button>
-                        <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
-                    </DialogFooter>
-                </form>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancelar</Button>
+                            <Button type="submit">Criar</Button>
+                        </DialogFooter>
+                    </form>
+                </FormProvider>
             </DialogContent>
         </Dialog>
     )

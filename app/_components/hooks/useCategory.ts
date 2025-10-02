@@ -191,8 +191,6 @@ export const useCategory = () => {
     router.replace(`?${params.toString()}`);
   };
 
-  const handleSort = (field: string) => { };
-
   const handlePageChange = (page: number) => {
     const newFilters = { ...queryParams, currentPage: page };
     updateUrl(newFilters);
@@ -214,7 +212,6 @@ export const useCategory = () => {
     handlePageChange,
     handleItemsPerPageChange,
     handleRemoveFilter,
-    handleSort,
     updateUrl,
     getActiveFilters,
     getAllCategories

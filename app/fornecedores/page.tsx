@@ -20,7 +20,8 @@ import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
 import { ModalCreateFornecedor } from '../_components/modals/fornecedores/ModalCreateFornecedor';
 import { ModalEditFornecedor } from '../_components/modals/fornecedores/ModalEditFornecedor';
 import { ModalDeleteFornecedor } from '../_components/modals/fornecedores/ModalDeleteFornecedor';
-import { FornecedorSchema } from '@/types/validation';
+import { FornecedorSchema, fornecedorSchema } from '@/types/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const FornecedoresPage: FC = () => {
@@ -31,8 +32,16 @@ const FornecedoresPage: FC = () => {
   const [selectedFornecedor, setSelectedFornecedor] = useState<Fornecedor | null>(null);
   const [localSearch, setLocalSearch] = useState('');
 
-  const createForm = useForm<FornecedorSchema>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
-  const editForm = useForm<FornecedorSchema>({ defaultValues: { nome: '', cnpj: '', telefone: '', email: '' } });
+  const createForm = useForm<FornecedorSchema>({
+    resolver: zodResolver(fornecedorSchema),
+    mode: 'onChange',
+    defaultValues: { nome: '', cnpj: '', telefone: '', email: '' }
+  });
+  const editForm = useForm<FornecedorSchema>({
+    resolver: zodResolver(fornecedorSchema),
+    mode: 'onChange',
+    defaultValues: { nome: '', cnpj: '', telefone: '', email: '' }
+  });
 
   const {
     fornecedorQuery,
@@ -59,7 +68,7 @@ const FornecedoresPage: FC = () => {
   }, [appliedFilters, localSearch, updateUrl]);
 
 
-  const handleSubmitCreate = createForm.handleSubmit((data) => {
+  const onSubmitCreate = (data: FornecedorSchema) => {
     handleCreate({
       nome: data.nome,
       cnpj: data.cnpj || null,
@@ -68,9 +77,9 @@ const FornecedoresPage: FC = () => {
     });
     setIsCreateModalOpen(false);
     createForm.reset();
-  });
+  };
 
-  const handleSubmitEdit = editForm.handleSubmit((data) => {
+  const onSubmitEdit = (data: FornecedorSchema) => {
     if (!selectedFornecedor) return;
     handleEdit(selectedFornecedor.id, {
       nome: data.nome,
@@ -81,7 +90,7 @@ const FornecedoresPage: FC = () => {
     setIsEditModalOpen(false);
     setSelectedFornecedor(null);
     editForm.reset();
-  });
+  };
 
   const openEditModal = (fornecedor: Fornecedor) => {
     setSelectedFornecedor(fornecedor);
@@ -200,7 +209,7 @@ const FornecedoresPage: FC = () => {
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
         createForm={createForm}
-        handleSubmitCreate={handleSubmitCreate}
+        onSubmit={onSubmitCreate}
       />
 
 
@@ -209,7 +218,7 @@ const FornecedoresPage: FC = () => {
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
         editForm={editForm}
-        handleSubmitEdit={handleSubmitEdit}
+        onSubmit={onSubmitEdit}
       />
 
       {/* Delete Dialog */}

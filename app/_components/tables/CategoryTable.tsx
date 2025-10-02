@@ -7,7 +7,6 @@ import { DataTable } from "../DataTable";
 interface CategoryTableProps {
   items: Category[];
   filterValues: FilterValues;
-  onSort: (field: string) => void;
   onEdit: (item: Category) => void;
   onDelete: (id: Category) => void;
 }
@@ -52,7 +51,6 @@ const columns = [
 export const CategoryTable: FC<CategoryTableProps> = ({
   items,
   filterValues,
-  onSort,
   onEdit,
   onDelete,
 }) => {

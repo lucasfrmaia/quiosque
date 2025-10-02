@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Controller, useFormContext as UseFormContextType } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -12,7 +12,10 @@ import {
 } from '@/components/ui/select';
 import { Produto } from '@/types/interfaces/entities';
 import { Category } from '@/types/interfaces/entities';
-import { ProdutoSchema } from '@/types/validation';
+import { z } from 'zod';
+import { produtoSchema } from '@/types/validation';
+
+type ProdutoFormData = z.infer<typeof produtoSchema>;
 
 interface ProdutoFormProps {
   categories: Category[];
@@ -20,7 +23,7 @@ interface ProdutoFormProps {
 }
 
 export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false }) => {
-  const { control } = useFormContext<ProdutoSchema>();
+  const { control, register, formState: { errors } } = useFormContext<ProdutoFormData>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -28,102 +31,132 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
         <Label htmlFor="nome" className="text-right">
           Nome
         </Label>
-        <Input
-          id="nome"
-          {...control.register('nome')}
-          className="col-span-3"
-          placeholder="Nome do produto"
-        />
+        <div className="col-span-3 space-y-1">
+          <Input
+            id="nome"
+            {...register('nome')}
+            className={errors.nome ? 'border-red-500 focus:border-red-500' : ''}
+            placeholder="Nome do produto"
+          />
+          {errors.nome && (
+            <p className="text-sm text-red-500">{errors.nome.message}</p>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="descricao" className="text-right">
           Descrição
         </Label>
-        <Input
-          id="descricao"
-          {...control.register('descricao')}
-          className="col-span-3"
-          placeholder="Descrição do produto (opcional)"
-        />
+        <div className="col-span-3 space-y-1">
+          <Input
+            id="descricao"
+            {...register('descricao')}
+            className={errors.descricao ? 'border-red-500 focus:border-red-500' : ''}
+            placeholder="Descrição do produto (opcional)"
+          />
+          {errors.descricao && (
+            <p className="text-sm text-red-500">{errors.descricao.message}</p>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="imagemUrl" className="text-right">
           Imagem URL
         </Label>
-        <Input
-          id="imagemUrl"
-          {...control.register('imagemUrl')}
-          className="col-span-3"
-          placeholder="URL da imagem (opcional)"
-        />
+        <div className="col-span-3 space-y-1">
+          <Input
+            id="imagemUrl"
+            {...register('imagemUrl')}
+            className={errors.imagemUrl ? 'border-red-500 focus:border-red-500' : ''}
+            placeholder="URL da imagem (opcional)"
+          />
+          {errors.imagemUrl && (
+            <p className="text-sm text-red-500">{errors.imagemUrl.message}</p>
+          )}
+        </div>
       </div>
-  
+   
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="categoriaId" className="text-right">
           Categoria
         </Label>
-        <Controller
-          control={control}
-          name="categoriaId"
-          render={({ field }) => (
-            <Select value={String(field.value)} onValueChange={field.onChange}>
-              <SelectTrigger id="categoriaId" className="col-span-3">
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="col-span-3 space-y-1">
+          <Controller
+            control={control}
+            name="categoriaId"
+            render={({ field }) => (
+              <Select value={String(field.value || '')} onValueChange={field.onChange}>
+                <SelectTrigger id="categoriaId" className={errors.categoriaId ? 'border-red-500 focus:border-red-500' : ''}>
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.categoriaId && (
+            <p className="text-sm text-red-500">{errors.categoriaId.message}</p>
           )}
-        />
+        </div>
       </div>
-  
+   
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="ativo" className="text-right">
           Ativo
         </Label>
-        <Controller
-          control={control}
-          name="ativo"
-          render={({ field }) => (
-            <Select value={String(field.value)} onValueChange={field.onChange}>
-              <SelectTrigger id="ativo" className="col-span-3">
-                <SelectValue placeholder="Selecione se está ativo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="true">Sim</SelectItem>
-                <SelectItem value="false">Não</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="col-span-3 space-y-1">
+          <Controller
+            control={control}
+            name="ativo"
+            render={({ field }) => (
+              <Select value={String(field.value)} onValueChange={(value) => field.onChange(value === 'true')}>
+                <SelectTrigger id="ativo" className={errors.ativo ? 'border-red-500 focus:border-red-500' : ''}>
+                  <SelectValue placeholder="Selecione se está ativo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Sim</SelectItem>
+                  <SelectItem value="false">Não</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.ativo && (
+            <p className="text-sm text-red-500">{errors.ativo.message}</p>
           )}
-        />
+        </div>
       </div>
-  
+   
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="tipo" className="text-right">
           Tipo
         </Label>
-        <Controller
-          control={control}
-          name="tipo"
-          render={({ field }) => (
-            <Select value={field.value} onValueChange={(value) => field.onChange(value as 'INSUMO' | 'CARDAPIO')}>
-              <SelectTrigger id="tipo" className="col-span-3">
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="INSUMO">Insumo</SelectItem>
-                <SelectItem value="CARDAPIO">Cardápio</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="col-span-3 space-y-1">
+          <Controller
+            control={control}
+            name="tipo"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="tipo" className={errors.tipo ? 'border-red-500 focus:border-red-500' : ''}>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INSUMO">Insumo</SelectItem>
+                  <SelectItem value="CARDAPIO">Cardápio</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.tipo && (
+            <p className="text-sm text-red-500">{errors.tipo.message}</p>
           )}
-        />
+        </div>
       </div>
     </div>
   );

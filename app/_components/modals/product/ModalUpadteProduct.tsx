@@ -8,29 +8,29 @@ interface ModalUpdateProductProps {
   editForm: any;
   categories: any[];
   setIsEditModalOpen: (open: boolean) => void;
-  handleSubmitEdit: (e: React.BaseSyntheticEvent) => Promise<void>;
+  onSubmit: (data: any) => void;
 }
 
-export function ModalUpdateProduct({ isEditModalOpen, setIsEditModalOpen, editForm, handleSubmitEdit, categories }: ModalUpdateProductProps) {
-
+export function ModalUpdateProduct({ isEditModalOpen, setIsEditModalOpen, editForm, onSubmit, categories }: ModalUpdateProductProps) {
+ 
   return (
     <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
       <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmitEdit} className="space-y-4 py-4">
-          <DialogHeader>
-            <DialogTitle>Editar Produto</DialogTitle>
-            <DialogDescription>Edite o produto.</DialogDescription>
-          </DialogHeader>
-          <FormProvider {...editForm}>
-            <ProdutoForm categories={categories} editing={true} />
-          </FormProvider>
-          <DialogFooter>
-            <Button type="submit">Salvar</Button>
-            <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-          </DialogFooter>
-        </form>
+        <FormProvider {...editForm}>
+          <form onSubmit={editForm.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <DialogHeader>
+              <DialogTitle>Editar Produto</DialogTitle>
+              <DialogDescription>Edite o produto.</DialogDescription>
+            </DialogHeader>
+            <ProdutoForm categories={categories} />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+              <Button type="submit">Salvar</Button>
+            </DialogFooter>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   )
-
+ 
 }

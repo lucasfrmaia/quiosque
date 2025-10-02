@@ -16,9 +16,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SearchableSelect } from '../common/SearchableSelect';
 import { useProduto } from '../hooks/useProduto';
 import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto } from '@/types/interfaces/entities';
-import { NotaFiscalCompraSchema } from '@/types/validation';
+import { z } from 'zod';
+import { notaFiscalCompraSchema } from '@/types/validation';
 import { Package, X } from 'lucide-react';
 
+type NotaFiscalCompraFormData = z.infer<typeof notaFiscalCompraSchema>;
 
 interface NotaFiscalCompraFormProps {
   fornecedores: Fornecedor[];
@@ -26,7 +28,7 @@ interface NotaFiscalCompraFormProps {
 }
 
 export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedores, editing = false }) => {
-  const { control, register, watch } = useFormContext<NotaFiscalCompraSchema>();
+  const { control, register, watch, formState: { errors } } = useFormContext<NotaFiscalCompraFormData>();
   const produtosWatch = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control,
@@ -45,14 +47,14 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
     if (!selectedProduto || !quantidade || !precoUnitario) return;
 
     append({
-      produtoId: selectedProduto.id.toString(),
+      produtoId: Number(selectedProduto.id),
       quantidade,
       unidade: 'Unidade',
       precoUnitario
     });
 
     setSelectedProduto(null);
-    setQuantidade(9);
+    setQuantidade(0);
     setPrecoUnitario(0);
   };
 
@@ -74,35 +76,45 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="data">Data da Compra</Label>
-              <Input
-                id="data"
-                type="date"
-                {...register('data')}
-                className="h-10"
-                defaultValue={new Date().toISOString().split('T')[0]}
-              />
+              <div className="space-y-1">
+                <Input
+                  id="data"
+                  type="date"
+                  {...register('data')}
+                  className={errors.data ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}
+                  defaultValue={new Date().toISOString().split('T')[0]}
+                />
+                {errors.data && (
+                  <p className="text-sm text-red-500">{errors.data.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="fornecedorId">Fornecedor</Label>
-              <Controller
-                control={control}
-                name="fornecedorId"
-                render={({ field }) => (
-                  <Select value={String(field.value)} onValueChange={field.onChange}>
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Selecione um fornecedor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fornecedores.map((fornecedor) => (
-                        <SelectItem key={fornecedor.id} value={fornecedor.id.toString()}>
-                          {fornecedor.nome}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-1">
+                <Controller
+                  control={control}
+                  name="fornecedorId"
+                  render={({ field }) => (
+                    <Select value={String(field.value || '')} onValueChange={(value) => field.onChange(Number(value))}>
+                      <SelectTrigger className={errors.fornecedorId ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}>
+                        <SelectValue placeholder="Selecione um fornecedor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fornecedores.map((fornecedor) => (
+                          <SelectItem key={fornecedor.id} value={fornecedor.id.toString()}>
+                            {fornecedor.nome}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.fornecedorId && (
+                  <p className="text-sm text-red-500">{errors.fornecedorId.message}</p>
                 )}
-              />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -187,10 +199,10 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
               {fields.map((field, index) => {
                 const produtoCompra = produtosWatch[index];
                 if (!produtoCompra) return null;
-                const produto = allProdutos.find(p => p.id.toString() === produtoCompra.produtoId);
+                const produto = allProdutos.find(p => p.id.toString() === produtoCompra.produtoId.toString());
                 if (!produto) return null;
 
-                const subtotal = produtoCompra.precoUnitario * produtoCompra.quantidade 
+                const subtotal = produtoCompra.precoUnitario * produtoCompra.quantidade
 
                 return (
                   <div key={field.id} className="flex items-center justify-between p-2">
@@ -219,6 +231,9 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
             </div>
           </CardContent>
         </Card>
+      )}
+      {errors.produtos && (
+        <p className="text-sm text-red-500">{errors.produtos.message}</p>
       )}
     </div>
   );

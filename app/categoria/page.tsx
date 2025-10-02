@@ -1,8 +1,11 @@
 'use client';
 
 import { FC, useState, useEffect, useCallback } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Category } from '@/types/interfaces/entities';
+import { CategorySchema, categorySchema } from '@/types/validation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Tag, Plus, X } from 'lucide-react';
@@ -20,7 +23,6 @@ import { useCategory } from '@/app/_components/hooks/useCategory';
 import { ModalCreateCategory } from '../_components/modals/category/ModalCreateCategory';
 import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
 import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
-import { CategorySchema } from '@/types/validation';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const CategoriaPage: FC = () => {
@@ -31,22 +33,27 @@ const CategoriaPage: FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [localSearch, setLocalSearch] = useState('');
 
-  const createForm = useForm<CategorySchema>({ defaultValues: { name: '' } });
-  const editForm = useForm<CategorySchema>({ defaultValues: { name: '' } });
+  const createMethods = useForm<CategorySchema>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: { name: '' }
+  });
+  const createForm = createMethods;
+
+  const editMethods = useForm<CategorySchema>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: { name: '' }
+  });
+  const editForm = editMethods;
 
   const {
     queryParams,
-    handleRemoveFilter,
     handlePageChange,
     handleItemsPerPageChange,
     handleCreate,
     handleDelete,
     handleEdit,
-    handleApply,
     resetFilters,
     updateUrl,
-    handleSort,
-    getActiveFilters,
     getCategoriesByParams
   } = useCategory()
 
@@ -61,13 +68,13 @@ const CategoriaPage: FC = () => {
     updateUrl(newFilters);
   }, [queryParams, localSearch, updateUrl]);
 
-  const handleSubmitCreate = createForm.handleSubmit((data) => {
+  const onSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate(data);
     setIsCreateModalOpen(false);
     createForm.reset();
   });
 
-  const handleSubmitEdit = editForm.handleSubmit((data) => {
+  const onSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedCategory) return;
     handleEdit(selectedCategory.id, data);
     setIsEditModalOpen(false);
@@ -165,7 +172,6 @@ const CategoriaPage: FC = () => {
           <CategoryTable
             items={response?.categories || []}
             filterValues={queryParams}
-            onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(ctg) => {
               const category = response?.categories?.find(c => c.id === ctg.id);
@@ -189,16 +195,16 @@ const CategoriaPage: FC = () => {
       <ModalCreateCategory
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
-        handleSubmitCreate={handleSubmitCreate}
         createForm={createForm}
+        onSubmit={onSubmitCreate}
       />
 
       {/* Edit Dialog */}
       <ModalUpdateCategory
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
-        handleSubmitEdit={handleSubmitEdit}
         editForm={editForm}
+        onSubmit={onSubmitEdit}
       />
 
       {/* Delete Dialog */}

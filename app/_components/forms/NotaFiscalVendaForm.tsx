@@ -10,15 +10,18 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SearchableSelect, Option } from '../common/SearchableSelect';
 import { NotaFiscalVenda, ProdutoVenda, ProdutoEstoque } from '@/types/interfaces/entities';
-import { NotaFiscalVendaSchema } from '@/types/validation';
+import { z } from 'zod';
+import { notaFiscalVendaSchema } from '@/types/validation';
 import { Package } from 'lucide-react';
+
+type NotaFiscalVendaFormData = z.infer<typeof notaFiscalVendaSchema>;
 
 interface NotaFiscalVendaFormProps {
   editing?: boolean;
 }
 
 export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = false }) => {
-  const { register, watch, setValue } = useFormContext<NotaFiscalVendaSchema>();
+  const { register, watch, setValue, formState: { errors } } = useFormContext<NotaFiscalVendaFormData>();
   const produtos = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control: useFormContext().control,
@@ -49,10 +52,10 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
 
   if (isLoading)
     return <>Carregando...</>
-
+ 
   if (error)
     return <>Error!</>
-
+ 
   const estoqueOptions: Option[] = allEstoque?.map(estoque => ({
     name: `${estoque.produto?.nome || 'Sem nome'} (Estoque: ${estoque.quantidade})`,
     ...estoque
@@ -93,13 +96,18 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="data">Data da Venda</Label>
-              <Input
-                id="data"
-                type="date"
-                {...register('data')}
-                className="h-10"
-                defaultValue={new Date().toISOString().split('T')[0]}
-              />
+              <div className="space-y-1">
+                <Input
+                  id="data"
+                  type="date"
+                  {...register('data')}
+                  className={errors.data ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}
+                  defaultValue={new Date().toISOString().split('T')[0]}
+                />
+                {errors.data && (
+                  <p className="text-sm text-red-500">{errors.data.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -204,6 +212,9 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
             </div>
           </CardContent>
         </Card>
+      )}
+      {errors.produtos && (
+        <p className="text-sm text-red-500">{errors.produtos.message}</p>
       )}
     </div>
   );

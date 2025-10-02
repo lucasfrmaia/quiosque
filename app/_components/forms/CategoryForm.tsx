@@ -1,26 +1,32 @@
 import { FC } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UseFormRegister, FieldValues } from 'react-hook-form';
-import { CategorySchema } from '@/types/validation';
+import { z } from 'zod';
+import { categorySchema } from '@/types/validation';
 
-interface CategoryFormProps {
-  register: UseFormRegister<CategorySchema>;
-}
+type CategoryFormData = z.infer<typeof categorySchema>;
 
-export const CategoryForm: FC<CategoryFormProps> = ({ register }) => {
+export const CategoryForm: FC = () => {
+  const { register, formState: { errors } } = useFormContext<CategoryFormData>();
+
   return (
     <div className="grid gap-4 py-4">
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="name" className="text-right">
           Nome
         </Label>
-        <Input
-          id="name"
-          {...register('name')}
-          className="col-span-3"
-          placeholder="Nome da categoria"
-        />
+        <div className="col-span-3 space-y-1">
+          <Input
+            id="name"
+            {...register('name')}
+            className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
+            placeholder="Nome da categoria"
+          />
+          {errors.name && (
+            <p className="text-sm text-red-500">{errors.name.message}</p>
+          )}
+        </div>
       </div>
     </div>
   );

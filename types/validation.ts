@@ -17,7 +17,7 @@ export const fornecedorSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
   cnpj: z.string().optional(),
   telefone: z.string().optional(),
-  email: z.email().optional(),
+  email: z.email({ error: "E-mail Inválido"}).optional(),
 });
 
 export const produtoEstoqueSchema = z.object({
