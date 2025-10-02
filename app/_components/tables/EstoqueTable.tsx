@@ -7,7 +7,6 @@ import { DataTable } from '../DataTable';
 interface EstoqueTableProps {
   items: ProdutoEstoque[];
   filterValues: FilterValues;
-  onSort: (field: string) => void;
   onEdit: (item: ProdutoEstoque) => void;
   onDelete: (id: ProdutoEstoque) => void;
 }
@@ -15,7 +14,6 @@ interface EstoqueTableProps {
 export const EstoqueTable: FC<EstoqueTableProps> = ({
   items,
   filterValues,
-  onSort,
   onEdit,
   onDelete,
 }) => {

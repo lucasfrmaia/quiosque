@@ -39,7 +39,7 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
   const columns = [
     {
       key: 'imagem',
-      header: 'Imagem',
+      header: '',
       render: (item: NotaFiscalVenda) => (
         <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
           <Box className="h-6 w-6 text-gray-400" />
@@ -49,10 +49,10 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
     },
     {
       key: 'nome',
-      header: 'Nome',
+      header: 'ID',
       render: (item: NotaFiscalVenda) => (
         <div className="space-y-1">
-          <div className="font-bold text-sm">Nota Fiscal #{item.id}</div>
+          <div className="font-bold text-sm">{item.id}</div>
         </div>
       ),
       sortable: false,

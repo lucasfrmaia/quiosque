@@ -33,7 +33,8 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
     name: "produtos"
   });
 
-  const { allProdutosQuery: { data: allProdutos = [] } } = useProduto();
+  const { getAllProdutos } = useProduto()
+  const { data: allProdutos = [], isLoading: isLoadingProduto, error: errorProduto } = getAllProdutos()
 
   const [selectedProduto, setSelectedProduto] = useState<any | null>(null);
   const [quantidade, setQuantidade] = useState(0);

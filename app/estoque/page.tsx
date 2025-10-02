@@ -35,19 +35,18 @@ const EstoquePage: FC = () => {
     handleEdit,
     handleDelete,
     resetFilters,
-    handleApply,
     handlePageChange,
     handleItemsPerPageChange,
     handleRemoveFilter,
     updateUrl,
     getActiveFilters,
-    handleSort
   } = useEstoque();
   
   const { getAllCategories } = useCategory();
   const { data: categories = [] } = getAllCategories();
   
-  const { allProdutosQuery: { data: produtos = [], isLoading: isLoadingProduto, error: errorProduto } = {} } = useProduto()
+  const { getAllProdutos } = useProduto()
+  const { data: produtos = [], isLoading: isLoadingProduto, error: errorProduto } = getAllProdutos()
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -311,7 +310,6 @@ const EstoquePage: FC = () => {
           <EstoqueTable
             items={response?.estoque || []}
             filterValues={appliedFilters}
-            onSort={() => {}}
             onEdit={openEditModal}
             onDelete={(produtoEstoque) => {
               const item = response?.estoque.find((i: ProdutoEstoque) => i.id === produtoEstoque.id);
