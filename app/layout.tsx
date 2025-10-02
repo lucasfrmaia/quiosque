@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './_components/Sidebar';
 import { AuthProvider } from './contexts/AuthContext';
@@ -12,12 +12,13 @@ const LayoutContent: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
+  const [isExpanded, setIsExpanded] = useState(true);
   
   return (
     <div className="flex min-h-screen bg-gray-50">
       
-      {isAuthenticated && !isLoginPage && <Sidebar />}
-      <main className={`flex-1 ${isAuthenticated && !isLoginPage ? 'ml-64' : ''} p-8`}>
+      {isAuthenticated && !isLoginPage && <Sidebar isExpanded={isExpanded} onToggle={() => setIsExpanded(!isExpanded)} />}
+      <main className={`flex-1 transition-all duration-300 ease-in-out p-8 ${isAuthenticated && !isLoginPage ? (isExpanded ? 'ml-64' : 'ml-16') : ''}`}>
         {children}
       </main>
     </div>

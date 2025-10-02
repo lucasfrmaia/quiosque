@@ -7,6 +7,7 @@ import { NotaFiscalCompraRepositoryPrisma } from './classes/NotaFiscalCompraRepo
 import { NotaFiscalVendaRepositoryPrisma } from './classes/NotaFiscalVendaRepositoryPrisma';
 import { CategoryRepositoryPrisma } from './classes/CategoryRepositoryPrisma';
 import { FornecedorRepositoryPrisma } from './classes/FornecedorRepositoryPrisma';
+import { Relatorio } from './classes/Relatorio';
 
 class RepositoryFactory {
   constructor(
@@ -16,7 +17,8 @@ class RepositoryFactory {
     public readonly notaFiscalCompraRepository: INotaFiscalCompraRepository,
     public readonly notaFiscalVendaRepository: INotaFiscalVendaRepository,
     public readonly categoryRepository: ICategoryRepository,
-    public readonly fornecedorRepository: IFornecedorRepository
+    public readonly fornecedorRepository: IFornecedorRepository,
+    public readonly relatorio: Relatorio
   ) {
   }
 }
@@ -30,5 +32,6 @@ export const repositoryFactory = new RepositoryFactory(
   new NotaFiscalCompraRepositoryPrisma(prisma),
   new NotaFiscalVendaRepositoryPrisma(prisma),
   new CategoryRepositoryPrisma(prisma),
-  new FornecedorRepositoryPrisma(prisma)
+  new FornecedorRepositoryPrisma(prisma),
+  new Relatorio(prisma)
 );
