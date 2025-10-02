@@ -81,16 +81,47 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
   }
 
   async findPerPage(filters: FilterValues) {
-    const { currentPage, itemsPerPage, search } = filters;
+    const { currentPage, itemsPerPage, search, dateStart, dateEnd, totalMin, totalMax, fornecedorId } = filters;
     const skip = (currentPage - 1) * itemsPerPage;
     const where: any = {};
 
+    // Fornecedor filter
+    if (fornecedorId) {
+      where.fornecedorId = parseInt(fornecedorId);
+    }
+
+    // Date range filter
+    const dateFilter: any = {};
+    if (dateStart) {
+      dateFilter.gte = new Date(dateStart);
+    }
+    if (dateEnd) {
+      dateFilter.lte = new Date(dateEnd);
+    }
+    if (Object.keys(dateFilter).length > 0) {
+      where.data = dateFilter;
+    }
+
+    // Total range filter
+    const totalFilter: any = {};
+    if (totalMin) {
+      totalFilter.gte = parseFloat(totalMin);
+    }
+    if (totalMax) {
+      totalFilter.lte = parseFloat(totalMax);
+    }
+    if (Object.keys(totalFilter).length > 0) {
+      where.total = totalFilter;
+    }
+
+    // Search filter
     if (search) {
       where.OR = [
-        { data: { contains: search, mode: 'insensitive' } },
-        { total: { contains: search, mode: 'insensitive' } },
-        { fornecedor: { nome: { contains: search, mode: 'insensitive' } } }
-      ];
+        { id: { equals: parseInt(search) || undefined } },
+        { total: { contains: search } },
+        { fornecedor: { nome: { contains: search } } },
+        { produtos: { some: { produto: { nome: { contains: search } } } } }
+      ].filter(Boolean);
     }
 
     const notas = await this.prisma.notaFiscalCompra.findMany({
@@ -107,8 +138,7 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
       }
     });
 
-
-    const total = await this.prisma.notaFiscalCompra.count();
+    const total = await this.prisma.notaFiscalCompra.count({ where });
 
     return { notas, total };
   }

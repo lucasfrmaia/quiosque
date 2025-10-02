@@ -21,6 +21,7 @@ import { ModalCreateFornecedor } from '../_components/modals/fornecedores/ModalC
 import { ModalEditFornecedor } from '../_components/modals/fornecedores/ModalEditFornecedor';
 import { ModalDeleteFornecedor } from '../_components/modals/fornecedores/ModalDeleteFornecedor';
 import { FornecedorSchema } from '@/types/validation';
+import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const FornecedoresPage: FC = () => {
 
@@ -103,7 +104,7 @@ const FornecedoresPage: FC = () => {
     setSelectedFornecedor(null);
   };
 
-  if (isLoading) return <p>Carregando...</p>;
+  if (isLoading) return <TableSkeleton/>;
   if (error) return <p>Erro!</p>;
 
   return (

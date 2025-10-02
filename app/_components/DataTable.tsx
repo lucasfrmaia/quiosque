@@ -87,19 +87,19 @@ export const DataTable = <T extends { id: number }>({
       {/* Mobile Cards View */}
       <div className="block md:hidden space-y-4">
         {sortedItems.map((item) => (
-          <Card key={item.id} className="shadow-sm border-gray-200">
-            <CardContent className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <Card key={item.id} className="shadow-md border border-gray-200 rounded-xl">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
                 {columns.map((column) => (
-                  <div key={column.key} className="space-y-1">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <div key={column.key} className="space-y-2 text-center">
+                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded-full inline-block">
                       {column.header}
                     </span>
-                    <div className="text-sm">{column.render(item)}</div>
+                    <div className="text-base font-medium text-gray-900">{column.render(item)}</div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-end space-x-2 pt-2 border-t border-gray-100">
+              <div className="flex justify-end space-x-3 pt-3 border-t border-gray-200">
                 {actions?.onView && (
                   <Button
                     variant="outline"
@@ -122,7 +122,6 @@ export const DataTable = <T extends { id: number }>({
                   variant="destructive"
                   size="sm"
                   onClick={() => actions?.onDelete(item)}
-                  className="text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300 transition-all duration-200"
                   aria-label="Excluir item"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -135,7 +134,7 @@ export const DataTable = <T extends { id: number }>({
 
       {/* Desktop Table View */}
       <div className="hidden md:block">
-        <div className="rounded-md border overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-gray-200 overflow-hidden shadow-lg bg-white">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
@@ -148,9 +147,9 @@ export const DataTable = <T extends { id: number }>({
                         column.sortable
                           ? "cursor-pointer select-none hover:bg-gray-100"
                           : ""
-                      } px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 ${
+                      } px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 border-b-2 border-gray-200 w-24 ${
                         column.key === "imagem" ? "w-20" : ""
-                      }`}
+                      } font-sans`}
                       onClick={() =>
                         column.sortable && handleSort(columnSortKey)
                       }
@@ -170,7 +169,7 @@ export const DataTable = <T extends { id: number }>({
                 })}
 
                 {actions && (
-                  <TableHead className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50">
+                  <TableHead className="text-right px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 b-2 border-gray-200 font-sans">
                     Ações
                   </TableHead>
                 )}
@@ -180,15 +179,15 @@ export const DataTable = <T extends { id: number }>({
               {sortedItems.map((item) => (
                 <TableRow
                   key={item.id}
-                  className="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100"
+                  className="hover:bg-gradient-to-r from-blue-50 to-indigo-50 transition-all duration-200 border-b border-gray-200 even:bg-gray-50"
                 >
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
-                      className={`px-4 py-4 text-sm ${
+                      className={`px-6 py-4 text-sm text-center font-medium text-gray-900 ${
                         column.key === "imagem"
-                          ? "text-center p-2"
-                          : "align-top"
+                          ? "p-2"
+                          : ""
                       }`}
                     >
                       {column.render(item)}
@@ -196,8 +195,8 @@ export const DataTable = <T extends { id: number }>({
                   ))}
 
                   {actions && (
-                    <TableCell className="text-right px-4 py-4">
-                      <div className="flex justify-end space-x-2">
+                    <TableCell className="text-right px-6 py-4">
+                      <div className="flex justify-end space-x-3">
                         {actions?.onView && (
                           <Button
                             variant="outline"
@@ -245,3 +244,4 @@ export const DataTable = <T extends { id: number }>({
     </>
   );
 };
+

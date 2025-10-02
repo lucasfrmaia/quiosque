@@ -32,7 +32,7 @@ export const notaFiscalCompraSchema = z.object({
   data: z.string().min(1, 'Data é obrigatória'),
   fornecedorId: z.number(),
   produtos: z.array(z.object({
-    produtoId: z.string(),
+    produtoId: z.number(),
     quantidade: z.number().positive().min(1, 'Quantidade deve ser positiva'),
     unidade: z.string().min(1, 'Unidade é obrigatória'),
     precoUnitario: z.float32().positive().min(0, 'Preço unitário deve ser positivo'),

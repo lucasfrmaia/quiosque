@@ -54,12 +54,8 @@ const NotasVendasPage: FC = () => {
 
   const { data: response, isLoading, error } = getNotasByParams();
 
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(queryParams);
-  const [localSearch, setLocalSearch] = useState(appliedFilters.search || '');
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({ ...queryParams, search: '' });
 
-  useEffect(() => {
-    setLocalSearch(appliedFilters.search || '');
-  }, [appliedFilters.search]);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -96,11 +92,6 @@ const NotasVendasPage: FC = () => {
     },
   });
 
-  const handleSearch = useCallback(() => {
-    const newFilters = { ...appliedFilters, search: localSearch, currentPage: 1 };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  }, [appliedFilters, localSearch, updateUrl]);
 
   const handleApplyFilters = () => {
     const newFilters = {
@@ -114,18 +105,6 @@ const NotasVendasPage: FC = () => {
     setAppliedFilters(newFilters);
     updateUrl(newFilters);
     setIsFilterOpen(false);
-  };
-
-  const handleClearFilters = () => {
-    setFilterValues({
-      dateStart: '',
-      dateEnd: '',
-      totalMin: '0',
-      totalMax: '10000',
-    });
-    const newFilters = { ...appliedFilters, dateStart: '', dateEnd: '', totalMin: '', totalMax: '', currentPage: 1 };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
   };
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
@@ -203,67 +182,30 @@ const NotasVendasPage: FC = () => {
         </Button>
       </div>
 
-      {/* Search Bar */}
-      <div className="mx-auto max-w-4xl mb-6">
-        <div className="relative flex items-center justify-center gap-4">
-          <div className="relative flex-1 max-w-2xl">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Pesquisar notas por ID, total ou data..."
-              value={localSearch}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setLocalSearch(e.target.value);
-              }}
-              className="pl-10 pr-4 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 shadow-sm hover:border-green-300 transition-all duration-200"
-            />
-            {localSearch && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-12 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                onClick={() => {
-                  setLocalSearch('');
-                  const newFilters = { ...appliedFilters, search: '', currentPage: 1 };
-                  setAppliedFilters(newFilters);
-                  updateUrl(newFilters);
-                }}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            )}
-            <Button
-              variant="default"
-              size="sm"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-              onClick={handleSearch}
-            >
-              <Search className="h-4 w-4 mr-1" />
-              Buscar
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setIsFilterOpen(true)}
-            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
-          >
-            <Filter className="h-4 w-4" />
-            Filtros
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleClearFilters}
-            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
-          >
-            Limpar Filtros
-          </Button>
-        </div>
+      {/* Filters Buttons */}
+      <div className="mx-auto max-w-4xl mb-6 flex justify-center gap-4">
+        <Button
+          variant="outline"
+          onClick={() => setIsFilterOpen(true)}
+          className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+        >
+          <Filter className="h-4 w-4" />
+          Filtros
+        </Button>
+        <Button
+          variant="outline"
+          onClick={resetFilters}
+          className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+        >
+          Limpar Filtros
+        </Button>
       </div>
 
       {/* Active Filters */}
       <ActiveFilters
         filters={activeFilters}
         onRemoveFilter={handleRemoveFilter}
-        onClearAll={handleClearFilters}
+        onClearAll={resetFilters}
       />
 
       {/* Filters Dialog */}
@@ -307,7 +249,7 @@ const NotasVendasPage: FC = () => {
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={handleClearFilters}>
+            <Button variant="outline" onClick={resetFilters}>
               Limpar Filtros
             </Button>
             <Button onClick={handleApplyFilters} className="bg-green-500 hover:bg-green-600">

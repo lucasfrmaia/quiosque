@@ -54,7 +54,6 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     if (search) {
       where.nome = {
         contains: search,
-        mode: 'insensitive'
       };
     }
 

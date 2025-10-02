@@ -27,6 +27,7 @@ import { ModalDeleteEstoque } from '../_components/modals/estoque/ModalDeleteEst
 import { useProduto } from '../_components/hooks/useProduto';
 import { Filter, ChevronDown, Package, Plus, Search, X } from 'lucide-react';
 import { EstoqueSchema } from '@/types/validation';
+import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const EstoquePage: FC = () => {
   const {
@@ -165,7 +166,7 @@ const EstoquePage: FC = () => {
     setSelectedItem(null);
   };
 
-  if (isLoading || isLoadingProduto) return <p>Carregando...</p>;
+  if (isLoading || isLoadingProduto) return <TableSkeleton/>;
   if (error || errorProduto) return <p>Erro ao carregar estoque!</p>;
 
   return (

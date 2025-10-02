@@ -77,15 +77,41 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
   }
 
   async findPerPage(filters: FilterValues) {
-    const { currentPage, itemsPerPage, search } = filters;
+    const { currentPage, itemsPerPage, search, dateStart, dateEnd, totalMin, totalMax } = filters;
     const skip = (currentPage - 1) * itemsPerPage;
     const where: any = {};
 
+    // Date range filter
+    const dateFilter: any = {};
+    if (dateStart) {
+      dateFilter.gte = new Date(dateStart);
+    }
+    if (dateEnd) {
+      dateFilter.lte = new Date(dateEnd);
+    }
+    if (Object.keys(dateFilter).length > 0) {
+      where.data = dateFilter;
+    }
+
+    // Total range filter
+    const totalFilter: any = {};
+    if (totalMin) {
+      totalFilter.gte = parseFloat(totalMin);
+    }
+    if (totalMax) {
+      totalFilter.lte = parseFloat(totalMax);
+    }
+    if (Object.keys(totalFilter).length > 0) {
+      where.total = totalFilter;
+    }
+
+    // Search filter
     if (search) {
       where.OR = [
-        { data: { contains: search } },
-        { total: { contains: search  } }
-      ];
+        { id: { equals: parseInt(search) || undefined } },
+        { total: { contains: search } },
+        { produtos: { some: { produto: { nome: { contains: search } } } } }
+      ].filter(Boolean);
     }
 
     const notas = await this.prisma.notaFiscalVenda.findMany({
@@ -101,7 +127,7 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
       }
     });
 
-    const total = await this.prisma.notaFiscalVenda.count();
+    const total = await this.prisma.notaFiscalVenda.count({ where });
 
     return { notas, total };
   }

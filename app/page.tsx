@@ -21,6 +21,7 @@ import {
   useComprasPorFornecedor,
 } from "@/app/_components/hooks/useRelatorio";
 import { FilterValues } from "@/types/interfaces/entities";
+import DashboardSkeleton from "./_components/skeletons/DashboardSkeleton";
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -156,9 +157,7 @@ const Dashboard: FC = () => {
 
   if (basicLoading) {
     return (
-      <div className="p-8 flex justify-center items-center min-h-[400px]">
-        Carregando dashboard...
-      </div>
+      <DashboardSkeleton/>
     );
   }
 

@@ -21,6 +21,7 @@ import { ModalCreateCategory } from '../_components/modals/category/ModalCreateC
 import { ModalUpdateCategory } from '../_components/modals/category/ModalEditCategory';
 import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteCategory';
 import { CategorySchema } from '@/types/validation';
+import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const CategoriaPage: FC = () => {
 
@@ -93,7 +94,7 @@ const CategoriaPage: FC = () => {
   };
 
   if (isLoading)
-    return <>Carregando...</>
+    return <TableSkeleton/>
 
   return (
     <div className="container mx-auto py-6 space-y-6">

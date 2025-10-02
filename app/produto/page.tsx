@@ -34,6 +34,7 @@ import { ModalCreateProduct } from '../_components/modals/product/ModalCreatePro
 import { ModalUpdateProduct } from '../_components/modals/product/ModalUpadteProduct';
 import { ModalDeleteProduct } from '../_components/modals/product/ModalDeleteProduct';
 import { ProdutoSchema } from '@/types/validation';
+import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const ProdutoPage: FC = () => {
 
@@ -150,7 +151,7 @@ const ProdutoPage: FC = () => {
     updateUrl(newFilters);
   };
 
-  if (isLoading || isLoadingCategories) return <p>Carregando...</p>;
+  if (isLoading || isLoadingCategories) return <TableSkeleton/>;
   if (error || erroCategories) return <p>Error!</p>;
 
   return (

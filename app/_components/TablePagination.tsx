@@ -101,15 +101,15 @@ export const TablePagination = <T,>({
       {/* Mobile Cards View */}
       <div className="block md:hidden space-y-4">
         {paginatedItems.map((item) => (
-          <Card key={(item as any).id || Math.random()} className="shadow-sm border-gray-200">
-            <CardContent className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <Card key={(item as any).id || Math.random()} className="shadow-md border border-gray-200 rounded-xl">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
                 {columns.map((column) => (
-                  <div key={column.key} className="space-y-1">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <div key={column.key} className="space-y-2">
+                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide bg-gray-100 px-2 py-1 rounded-full inline-block">
                       {column.header}
                     </span>
-                    <div className="text-sm">{column.render(item)}</div>
+                    <div className="text-base font-medium text-gray-900">{column.render(item)}</div>
                   </div>
                 ))}
               </div>
@@ -120,7 +120,7 @@ export const TablePagination = <T,>({
 
       {/* Desktop Table View */}
       <div className="hidden md:block">
-        <div className="rounded-md border overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-gray-200 overflow-hidden shadow-lg bg-white">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
@@ -133,14 +133,14 @@ export const TablePagination = <T,>({
                         column.sortable
                           ? "cursor-pointer select-none hover:bg-gray-100"
                           : ""
-                      } px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24 ${
+                      } px-6 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200 w-24 ${
                         column.key === "imagem" ? "w-20" : ""
-                      }`}
+                      } font-sans`}
                       onClick={() =>
                         column.sortable && handleSort(columnSortKey)
                       }
                     >
-                      <div className="flex items-center space-x-1">
+                      <div className="flex space-x-1">
                         <span>{column.header}</span>
                         {column.sortable && sortField === columnSortKey && (
                           <SortIcon
@@ -159,15 +159,15 @@ export const TablePagination = <T,>({
               {paginatedItems.map((item, index) => (
                 <TableRow
                   key={(item as any).id || index}
-                  className="hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100"
+                  className="hover:bg-gradient-to-r from-blue-50 to-indigo-50 transition-all duration-200 border-b border-gray-200 even:bg-gray-50"
                 >
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
-                      className={`px-4 py-4 text-sm ${
+                      className={`px-6 py-4 text-sm font-medium text-gray-900 ${
                         column.key === "imagem"
-                          ? "text-center p-2"
-                          : "align-top"
+                          ? "p-2"
+                          : ""
                       }`}
                     >
                       {column.render(item)}

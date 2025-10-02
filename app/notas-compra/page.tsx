@@ -29,6 +29,7 @@ import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/Modal
 import { FileText, Plus, Search, X, Filter, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { NotaFiscalCompraSchema } from '@/types/validation';
+import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const NotasCompraPage: FC = () => {
   /** Extrai filtros da URL */
@@ -38,15 +39,7 @@ const NotasCompraPage: FC = () => {
   const { getAllFornecedores } = useFornecedor();
   const { data: responsefornecedores, isLoading: isLoadingFornecedor, error: errorFornecedor } = getAllFornecedores()
 
-  /** Estados de filtros aplicados e pendentes */
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>(queryParams);
-  const [localSearch, setLocalSearch] = useState(appliedFilters.search || '');
-
-  useEffect(() => {
-    setLocalSearch(appliedFilters.search || '');
-  }, [appliedFilters.search]);
-
-
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({ ...queryParams, search: '' });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -57,7 +50,7 @@ const NotasCompraPage: FC = () => {
     dateStart: '',
     dateEnd: '',
     totalMin: '0',
-    totalMax: '10000',
+    totalMax: '0',
     fornecedorId: '',
   });
 
@@ -71,7 +64,6 @@ const NotasCompraPage: FC = () => {
     });
   }, [appliedFilters.dateStart, appliedFilters.dateEnd, appliedFilters.totalMin, appliedFilters.totalMax, appliedFilters.fornecedorId]);
 
-  /** Forms */
   const createForm = useForm<NotaFiscalCompraSchema>({
     defaultValues: {
       data: new Date().toISOString().split('T')[0],
@@ -88,11 +80,6 @@ const NotasCompraPage: FC = () => {
     },
   });
 
-  const handleSearch = useCallback(() => {
-    const newFilters = { ...appliedFilters, search: localSearch, currentPage: 1 };
-    setAppliedFilters(newFilters);
-    updateUrl(newFilters);
-  }, [appliedFilters, localSearch, updateUrl]);
 
   const handleApplyFilters = () => {
     const newFilters = {
@@ -117,7 +104,7 @@ const NotasCompraPage: FC = () => {
       totalMax: '10000',
       fornecedorId: '',
     });
-    const newFilters = { ...appliedFilters, dateStart: '', dateEnd: '', totalMin: '', totalMax: '', fornecedorId: '', currentPage: 1 };
+    const newFilters = { ...appliedFilters, dateStart: '', dateEnd: '', totalMin: '', totalMax: '', fornecedorId: '', search: '', currentPage: 1 };
     setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
@@ -170,12 +157,7 @@ const NotasCompraPage: FC = () => {
     setSelectedNota(nota);
     editForm.setValue('data', nota.data.toLocaleString());
     editForm.setValue('fornecedorId', nota.fornecedorId);
-    editForm.setValue('produtos', nota.produtos?.map(p => ({
-      produtoId: p.produtoId.toString(),
-      quantidade: p.quantidade.toString(),
-      unidade: p.unidade,
-      precoUnitario: p.precoUnitario.toString(),
-    })) || []);
+    editForm.setValue('produtos', nota.produtos || []);
     setIsEditModalOpen(true);
   };
 
@@ -192,7 +174,7 @@ const NotasCompraPage: FC = () => {
   };
 
  if (isLoading || isLoadingFornecedor) {
-    return <>Carregando...</>
+    return <TableSkeleton/>
  }
 
  if (error || errorFornecedor) {
@@ -218,58 +200,23 @@ const NotasCompraPage: FC = () => {
         </Button>
       </div>
 
-      {/* Filtros */}
-      <div className="mx-auto max-w-4xl mb-6">
-        <div className="relative flex items-center justify-center gap-4">
-          <div className="relative flex-1 max-w-2xl">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Pesquisar notas por ID, fornecedor ou data..."
-              value={localSearch}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalSearch(e.target.value)}
-              className="pl-10 pr-4 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 shadow-sm hover:border-green-300 transition-all duration-200"
-            />
-            {localSearch && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-12 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                onClick={() => {
-                  setLocalSearch('');
-                  const newFilters = { ...appliedFilters, search: '', currentPage: 1 };
-                  setAppliedFilters(newFilters);
-                  updateUrl(newFilters);
-                }}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            )}
-            <Button
-              variant="default"
-              size="sm"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
-              onClick={handleSearch}
-            >
-              <Search className="h-4 w-4 mr-1" />
-              Buscar
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setIsFilterOpen(true)}
-            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
-          >
-            <Filter className="h-4 w-4" />
-            Filtros
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleClearFilters}
-            className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
-          >
-            Limpar Filtros
-          </Button>
-        </div>
+      {/* Filters Buttons */}
+      <div className="mx-auto max-w-4xl mb-6 flex justify-center gap-4">
+        <Button
+          variant="outline"
+          onClick={() => setIsFilterOpen(true)}
+          className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+        >
+          <Filter className="h-4 w-4" />
+          Filtros
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleClearFilters}
+          className="rounded-xl border-2 border-green-300 hover:bg-green-50 hover:border-green-500 flex items-center gap-1 shadow-sm hover:shadow-md transition-all duration-200"
+        >
+          Limpar Filtros
+        </Button>
       </div>
 
       {/* Filtros ativos */}
