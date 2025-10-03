@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface Option {
-  id: number | string;
+  id: string;
   name: string;
   [key: string]: any;
 }
@@ -29,11 +29,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   options,
   value,
   onChange,
-  placeholder = 'Selecione uma opção...',
+  placeholder = "Selecione uma opção...",
   className,
-  searchPlaceholder = 'Buscar...',
+  searchPlaceholder = "Buscar...",
 }) => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
 
   const filteredOptions = options.filter((option) =>
@@ -43,11 +43,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const selectedValue = value ? value.name : placeholder;
 
   return (
-    <div className={cn('relative', className)}>
-      <Select open={open} onOpenChange={setOpen} value={value?.id?.toString() || ''} onValueChange={(id) => {
-        const option = options.find(opt => opt.id.toString() === id);
-        onChange(option || null);
-      }}>
+    <div className={cn("relative", className)}>
+      <Select
+        open={open}
+        onOpenChange={setOpen}
+        value={value?.id?.toString() || ""}
+        onValueChange={(id) => {
+          const option = options.find((opt) => opt.id.toString() === id);
+          onChange(option || null);
+        }}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder={selectedValue} />
           <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
@@ -69,7 +74,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               </SelectItem>
             ))
           ) : (
-            <SelectItem value="Null" disabled>Nenhuma opção encontrada.</SelectItem>
+            <SelectItem value="Null" disabled>
+              Nenhuma opção encontrada.
+            </SelectItem>
           )}
         </SelectContent>
       </Select>

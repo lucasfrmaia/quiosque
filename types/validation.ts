@@ -29,24 +29,24 @@ export const produtoEstoqueSchema = z.object({
 });
 
 export const notaFiscalCompraSchema = z.object({
-  data: z.date({ error: "Escolha uma Data!" }),
-  fornecedorId: z.string(),
+  data: z.coerce.date({ error: "Escolha uma Data!" }),
+  fornecedorId: z.coerce.number({ error: 'Selecione um Fornecedor!' }),
   produtos: z.array(z.object({
-    produtoId: z.string(),
-    quantidade: z.number().positive().min(1, 'Quantidade deve ser positiva'),
+    produtoId: z.coerce.number(),
+    quantidade: z.coerce.number().positive().min(1, 'Quantidade deve ser positiva'),
     unidade: z.string().min(1, 'Unidade é obrigatória'),
-    precoUnitario: z.float32().positive().min(0, 'Preço unitário deve ser positivo'),
+    precoUnitario: z.coerce.number().positive().min(0, 'Preço unitário deve ser positivo'),
   })).min(1, 'Pelo menos um produto é obrigatório'),
 });
 
 export const notaFiscalVendaSchema = z.object({
-  data: z.date({ error: "Escolha uma Data!" }),
+  data: z.coerce.date({ error: "Escolha uma Data!" }),
   total: z.number().min(0, 'Total deve ser positivo'),
   produtos: z.array(z.object({
-    produtoId: z.string(),
-    quantidade: z.number().min(1, 'Quantidade deve ser positiva'),
+    produtoId: z.coerce.number(),
+    quantidade: z.coerce.number().min(1, 'Quantidade deve ser positiva'),
     unidade: z.string().min(1, 'Unidade é obrigatória'),
-    precoUnitario: z.number().min(0, 'Preço unitário deve ser positivo'),
+    precoUnitario: z.coerce.number().min(0, 'Preço unitário deve ser positivo'),
   })).min(1, 'Pelo menos um produto é obrigatório'),
 });
 

@@ -1,18 +1,22 @@
-import { FC, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useFormContext } from 'react-hook-form';
-import { useFieldArray } from 'react-hook-form';
-import { useQuery } from '@tanstack/react-query';
-import { X } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SearchableSelect, Option } from '../common/SearchableSelect';
-import { NotaFiscalVenda, ProdutoVenda, ProdutoEstoque } from '@/types/interfaces/entities';
-import { z } from 'zod';
-import { notaFiscalVendaSchema } from '@/types/validation';
-import { Package } from 'lucide-react';
+import { FC, useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useFormContext } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SearchableSelect, Option } from "../common/SearchableSelect";
+import {
+  NotaFiscalVenda,
+  ProdutoVenda,
+  ProdutoEstoque,
+} from "@/types/interfaces/entities";
+import { z } from "zod";
+import { notaFiscalVendaSchema } from "@/types/validation";
+import { Package } from "lucide-react";
 
 type NotaFiscalVendaFormData = z.infer<typeof notaFiscalVendaSchema>;
 
@@ -20,59 +24,75 @@ interface NotaFiscalVendaFormProps {
   editing?: boolean;
 }
 
-export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = false }) => {
-  const { register, watch, setValue, formState: { errors } } = useFormContext<NotaFiscalVendaFormData>();
-  const produtos = watch('produtos') || [];
+export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
+  editing = false,
+}) => {
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext<NotaFiscalVendaFormData>();
+  const produtos = watch("produtos") || [];
   const { fields, append, remove } = useFieldArray({
     control: useFormContext().control,
-    name: "produtos"
+    name: "produtos",
   });
 
-  const [selectedEstoque, setSelectedEstoque] = useState<Option | null>(null);
+  const [selectedEstoque, setSelectedEstoque] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [pendingQuantity, setPendingQuantity] = useState(1);
 
   useEffect(() => {
-    const today = new Date()
+    const today = new Date();
 
-    if (!watch('data')) {
-      setValue('data', today);
+    if (!watch("data")) {
+      setValue("data", today);
     }
-    
   }, [setValue, watch]);
 
-  const { data: allEstoque, isLoading, error } = useQuery<ProdutoEstoque[]>({
-    queryKey: ['all-estoque-venda'],
+  const {
+    data: allEstoque,
+    isLoading,
+    error,
+  } = useQuery<ProdutoEstoque[]>({
+    queryKey: ["all-estoque-venda"],
     queryFn: async () => {
-      const response = await fetch('/api/estoque/findAll');
+      const response = await fetch("/api/estoque/findAll");
       if (!response.ok) {
-        throw new Error('Failed to fetch estoque');
+        throw new Error("Failed to fetch estoque");
       }
       const result = await response.json();
       return result;
     },
   });
 
-  if (isLoading)
-    return <>Carregando...</>
- 
-  if (error)
-    return <>Error!</>
- 
-  const estoqueOptions: Option[] = allEstoque?.map(estoque => ({
-    name: `${estoque.produto?.nome || 'Sem nome'} (Estoque: ${estoque.quantidade})`,
-    ...estoque
-  })) || [];
+  if (isLoading) return <>Carregando...</>;
+
+  if (error) return <>Error!</>;
+
+  const estoqueOptions =
+    allEstoque?.map((estoque) => ({
+      id: String(estoque.id),
+      name: `${estoque.produto?.nome || "Sem nome"} (Estoque: ${
+        estoque.quantidade
+      })`,
+    })) || [];
 
   const handleAddProduto = () => {
     if (!selectedEstoque || pendingQuantity < 1) return;
 
-    const estoque = allEstoque?.find(e => e.id === selectedEstoque.id);
+    const estoque = allEstoque?.find(
+      (e) => String(e.id) === selectedEstoque.id
+    );
     if (!estoque || !estoque.produto) return;
 
     append({
-      produtoId: estoque.produto.id,
+      produtoId: estoque!.produto!.id,
       quantidade: pendingQuantity,
-      unidade: estoque.unidade || 'Unidade',
+      unidade: estoque.unidade || "Unidade",
       precoUnitario: estoque.preco || 0,
     });
 
@@ -81,7 +101,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
   };
 
   const total = produtos.reduce((sum, produto) => {
-    return sum + (produto.precoUnitario * produto.quantidade);
+    return sum + produto.precoUnitario * produto.quantidade;
   }, 0);
 
   return (
@@ -102,9 +122,13 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
                 <Input
                   id="data"
                   type="date"
-                  {...register('data')}
-                  className={errors.data ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}
-                  defaultValue={new Date().toISOString().split('T')[0]}
+                  {...register("data")}
+                  className={
+                    errors.data
+                      ? "h-10 border-red-500 focus:border-red-500"
+                      : "h-10"
+                  }
+                  defaultValue={new Date().toISOString().split("T")[0]}
                 />
                 {errors.data && (
                   <p className="text-sm text-red-500">{errors.data.message}</p>
@@ -115,7 +139,9 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
             <div className="space-y-2">
               <Label>Total Estimado</Label>
               <div className="h-10 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-center">
-                <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
+                <span className="text-lg font-bold text-green-600">
+                  R$ {total.toFixed(2)}
+                </span>
               </div>
             </div>
           </div>
@@ -137,7 +163,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
               <SearchableSelect
                 options={estoqueOptions}
                 value={selectedEstoque}
-                onChange={setSelectedEstoque}
+                onChange={(option) => setSelectedEstoque(option)}
                 placeholder="Buscar produto no estoque..."
                 className="h-10"
               />
@@ -148,7 +174,9 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
               <Input
                 type="number"
                 value={pendingQuantity}
-                onChange={(e) => setPendingQuantity(parseInt(e.target.value) || 1)}
+                onChange={(e) =>
+                  setPendingQuantity(parseInt(e.target.value) || 1)
+                }
                 placeholder="1"
                 className="h-10"
                 min="1"
@@ -181,19 +209,29 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
               {fields.map((field, index) => {
                 const produtoVenda = produtos[index];
                 if (!produtoVenda) return null;
-                const estoqueItem = allEstoque?.find((e) => e.produtoId === produtoVenda.produtoId);
+                const estoqueItem = allEstoque?.find(
+                  (e) => e.produto!.id === produtoVenda.produtoId
+                );
                 const produto = estoqueItem?.produto;
                 if (!estoqueItem || !produto) return null;
 
-                const subtotal = produtoVenda.precoUnitario * produtoVenda.quantidade;
+                const subtotal =
+                  produtoVenda.precoUnitario * produtoVenda.quantidade;
 
                 return (
-                  <div key={field.id} className="flex items-center justify-between p-2">
+                  <div
+                    key={field.id}
+                    className="flex items-center justify-between p-2"
+                  >
                     <Badge variant="secondary" className="mr-2">
-                      {produto.nome} • Qtd: {produtoVenda.quantidade} {produtoVenda.unidade} • R$ {produtoVenda.precoUnitario.toFixed(2)}
+                      {produto.nome} • Qtd: {produtoVenda.quantidade}{" "}
+                      {produtoVenda.unidade} • R${" "}
+                      {produtoVenda.precoUnitario.toFixed(2)}
                     </Badge>
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-sm font-semibold text-green-600 whitespace-nowrap">R$ {subtotal.toFixed(2)}</span>
+                      <span className="text-sm font-semibold text-green-600 whitespace-nowrap">
+                        R$ {subtotal.toFixed(2)}
+                      </span>
                       <Button
                         type="button"
                         variant="ghost"

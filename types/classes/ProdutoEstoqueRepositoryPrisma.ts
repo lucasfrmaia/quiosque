@@ -10,13 +10,15 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
   }
 
   async create(produtoEstoque: Omit<ProdutoEstoque, 'id' | 'produto'>): Promise<ProdutoEstoque> {
-    const data = {
-      ...produtoEstoque,
-      dataValidade: produtoEstoque.dataValidade ? new Date(produtoEstoque.dataValidade) : null
-    };
-
+    
     const createdProdutoEstoque = await this.prisma.produtoEstoque.create({
-      data,
+      data: {
+        quantidade: produtoEstoque.quantidade,
+        preco: produtoEstoque.preco,
+        unidade: produtoEstoque.unidade,
+        dataValidade: produtoEstoque.dataValidade,
+        produtoId: Number(produtoEstoque.produtoId)
+      },
       include: {
         produto: true
       }

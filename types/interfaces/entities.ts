@@ -28,7 +28,7 @@ export interface Produto {
   imagemUrl?: string | null;
   ativo: boolean;
   tipo: TipoProduto;
-  categoriaId?: string | null;
+  categoriaId?: number | null;
   categoria?: Category | null;
   estoques?: ProdutoEstoque[];
   compras?: ProdutoCompra[];
@@ -39,9 +39,9 @@ export interface ProdutoEstoque {
   id: number;
   preco: number;
   quantidade: number;
-  dataValidade: Date | undefined;
+  dataValidade: Date | null;
   unidade: string;
-  produtoId: string;
+  produtoId: number;
   produto?: Produto;
 }
 
@@ -49,7 +49,7 @@ export interface NotaFiscalCompra {
   id: number;
   data: Date;
   total: number;
-  fornecedorId: string;
+  fornecedorId: number;
   fornecedor?: Fornecedor;
   produtos?: ProdutoCompra[];
 }
@@ -57,7 +57,7 @@ export interface NotaFiscalCompra {
 export interface ProdutoCompra {
   id: number;
   notaFiscalId: number;
-  produtoId: string;
+  produtoId: number;
   quantidade: number;
   unidade: string;
   precoUnitario: number;
@@ -75,7 +75,7 @@ export interface NotaFiscalVenda {
 export interface ProdutoVenda {
   id: number;
   notaFiscalId: number;
-  produtoId: string;
+  produtoId: number;
   quantidade: number;
   unidade: string;
   precoUnitario: number;
@@ -98,5 +98,5 @@ export interface FilterValues {
   dateEnd?: string;
   totalMin?: string;
   totalMax?: string;
-  fornecedorId?: string;
+  fornecedorId?: number | string;
 }
