@@ -11,7 +11,10 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
 
   async create(produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>): Promise<Produto> {
     const createdProduto = await this.prisma.produto.create({
-      data: produto,
+      data: {
+         ...produto,
+         categoriaId: Number(produto.categoriaId)
+      },
       include: {
         categoria: true,
         estoques: true
@@ -82,7 +85,10 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
   async update(id: number, produto: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>): Promise<Produto> {
     const updatedProduto = await this.prisma.produto.update({
       where: { id },
-      data: produto,
+      data: {
+        ...produto,
+        categoriaId: Number(produto.categoriaId)
+      },
       include: {
         categoria: true,
         estoques: true,

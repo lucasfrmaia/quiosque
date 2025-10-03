@@ -85,7 +85,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             control={control}
             name="categoriaId"
             render={({ field }) => (
-              <Select value={field.value ? String(field.value) : ''} onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}>
+              <Select value={field.value || ''} onValueChange={field.onChange}>
                 <SelectTrigger id="categoriaId" className={errors.categoriaId ? 'border-red-500 focus:border-red-500' : ''}>
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>

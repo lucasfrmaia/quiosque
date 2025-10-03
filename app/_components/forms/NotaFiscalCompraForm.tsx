@@ -95,7 +95,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 <Input
                   id="data"
                   type="date"
-                  {...register("data")}
+                  {...register("data", { valueAsDate: true })}
                   className={
                     errors.data
                       ? "h-10 border-red-500 focus:border-red-500"
