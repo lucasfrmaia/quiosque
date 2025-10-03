@@ -32,10 +32,12 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
   const [pendingQuantity, setPendingQuantity] = useState(1);
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date()
+
     if (!watch('data')) {
       setValue('data', today);
     }
+    
   }, [setValue, watch]);
 
   const { data: allEstoque, isLoading, error } = useQuery<ProdutoEstoque[]>({
@@ -179,7 +181,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
               {fields.map((field, index) => {
                 const produtoVenda = produtos[index];
                 if (!produtoVenda) return null;
-                const estoqueItem = allEstoque?.find((e) => e.produto?.id === produtoVenda.produtoId);
+                const estoqueItem = allEstoque?.find((e) => e.produtoId === produtoVenda.produtoId);
                 const produto = estoqueItem?.produto;
                 if (!estoqueItem || !produto) return null;
 

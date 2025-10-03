@@ -5,8 +5,8 @@ export const produtoSchema = z.object({
   descricao: z.string().optional(),
   imagemUrl: z.string().optional(),
   ativo: z.boolean(),
-  tipo: z.enum(['INSUMO', 'CARDAPIO']),
-  categoriaId: z.number().optional(),
+  tipo: z.enum(['INSUMO', 'CARDAPIO'], { error: 'Selecione um Tipo!' }),
+  categoriaId: z.string().optional(),
 });
 
 export const categorySchema = z.object({
@@ -17,22 +17,22 @@ export const fornecedorSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
   cnpj: z.string().optional(),
   telefone: z.string().optional(),
-  email: z.email({ error: "E-mail Inválido"}).optional(),
+  email: z.email({ error: "E-mail Inválido"}),
 });
 
 export const produtoEstoqueSchema = z.object({
   preco: z.number().min(0, 'Preço deve ser positivo'),
   quantidade: z.number().min(0, 'Quantidade deve ser positiva'),
-  dataValidade: z.date().optional(),
+  dataValidade: z.date({ error: "Escolha uma Data!" }).optional(),
   unidade: z.string().min(1, 'Unidade é obrigatória'),
-  produtoId: z.number(),
+  produtoId: z.string({ error: 'Escolha um Produto!'}),
 });
 
 export const notaFiscalCompraSchema = z.object({
-  data: z.string().min(1, 'Data é obrigatória'),
-  fornecedorId: z.number(),
+  data: z.date({ error: "Escolha uma Data!" }),
+  fornecedorId: z.string(),
   produtos: z.array(z.object({
-    produtoId: z.number(),
+    produtoId: z.string(),
     quantidade: z.number().positive().min(1, 'Quantidade deve ser positiva'),
     unidade: z.string().min(1, 'Unidade é obrigatória'),
     precoUnitario: z.float32().positive().min(0, 'Preço unitário deve ser positivo'),
@@ -40,10 +40,10 @@ export const notaFiscalCompraSchema = z.object({
 });
 
 export const notaFiscalVendaSchema = z.object({
-  data: z.string().min(1, 'Data é obrigatória'),
+  data: z.date({ error: "Escolha uma Data!" }),
   total: z.number().min(0, 'Total deve ser positivo'),
   produtos: z.array(z.object({
-    produtoId: z.number(),
+    produtoId: z.string(),
     quantidade: z.number().min(1, 'Quantidade deve ser positiva'),
     unidade: z.string().min(1, 'Unidade é obrigatória'),
     precoUnitario: z.number().min(0, 'Preço unitário deve ser positivo'),

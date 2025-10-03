@@ -33,7 +33,8 @@ import { Box, Filter, Plus, Search, X } from 'lucide-react';
 import { ModalCreateProduct } from '../_components/modals/product/ModalCreateProdutct';
 import { ModalUpdateProduct } from '../_components/modals/product/ModalUpadteProduct';
 import { ModalDeleteProduct } from '../_components/modals/product/ModalDeleteProduct';
-import { ProdutoSchema } from '@/types/validation';
+import { ProdutoSchema, produtoSchema } from '@/types/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const ProdutoPage: FC = () => {
@@ -74,12 +75,26 @@ const ProdutoPage: FC = () => {
   }, [appliedFilters.search]);
 
   const { data: categories, isLoading: isLoadingCategories, error: erroCategories } = getAllCategories()
+  
   const createForm = useForm<ProdutoSchema>({
-    defaultValues: { nome: '', categoriaId: -1, ativo: true, tipo: 'INSUMO', descricao: '', imagemUrl: '' }
+    resolver: zodResolver(produtoSchema),
+    defaultValues: {
+      nome: '',
+      descricao: '',
+      imagemUrl: '',
+      ativo: false,
+      categoriaId: undefined,
+    },
   });
-
   const editForm = useForm<ProdutoSchema>({
-    defaultValues: { nome: '', categoriaId: -1, ativo: true, tipo: 'INSUMO', descricao: '', imagemUrl: '' }
+    resolver: zodResolver(produtoSchema),
+    defaultValues: {
+      nome: '',
+      descricao: '',
+      imagemUrl: '',
+      ativo: false,
+      categoriaId: undefined,
+    },
   });
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
@@ -87,9 +102,9 @@ const ProdutoPage: FC = () => {
       nome: data.nome,
       descricao: data.descricao || null,
       imagemUrl: data.imagemUrl || null,
-      ativo: data.ativo === true,
+      ativo: data.ativo,
       tipo: data.tipo,
-      categoriaId: Number(data.categoriaId),
+      categoriaId: data.categoriaId,
     });
     setIsCreateModalOpen(false);
     createForm.reset();
@@ -101,9 +116,9 @@ const ProdutoPage: FC = () => {
       nome: data.nome,
       descricao: data.descricao || null,
       imagemUrl: data.imagemUrl || null,
-      ativo: data.ativo === true,
+      ativo: data.ativo,
       tipo: data.tipo,
-      categoriaId: Number(data.categoriaId),
+      categoriaId: data.categoriaId,
     });
     setIsEditModalOpen(false);
     setSelectedProduto(null);
@@ -113,7 +128,7 @@ const ProdutoPage: FC = () => {
   const openEditModal = (produto: Produto) => {
     setSelectedProduto(produto);
     editForm.setValue('nome', produto.nome);
-    editForm.setValue('categoriaId', produto.categoriaId || -1);
+    editForm.setValue('categoriaId', produto.categoriaId ?? undefined);
     editForm.setValue('ativo', produto.ativo);
     editForm.setValue('tipo', produto.tipo);
     editForm.setValue('descricao', produto.descricao || '');
@@ -296,7 +311,7 @@ const ProdutoPage: FC = () => {
         createForm={createForm}
         categories={categories || []}
         setIsCreateModalOpen={setIsCreateModalOpen}
-        handleSubmitCreate={handleSubmitCreate}
+        onSubmit={handleSubmitCreate}
       />
 
       <ModalUpdateProduct
@@ -304,7 +319,7 @@ const ProdutoPage: FC = () => {
         editForm={editForm}
         categories={categories || []}
         setIsEditModalOpen={setIsEditModalOpen}
-        handleSubmitEdit={handleSubmitEdit}
+        onSubmit={handleSubmitEdit}
       />
 
       {/* Delete Dialog */}

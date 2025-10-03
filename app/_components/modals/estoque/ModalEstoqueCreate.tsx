@@ -30,7 +30,7 @@ export function ModalEstoqueCreate({
     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <FormProvider {...createForm}>
-          <form onSubmit={createForm.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form onSubmit={onSubmit} className="space-y-4 py-4">
             <DialogHeader>
               <DialogTitle>Novo Item de Estoque</DialogTitle>
               <DialogDescription>

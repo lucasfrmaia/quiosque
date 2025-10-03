@@ -13,9 +13,7 @@ import {
 import { Produto } from '@/types/interfaces/entities';
 import { Category } from '@/types/interfaces/entities';
 import { z } from 'zod';
-import { produtoSchema } from '@/types/validation';
-
-type ProdutoFormData = z.infer<typeof produtoSchema>;
+import { ProdutoSchema } from '@/types/validation';
 
 interface ProdutoFormProps {
   categories: Category[];
@@ -23,7 +21,7 @@ interface ProdutoFormProps {
 }
 
 export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false }) => {
-  const { control, register, formState: { errors } } = useFormContext<ProdutoFormData>();
+  const { control, register, formState: { errors } } = useFormContext<ProdutoSchema>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -87,7 +85,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             control={control}
             name="categoriaId"
             render={({ field }) => (
-              <Select value={String(field.value || '')} onValueChange={field.onChange}>
+              <Select value={field.value ? String(field.value) : ''} onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}>
                 <SelectTrigger id="categoriaId" className={errors.categoriaId ? 'border-red-500 focus:border-red-500' : ''}>
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>

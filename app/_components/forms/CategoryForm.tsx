@@ -3,12 +3,10 @@ import { useFormContext } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { z } from 'zod';
-import { categorySchema } from '@/types/validation';
-
-type CategoryFormData = z.infer<typeof categorySchema>;
+import { CategorySchema } from '@/types/validation';
 
 export const CategoryForm: FC = () => {
-  const { register, formState: { errors } } = useFormContext<CategoryFormData>();
+  const { register, formState: { errors } } = useFormContext<CategorySchema>();
 
   return (
     <div className="grid gap-4 py-4">

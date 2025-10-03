@@ -1,27 +1,28 @@
-import { FC } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { FC } from "react";
+import { useFormContext } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Produto } from '@/types/interfaces/entities';
-import { z } from 'zod';
-import { produtoEstoqueSchema } from '@/types/validation';
-
-type EstoqueFormData = z.infer<typeof produtoEstoqueSchema>;
+} from "@/components/ui/select";
+import { Produto } from "@/types/interfaces/entities";
+import { EstoqueSchema } from "@/types/validation";
 
 interface EstoqueFormProps {
   produtos: Produto[];
 }
 
 export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
-  const { control, register, formState: { errors } } = useFormContext<EstoqueFormData>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<EstoqueSchema>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -34,8 +35,18 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
             control={control}
             name="produtoId"
             render={({ field }) => (
-              <Select value={String(field.value)} onValueChange={field.onChange}>
-                <SelectTrigger id="produtoId" className={errors.produtoId ? 'border-red-500 focus:border-red-500' : ''}>
+              <Select
+                value={String(field.value)}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger
+                  id="produtoId"
+                  className={
+                    errors.produtoId
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
+                >
                   <SelectValue placeholder="Selecione um produto" />
                 </SelectTrigger>
                 <SelectContent>
@@ -62,10 +73,12 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           <Input
             id="preco"
             type="number"
-            {...register('preco')}
-            className={errors.preco ? 'border-red-500 focus:border-red-500' : ''}
+            step={1}
+            {...register("preco", { valueAsNumber: true })}
+            className={
+              errors.preco ? "border-red-500 focus:border-red-500" : ""
+            }
             placeholder="Preço unitário"
-            step="0.01"
           />
           {errors.preco && (
             <p className="text-sm text-red-500">{errors.preco.message}</p>
@@ -81,8 +94,11 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           <Input
             id="quantidade"
             type="number"
-            {...register('quantidade')}
-            className={errors.quantidade ? 'border-red-500 focus:border-red-500' : ''}
+            step={1}
+            {...register("quantidade", { valueAsNumber: true })}
+            className={
+              errors.quantidade ? "border-red-500 focus:border-red-500" : ""
+            }
             placeholder="Quantidade em estoque"
           />
           {errors.quantidade && (
@@ -99,11 +115,15 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           <Input
             id="dataValidade"
             type="date"
-            {...register('dataValidade')}
-            className={errors.dataValidade ? 'border-red-500 focus:border-red-500' : ''}
+            {...register("dataValidade", { valueAsDate: true })}
+            className={
+              errors.dataValidade ? "border-red-500 focus:border-red-500" : ""
+            }
           />
           {errors.dataValidade && (
-            <p className="text-sm text-red-500">{errors.dataValidade.message}</p>
+            <p className="text-sm text-red-500">
+              {errors.dataValidade.message}
+            </p>
           )}
         </div>
       </div>
@@ -116,8 +136,10 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           <Input
             id="unidade"
             type="text"
-            {...register('unidade')}
-            className={errors.unidade ? 'border-red-500 focus:border-red-500' : ''}
+            {...register("unidade")}
+            className={
+              errors.unidade ? "border-red-500 focus:border-red-500" : ""
+            }
             placeholder="Unidade (ex: Unidade, Kg)"
           />
           {errors.unidade && (
@@ -125,7 +147,6 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           )}
         </div>
       </div>
-
     </div>
   );
 };

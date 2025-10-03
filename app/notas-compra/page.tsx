@@ -28,7 +28,8 @@ import { ModalEditNotaCompra } from '../_components/modals/notas-compras/ModalEd
 import { ModalDeleteNotaCompra } from '../_components/modals/notas-compras/ModalDeleteNotaCompra';
 import { FileText, Plus, Search, X, Filter, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { NotaFiscalCompraSchema } from '@/types/validation';
+import { NotaFiscalCompraSchema, notaFiscalCompraSchema } from '@/types/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const NotasCompraPage: FC = () => {
@@ -65,20 +66,24 @@ const NotasCompraPage: FC = () => {
   }, [appliedFilters.dateStart, appliedFilters.dateEnd, appliedFilters.totalMin, appliedFilters.totalMax, appliedFilters.fornecedorId]);
 
   const createForm = useForm<NotaFiscalCompraSchema>({
+    resolver: zodResolver(notaFiscalCompraSchema),
     defaultValues: {
-      data: new Date().toISOString().split('T')[0],
-      fornecedorId: -1,
+      data: new Date(),
+      fornecedorId: undefined,
       produtos: [],
     },
   });
 
   const editForm = useForm<NotaFiscalCompraSchema>({
+    resolver: zodResolver(notaFiscalCompraSchema),
     defaultValues: {
-      data: new Date().toISOString().split('T')[0],
-      fornecedorId: -1,
+      data: new Date(),
+      fornecedorId: undefined,
       produtos: [],
-    },
+    }, 
   });
+
+  console.log(createForm?.formState.errors)
 
 
   const handleApplyFilters = () => {
@@ -127,14 +132,13 @@ const NotasCompraPage: FC = () => {
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
       data: new Date(data.data),
-      fornecedorId: Number(data.fornecedorId),
-      total: data.produtos.reduce((acc, value) => acc + Number(value.precoUnitario), 0),
+      fornecedorId: data.fornecedorId,
+      total: data.produtos.reduce((acc, value) => acc + value.precoUnitario, 0),
       produtos: data.produtos.map(p => ({
-        notaFiscalId: 0,
-        produtoId: Number(p.produtoId),
-        quantidade: Number(p.quantidade),
+        produtoId: p.produtoId,
+        quantidade: p.quantidade,
         unidade: p.unidade,
-        precoUnitario: Number(p.precoUnitario),
+        precoUnitario: p.precoUnitario,
       })),
     });
     setIsCreateModalOpen(false);
@@ -145,7 +149,7 @@ const NotasCompraPage: FC = () => {
     if (!selectedNota) return;
     handleEdit(selectedNota.id, {
       data: new Date(data.data),
-      fornecedorId: Number(data.fornecedorId),
+      fornecedorId: data.fornecedorId,
     });
 
     setIsEditModalOpen(false);
@@ -155,7 +159,7 @@ const NotasCompraPage: FC = () => {
 
   const openEditModal = (nota: NotaFiscalCompra) => {
     setSelectedNota(nota);
-    editForm.setValue('data', nota.data.toLocaleString());
+    editForm.setValue('data', nota.data);
     editForm.setValue('fornecedorId', nota.fornecedorId);
     editForm.setValue('produtos', nota.produtos || []);
     setIsEditModalOpen(true);
@@ -268,7 +272,7 @@ const NotasCompraPage: FC = () => {
                   })
                 }
                 max={10000}
-                step={100}
+                step={1}
                 className="w-full"
               />
               <div className="flex justify-between text-sm text-muted-foreground">
@@ -322,7 +326,7 @@ const NotasCompraPage: FC = () => {
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
         createForm={createForm}
-        handleSubmitCreate={handleSubmitCreate}
+        onSubmit={handleSubmitCreate}
         fornecedores={responsefornecedores || []}
       />
 
@@ -330,7 +334,7 @@ const NotasCompraPage: FC = () => {
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
         editForm={editForm}
-        handleSubmitEdit={handleSubmitEdit}
+        onSubmit={handleSubmitEdit}
         fornecedores={responsefornecedores || []}
       />
 

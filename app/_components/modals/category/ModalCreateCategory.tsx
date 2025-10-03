@@ -16,7 +16,7 @@ export function ModalCreateCategory({ isCreateModalOpen, setIsCreateModalOpen, c
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
                 <FormProvider {...createForm}>
-                    <form onSubmit={createForm.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                    <form onSubmit={onSubmit} className="space-y-4 py-4">
                         <DialogHeader>
                             <DialogTitle>Nova Categoria</DialogTitle>
                             <DialogDescription>Crie uma nova categoria.</DialogDescription>

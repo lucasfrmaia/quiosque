@@ -33,7 +33,8 @@ import { NumberRangeFilter } from '@/app/_components/filtros/NumberRangeFilter';
 import { ModalCreateNotaVenda } from '../_components/modals/nota-vendas/ModalCreateNotaVenda';
 import { ModalEditNotaVenda } from '../_components/modals/nota-vendas/ModalEditNotaVenda';
 import { ModalDeleteNotaVenda } from '../_components/modals/nota-vendas/ModalDeleteNotaVenda';
-import { NotaFiscalVendaSchema } from '@/types/validation';
+import { NotaFiscalVendaSchema, notaFiscalVendaSchema } from '@/types/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const NotasVendasPage: FC = () => {
 
@@ -80,14 +81,18 @@ const NotasVendasPage: FC = () => {
   }, [appliedFilters.dateStart, appliedFilters.dateEnd, appliedFilters.totalMin, appliedFilters.totalMax]);
 
   const createForm = useForm<NotaFiscalVendaSchema>({
+    resolver: zodResolver(notaFiscalVendaSchema),
     defaultValues: {
-      data: new Date().toISOString().split('T')[0],
+      data: new Date(),
+      total: 0,
       produtos: [],
     },
   });
   const editForm = useForm<NotaFiscalVendaSchema>({
+    resolver: zodResolver(notaFiscalVendaSchema),
     defaultValues: {
-      data: new Date().toISOString().split('T')[0],
+      data: new Date(),
+      total: 0,
       produtos: [],
     },
   });
@@ -110,13 +115,8 @@ const NotasVendasPage: FC = () => {
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
       data: new Date(data.data),
-      total: Number(data.total),
-      produtos: data.produtos.map((p) => ({
-        produtoId: Number(p.produtoId),
-        quantidade: Number(p.quantidade),
-        unidade: p.unidade,
-        precoUnitario: Number(p.precoUnitario),
-      })),
+      total: data.total,
+      produtos: data.produtos,
     });
     setIsCreateModalOpen(false);
     createForm.reset();
@@ -126,7 +126,7 @@ const NotasVendasPage: FC = () => {
     if (!selectedNota) return;
     handleEdit(selectedNota.id, {
       data: new Date(data.data),
-      total: Number(data.total),
+      total: data.total,
     });
     setIsEditModalOpen(false);
     setSelectedNota(null);
@@ -135,7 +135,7 @@ const NotasVendasPage: FC = () => {
 
   const openEditModal = (nota: NotaFiscalVenda) => {
     setSelectedNota(nota);
-    editForm.setValue('data', nota.data.toLocaleString());
+    editForm.setValue('data', nota.data);
     editForm.setValue('total', nota.total)
     editForm.setValue(
       'produtos',
@@ -239,7 +239,7 @@ const NotasVendasPage: FC = () => {
                   })
                 }
                 max={10000}
-                step={100}
+                step={10}
                 className="w-full"
               />
               <div className="flex justify-between text-sm text-muted-foreground">
@@ -292,7 +292,7 @@ const NotasVendasPage: FC = () => {
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
         createForm={createForm}
-        handleSubmitCreate={handleSubmitCreate}
+        onSubmit={handleSubmitCreate}
       />
 
       {/* Edit Dialog */}
@@ -300,7 +300,7 @@ const NotasVendasPage: FC = () => {
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
         editForm={editForm}
-        handleSubmitEdit={handleSubmitEdit}
+        onSubmit={handleSubmitEdit}
       />
 
       {/* Delete Dialog */}

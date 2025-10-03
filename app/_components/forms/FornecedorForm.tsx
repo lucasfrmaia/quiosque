@@ -70,7 +70,6 @@ export const FornecedorForm: FC = () => {
         <div className="col-span-3 space-y-1">
           <Input
             id="email"
-            type="email"
             {...register('email')}
             className={errors.email ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Email (opcional)"

@@ -47,7 +47,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
     if (!selectedProduto || !quantidade || !precoUnitario) return;
 
     append({
-      produtoId: Number(selectedProduto.id),
+      produtoId: selectedProduto.id,
       quantidade,
       unidade: 'Unidade',
       precoUnitario
@@ -80,7 +80,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
                 <Input
                   id="data"
                   type="date"
-                  {...register('data')}
+                  {...register('data', { valueAsDate: true })}
                   className={errors.data ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}
                   defaultValue={new Date().toISOString().split('T')[0]}
                 />
@@ -97,7 +97,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
                   control={control}
                   name="fornecedorId"
                   render={({ field }) => (
-                    <Select value={String(field.value || '')} onValueChange={(value) => field.onChange(Number(value))}>
+                    <Select value={String(field.value || '')} onValueChange={field.onChange}>
                       <SelectTrigger className={errors.fornecedorId ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}>
                         <SelectValue placeholder="Selecione um fornecedor" />
                       </SelectTrigger>
@@ -142,7 +142,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
               <SearchableSelect
                 options={produtoOptions}
                 value={selectedProduto}
-                onChange={setSelectedProduto}
+                onChange={(option) => setSelectedProduto(option?.name)}
                 placeholder="Buscar produto..."
                 className="h-10"
               />
@@ -156,7 +156,6 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
                 onChange={(e) => setQuantidade(Number(e.target.value))}
                 placeholder="0"
                 className="h-10"
-                min="0"
               />
             </div>
 
@@ -168,8 +167,6 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({ fornecedor
                 onChange={(e) => setPrecoUnitario(Number(e.target.value))}
                 placeholder="0.00"
                 className="h-10"
-                step="0.01"
-                min="0"
               />
             </div>
           </div>

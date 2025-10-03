@@ -26,7 +26,8 @@ import { ModalEditEstoque } from '../_components/modals/estoque/ModalEditEstoque
 import { ModalDeleteEstoque } from '../_components/modals/estoque/ModalDeleteEstoque';
 import { useProduto } from '../_components/hooks/useProduto';
 import { Filter, ChevronDown, Package, Plus, Search, X } from 'lucide-react';
-import { EstoqueSchema } from '@/types/validation';
+import { EstoqueSchema, produtoEstoqueSchema } from '@/types/validation';
+import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const EstoquePage: FC = () => {
@@ -62,7 +63,6 @@ const EstoquePage: FC = () => {
   });
 
   const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
-
   const { estoqueQuery: { data: response, isLoading, error } = {} } = useEstoque();
 
   useEffect(() => {
@@ -99,32 +99,34 @@ const EstoquePage: FC = () => {
   };
 
   const createForm = useForm<EstoqueSchema>({
+    resolver: zodResolver(produtoEstoqueSchema),
     defaultValues: {
       preco: 0,
       quantidade: 0,
-      dataValidade: new Date(),
+      dataValidade: undefined,
       unidade: '',
-      produtoId: -1,
+      produtoId: undefined,
     },
   });
 
   const editForm = useForm<EstoqueSchema>({
+    resolver: zodResolver(produtoEstoqueSchema),
     defaultValues: {
       preco: 0,
       quantidade: 0,
-      dataValidade: new Date(),
+      dataValidade: undefined,
       unidade: '',
-      produtoId: -1,
+      produtoId: undefined,
     },
   });
 
   const handleSubmitCreate = createForm.handleSubmit((data) => {
     handleCreate({
-      preco: Number(data.preco),
-      quantidade: Number(data.quantidade),
+      preco: data.preco,
+      quantidade: data.quantidade,
       dataValidade: data.dataValidade,
       unidade: data.unidade,
-      produtoId: Number(data.produtoId),
+      produtoId: data.produtoId,
     });
     setIsCreateModalOpen(false);
     createForm.reset();
@@ -133,11 +135,11 @@ const EstoquePage: FC = () => {
   const handleSubmitEdit = editForm.handleSubmit((data) => {
     if (!selectedItem) return;
     handleEdit(selectedItem.id, {
-      preco: Number(data.preco),
-      quantidade: Number(data.quantidade),
+      preco: data.preco,
+      quantidade: data.quantidade,
       dataValidade: data.dataValidade,
       unidade: data.unidade,
-      produtoId: Number(data.produtoId),
+      produtoId: data.produtoId,
     });
     setIsEditModalOpen(false);
     setSelectedItem(null);
@@ -148,7 +150,7 @@ const EstoquePage: FC = () => {
     setSelectedItem(item);
     editForm.setValue('preco', item.preco);
     editForm.setValue('quantidade', item.quantidade);
-    editForm.setValue('dataValidade', item.dataValidade || new Date());
+    editForm.setValue('dataValidade', item.dataValidade ?? undefined);
     editForm.setValue('unidade', item.unidade);
     editForm.setValue('produtoId', item.produtoId);
     setIsEditModalOpen(true);
@@ -338,7 +340,7 @@ const EstoquePage: FC = () => {
       <ModalEstoqueCreate
         isCreateModalOpen={isCreateModalOpen}
         setIsCreateModalOpen={setIsCreateModalOpen}
-        handleSubmitCreate={handleSubmitCreate}
+        onSubmit={handleSubmitCreate}
         createForm={createForm}
         produtos={produtos || []}
       />
@@ -347,7 +349,7 @@ const EstoquePage: FC = () => {
       <ModalEditEstoque
         isEditModalOpen={isEditModalOpen}
         setIsEditModalOpen={setIsEditModalOpen}
-        handleSubmitEdit={handleSubmitEdit}
+        onSubmit={handleSubmitEdit}
         editForm={editForm}
         produtos={produtos || []}
       />
