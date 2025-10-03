@@ -73,7 +73,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           <Input
             id="preco"
             type="number"
-            step={1}
+            step="0.01"
             {...register("preco", { valueAsNumber: true })}
             className={
               errors.preco ? "border-red-500 focus:border-red-500" : ""
@@ -94,7 +94,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           <Input
             id="quantidade"
             type="number"
-            step={1}
+            step="0.01"
             {...register("quantidade", { valueAsNumber: true })}
             className={
               errors.quantidade ? "border-red-500 focus:border-red-500" : ""

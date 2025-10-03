@@ -38,7 +38,7 @@ export const useProduto = () => {
       currentPage,
       itemsPerPage,
       search,
-      categoryId,
+      categoryId: categoryId?.toString(),
       toString: params.toString(),
     };
   }, [searchParams]);
@@ -133,10 +133,8 @@ export const useProduto = () => {
   });
 
   const handleEdit = (
-    id: number,
-    updates: Partial<
-      Omit<Produto, "id" | "categoria" | "estoques" | "compras" | "vendas">
-    >
+    id: ProdutoPatchData['id'],
+    updates: ProdutoPatchData['updates']
   ) => {
     editMutation.mutate({ id, updates });
   };
@@ -180,7 +178,7 @@ export const useProduto = () => {
   };
 
   const updateUrl = useCallback(
-    (newFilters: FilterValues & { categoryId?: number }) => {
+    (newFilters: FilterValues & { categoryId: string | null | undefined }) => {
       const params = new URLSearchParams(searchParams.toString());
 
       params.set("page", String(newFilters.currentPage));

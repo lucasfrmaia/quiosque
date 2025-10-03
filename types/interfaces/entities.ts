@@ -93,10 +93,10 @@ export interface FilterValues {
   quantidadeMax?: string;
   precoMin?: string;
   precoMax?: string;
-  categoryId?: number | null;
+  categoryId?: string | null;
   dateStart?: string;
   dateEnd?: string;
   totalMin?: string;
   totalMax?: string;
-  fornecedorId?: number | string;
+  fornecedorId?: string | string;
 }

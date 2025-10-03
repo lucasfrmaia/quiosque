@@ -69,14 +69,17 @@ export type FornecedorUpdateInput = {
 
 export type ProdutoInsertData = Omit<
   Produto,
-  "id" | "categoria" | "estoques" | "compras" | "vendas"
->;
+  "id" | "categoria" | "estoques" | "compras" | "vendas" | "categoriaId"
+> & { categoriaId: string | undefined };
 
 export type ProdutoPatchData = {
   id: number;
   updates: Partial<
-    Omit<Produto, "id" | "categoria" | "estoques" | "compras" | "vendas">
-  >;
+    Omit<
+      Produto,
+      "id" | "categoria" | "estoques" | "compras" | "vendas" | "categoriaId"
+    >
+  > & { categoriaId: string | undefined };
 };
 
 export type EstoqueNewData = Omit<ProdutoEstoque, "id" | "produto">;

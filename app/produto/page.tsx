@@ -58,7 +58,7 @@ const ProdutoPage: FC = () => {
   const [selectedProduto, setSelectedProduto] = useState<Produto | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterValues, setFilterValues] = useState({
-    categoryId: undefined as number | undefined,
+    categoryId: undefined as string | undefined,
   });
 
   const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
@@ -128,7 +128,7 @@ const ProdutoPage: FC = () => {
   const openEditModal = (produto: Produto) => {
     setSelectedProduto(produto);
     editForm.setValue('nome', produto.nome);
-    editForm.setValue('categoriaId', produto.categoriaId ?? undefined);
+    editForm.setValue('categoriaId', produto.categoriaId?.toString());
     editForm.setValue('ativo', produto.ativo);
     editForm.setValue('tipo', produto.tipo);
     editForm.setValue('descricao', produto.descricao || '');
@@ -215,7 +215,7 @@ const ProdutoPage: FC = () => {
               size="sm"
               className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
               onClick={() => {
-                const newFilters = { ...appliedFilters, search: searchInput, currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
+                const newFilters = { ...appliedFilters, search: searchInput, currentPage: 1, categoryId: appliedFilters.categoryId };
                 updateUrl(newFilters);
               }}
             >
@@ -256,9 +256,9 @@ const ProdutoPage: FC = () => {
                 {categories?.map((category) => (
                   <Button
                     key={category.id}
-                    variant={filterValues.categoryId === category.id ? "default" : "outline"}
-                    className={`rounded-full ${filterValues.categoryId === category.id ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
-                    onClick={() => setFilterValues({ ...filterValues, categoryId: category.id })}
+                    variant={filterValues.categoryId === String(category.id) ? "default" : "outline"}
+                    className={`rounded-full ${filterValues.categoryId === String(category.id) ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
+                    onClick={() => setFilterValues({ ...filterValues, categoryId: String(category.id) })}
                   >
                     {category.name}
                   </Button>

@@ -83,9 +83,6 @@ const NotasCompraPage: FC = () => {
     }, 
   });
 
-  console.log(createForm?.formState.errors)
-
-
   const handleApplyFilters = () => {
     const newFilters = {
       ...appliedFilters,
@@ -242,7 +239,7 @@ const NotasCompraPage: FC = () => {
             <div className="space-y-2">
               <Label>Fornecedor</Label>
               <SearchableSelect
-                options={responsefornecedores?.map(f => ({ id: f.id, name: f.nome })) || []}
+                options={responsefornecedores?.map(f => ({ id: String(f.id), name: f.nome })) || []}
                 value={filterValues.fornecedorId ? { id: filterValues.fornecedorId, name: responsefornecedores?.find(f => f.id.toString() === filterValues.fornecedorId)?.nome || '' } : null}
                 onChange={(option) => setFilterValues({ ...filterValues, fornecedorId: option ? option.id.toString() : '' })}
                 placeholder="Selecione um fornecedor"
