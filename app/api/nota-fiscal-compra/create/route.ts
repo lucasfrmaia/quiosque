@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(notaFiscal, { status: 201 });
   } catch (error: any) {
+    console.error(error.message);
     return NextResponse.json(
       { success: false, error: error.message || 'Internal server error' },
       { status: 500 },

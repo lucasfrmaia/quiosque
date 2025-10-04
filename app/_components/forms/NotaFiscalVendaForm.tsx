@@ -82,7 +82,6 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
     append({
       produtoId: estoque!.produto!.id,
       quantidade: pendingQuantity,
-      unidade: estoque.unidade || 'Unidade',
       precoUnitario: estoque.preco || 0,
     });
 
@@ -200,7 +199,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
                 return (
                   <div key={field.id} className="flex items-center justify-between p-2">
                     <Badge variant="secondary" className="mr-2">
-                      {produto.nome} • Qtd: {produtoVenda.quantidade} {produtoVenda.unidade} • R${' '}
+                      {produto.nome} • Qtd: {produtoVenda.quantidade} • R${' '}
                       {produtoVenda.precoUnitario.toFixed(2)}
                     </Badge>
                     <div className="flex items-center gap-2 min-w-0">

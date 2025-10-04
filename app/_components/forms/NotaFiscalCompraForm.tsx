@@ -20,6 +20,8 @@ import type { Option } from '../common/SearchableSelect';
 import { z } from 'zod';
 import { notaFiscalCompraSchema } from '@/types/validation';
 import { Package, X } from 'lucide-react';
+import { SelectTipoUnidade } from '../common/SelectTipoUnidade';
+import { TipoUnidade } from '@/types/types/types';
 
 type NotaFiscalCompraFormData = z.infer<typeof notaFiscalCompraSchema>;
 
@@ -54,6 +56,8 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
   const [selectedProduto, setSelectedProduto] = useState<Option | null>(null);
   const [quantidade, setQuantidade] = useState(0);
   const [precoUnitario, setPrecoUnitario] = useState(0);
+  const [selectedTipoUnidade, setSelectedTipoUnidade] = useState<TipoUnidade>('UNIDADE');
+
   const produtoOptions = allProdutos.map((p) => ({ name: p.nome, id: p.id.toString() }) as Option);
 
   const handleAddProduto = () => {
@@ -62,7 +66,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
     append({
       produtoId: Number(selectedProduto.id),
       quantidade,
-      unidade: 'Unidade',
+      unidade: selectedTipoUnidade,
       precoUnitario,
     });
 
@@ -189,6 +193,10 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 className="h-10"
               />
             </div>
+          </div>
+
+          <div>
+            <SelectTipoUnidade changeUnidade={setSelectedTipoUnidade} control={control} />
           </div>
 
           <Button

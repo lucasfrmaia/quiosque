@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { Produto } from '@/types/interfaces/entities';
 import { EstoqueSchema } from '@/types/validation';
+import { SelectTipoUnidade } from '../common/SelectTipoUnidade';
 
 interface EstoqueFormProps {
   produtos: Produto[];
@@ -115,14 +116,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           Unidade
         </Label>
         <div className="col-span-3 space-y-1">
-          <Input
-            id="unidade"
-            type="text"
-            {...register('unidade')}
-            className={errors.unidade ? 'border-red-500 focus:border-red-500' : ''}
-            placeholder="Unidade (ex: Unidade, Kg)"
-          />
-          {errors.unidade && <p className="text-sm text-red-500">{errors.unidade.message}</p>}
+          <SelectTipoUnidade control={control} />
         </div>
       </div>
     </div>

@@ -124,7 +124,7 @@ const ProdutoPage: FC = () => {
   const openEditModal = (produto: Produto) => {
     setSelectedProduto(produto);
     editForm.setValue('nome', produto.nome);
-    editForm.setValue('categoriaId', produto.categoriaId);
+    editForm.setValue('categoriaId', produto.categoriaId || undefined);
     editForm.setValue('ativo', produto.ativo);
     editForm.setValue('tipo', produto.tipo);
     editForm.setValue('descricao', produto.descricao || '');

@@ -77,7 +77,6 @@ export interface ProdutoVenda {
   notaFiscalId: number;
   produtoId: number;
   quantidade: number;
-  unidade: string;
   precoUnitario: number;
   produto?: Produto;
   notaFiscal?: NotaFiscalVenda;

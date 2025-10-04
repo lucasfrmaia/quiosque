@@ -27,7 +27,7 @@ export const produtoEstoqueSchema = z.object({
     .min(0, 'Quantidade deve ser positiva')
     .max(1000000, 'Quantidade muito alta'),
   dataValidade: z.date({ message: 'Escolha uma Data!' }).optional(),
-  unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
+  unidade: z.enum(['UNIDADE', 'KG', 'MG']).optional(),
   produtoId: z.number({ message: 'Escolha um Produto!' }).int().positive(),
 });
 
@@ -43,7 +43,7 @@ export const notaFiscalCompraSchema = z.object({
           .positive()
           .min(0, 'Quantidade deve ser positiva')
           .max(100000, 'Quantidade muito alta'),
-        unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
+        unidade: z.enum(['UNIDADE', 'KG', 'MG']).optional(),
         precoUnitario: z
           .number()
           .positive()
@@ -65,7 +65,6 @@ export const notaFiscalVendaSchema = z.object({
           .number()
           .min(1, 'Quantidade deve ser positiva')
           .max(100000, 'Quantidade muito alta'),
-        unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
         precoUnitario: z
           .number()
           .min(0, 'Preço unitário deve ser positivo')

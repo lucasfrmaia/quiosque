@@ -145,7 +145,7 @@ export const DataTable = <T extends { id: number }>({
                       key={column.key}
                       className={`${
                         column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
-                      } px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 border-b-2 border-gray-200 w-24 ${
+                      } px-4 py-3 text-rigth text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 border-b-2 border-gray-200 w-24 ${
                         column.key === 'imagem' ? 'w-20' : ''
                       } font-sans`}
                       onClick={() => column.sortable && handleSort(columnSortKey)}
@@ -165,7 +165,7 @@ export const DataTable = <T extends { id: number }>({
                 })}
 
                 {actions && (
-                  <TableHead className="text-right px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 b-2 border-gray-200 font-sans">
+                  <TableHead className="text-center px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 b-2 border-gray-200 font-sans">
                     Ações
                   </TableHead>
                 )}
@@ -180,7 +180,7 @@ export const DataTable = <T extends { id: number }>({
                   {columns.map((column) => (
                     <TableCell
                       key={column.key}
-                      className={`px-6 py-4 text-sm text-center font-medium text-gray-900 ${
+                      className={`px-6 py-4 text-sm text-left font-medium text-gray-900 ${
                         column.key === 'imagem' ? 'p-2' : ''
                       }`}
                     >
