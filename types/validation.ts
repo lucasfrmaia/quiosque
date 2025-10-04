@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const produtoSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
   descricao: z.string().max(255, 'Descrição deve ter no máximo 255 caracteres').optional(),
-  imagemUrl: z.string().url('URL inválida').max(255, 'URL muito longa').optional(),
+  imagemUrl: z.string().max(255, 'URL muito longa').optional(),
   ativo: z.boolean(),
   tipo: z.enum(['INSUMO', 'CARDAPIO'], { error: 'Selecione um Tipo!' }),
   categoriaId: z.number().int().positive().max(999999, 'ID de categoria inválido').optional(),
@@ -41,7 +41,7 @@ export const notaFiscalCompraSchema = z.object({
         quantidade: z
           .number()
           .positive()
-          .min(1, 'Quantidade deve ser positiva')
+          .min(0, 'Quantidade deve ser positiva')
           .max(100000, 'Quantidade muito alta'),
         unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
         precoUnitario: z

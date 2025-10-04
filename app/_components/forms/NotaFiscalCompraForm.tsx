@@ -60,7 +60,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
     if (!selectedProduto || !quantidade || !precoUnitario) return;
 
     append({
-      produtoId: Number(selectedProduto!.id),
+      produtoId: Number(selectedProduto.id),
       quantidade,
       unidade: 'Unidade',
       precoUnitario,
@@ -110,7 +110,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                   render={({ field }) => (
                     <Select
                       value={field.value ? String(field.value) : ''}
-                      onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                      onValueChange={(val) => field.onChange(Number(val))}
                     >
                       <SelectTrigger
                         className={

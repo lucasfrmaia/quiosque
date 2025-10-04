@@ -84,8 +84,8 @@ export const useFornecedor = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
+      queryClient.refetchQueries({ queryKey: ['fornecedores', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['fornecedores'] });
     },
   });
 
@@ -110,8 +110,8 @@ export const useFornecedor = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
+      queryClient.refetchQueries({ queryKey: ['fornecedores', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['fornecedores'] });
     },
   });
 
@@ -137,7 +137,7 @@ export const useFornecedor = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['fornecedores', paramsToString] });
     },
   });
 

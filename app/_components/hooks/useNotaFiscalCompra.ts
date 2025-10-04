@@ -187,7 +187,10 @@ export const useNotaFiscalCompra = () => {
       if (!result.success) throw new Error(result.error || 'Erro ao criar nota fiscal de compra');
       return result.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] }),
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['notaFiscalCompra'] });
+      queryClient.refetchQueries({ queryKey: ['notaFiscalCompra', queryParams] });
+    },
   });
 
   const handleCreate = (nota: NotaFiscalCompraCreationData) => {
@@ -207,7 +210,10 @@ export const useNotaFiscalCompra = () => {
         throw new Error(result.error || 'Erro ao atualizar nota fiscal de compra');
       return result.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] }),
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['notaFiscalCompra'] });
+      queryClient.refetchQueries({ queryKey: ['notaFiscalCompra', queryParams] });
+    },
   });
 
   const handleEdit = (
@@ -225,7 +231,10 @@ export const useNotaFiscalCompra = () => {
       if (!result.success) throw new Error(result.error || 'Erro ao excluir nota fiscal de compra');
       return result;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notaFiscalCompra'] }),
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['notaFiscalCompra'] });
+      queryClient.refetchQueries({ queryKey: ['notaFiscalCompra', queryParams] });
+    },
   });
 
   const handleDelete = (id: number) => {

@@ -11,7 +11,6 @@ import { HeaderNotaModal } from '../modals/HeaderNotaMotal';
 interface NotaFiscalVendaTableProps {
   items: NotaFiscalVenda[];
   filterValues: FilterValues;
-  onSort: (field: string) => void;
   onEdit: (nota: NotaFiscalVenda) => void;
   onDelete: (nota: NotaFiscalVenda) => void;
 }
@@ -19,7 +18,6 @@ interface NotaFiscalVendaTableProps {
 export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
   items,
   filterValues,
-  onSort,
   onEdit,
   onDelete,
 }) => {

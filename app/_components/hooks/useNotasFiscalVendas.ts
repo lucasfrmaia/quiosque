@@ -97,7 +97,8 @@ export const useNotasFiscaisVendas = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas'] });
+      queryClient.refetchQueries({ queryKey: ['notas'] });
+      queryClient.refetchQueries({ queryKey: ['notas', queryParams] });
     },
   });
 
@@ -122,7 +123,8 @@ export const useNotasFiscaisVendas = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas'] });
+      queryClient.refetchQueries({ queryKey: ['notas'] });
+      queryClient.refetchQueries({ queryKey: ['notas', queryParams] });
     },
   });
 
@@ -148,7 +150,8 @@ export const useNotasFiscaisVendas = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas'] });
+      queryClient.refetchQueries({ queryKey: ['notas'] });
+      queryClient.refetchQueries({ queryKey: ['notas', queryParams] });
     },
   });
 
@@ -224,10 +227,6 @@ export const useNotasFiscaisVendas = () => {
     updateUrl(newFilters);
   };
 
-  const handleSort = (field: string) => {
-    // implementar se quiser ordenação por campo específico
-  };
-
   const handlePageChange = (page: number) => {
     const newFilters = { ...queryParams, currentPage: page };
     updateUrl(newFilters);
@@ -249,7 +248,6 @@ export const useNotasFiscaisVendas = () => {
     handlePageChange,
     handleItemsPerPageChange,
     handleRemoveFilter,
-    handleSort,
     updateUrl,
     getActiveFilters,
   };

@@ -83,7 +83,10 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             control={control}
             name="categoriaId"
             render={({ field }) => (
-              <Select value={String(field.value) || '0'} onValueChange={field.onChange}>
+              <Select
+                value={String(field.value) || '0'}
+                onValueChange={(val) => field.onChange(Number(val))}
+              >
                 <SelectTrigger
                   id="categoriaId"
                   className={errors.categoriaId ? 'border-red-500 focus:border-red-500' : ''}

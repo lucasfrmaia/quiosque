@@ -94,8 +94,8 @@ export const useProduto = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
+      queryClient.refetchQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -122,8 +122,8 @@ export const useProduto = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
+      queryClient.refetchQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -146,8 +146,8 @@ export const useProduto = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
+      queryClient.refetchQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['produtos-all'] });
     },
   });
 

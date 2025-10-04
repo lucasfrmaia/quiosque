@@ -37,22 +37,20 @@ export const useCategory = () => {
   const queryParams = getFiltersFromParams();
   const paramsToString = queryParams.toString;
 
-  const getCategoriesByParams = () => {
-    return useQuery<{ categories: Category[]; total: number }>({
-      queryKey: ['categories', paramsToString],
-      queryFn: async () => {
-        const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
+  const categoryParams = useQuery<{ categories: Category[]; total: number }>({
+    queryKey: ['categories', paramsToString],
+    queryFn: async () => {
+      const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch categories');
-        }
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
 
-        const result = await response.json();
+      const result = await response.json();
 
-        return result;
-      },
-    });
-  };
+      return result;
+    },
+  });
 
   const getAllCategories = () => {
     return useQuery<Category[]>({
@@ -88,7 +86,8 @@ export const useCategory = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['categories', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['categories'] });
     },
   });
 
@@ -113,7 +112,8 @@ export const useCategory = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['categories', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['categories'] });
     },
   });
 
@@ -136,7 +136,8 @@ export const useCategory = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['categories', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['categories'] });
     },
   });
 
@@ -205,7 +206,7 @@ export const useCategory = () => {
 
   return {
     queryParams,
-    getCategoriesByParams,
+    categoryParams,
     handleCreate,
     handleEdit,
     handleDelete,

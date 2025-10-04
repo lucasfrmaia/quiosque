@@ -86,7 +86,7 @@ export const useEstoque = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['estoque', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['estoque', paramsToString] });
     },
   });
   const handleCreate = (estoque: EstoqueNewData) => {
@@ -106,7 +106,7 @@ export const useEstoque = () => {
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['estoque', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['estoque', paramsToString] });
     },
   });
   const handleEdit = (id: EstoqueUpdatePayload['id'], updates: EstoqueUpdatePayload['updates']) => {
@@ -122,7 +122,7 @@ export const useEstoque = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['estoque', paramsToString] });
+      queryClient.refetchQueries({ queryKey: ['estoque', paramsToString] });
     },
   });
   const handleDelete = (id: number) => {

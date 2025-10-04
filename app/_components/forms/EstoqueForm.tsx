@@ -35,7 +35,10 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
             control={control}
             name="produtoId"
             render={({ field }) => (
-              <Select value={String(field.value)} onValueChange={(value) => String(value)}>
+              <Select
+                value={String(field.value)}
+                onValueChange={(val) => field.onChange(Number(val))}
+              >
                 <SelectTrigger
                   id="produtoId"
                   className={errors.produtoId ? 'border-red-500 focus:border-red-500' : ''}
@@ -44,7 +47,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
                 </SelectTrigger>
                 <SelectContent>
                   {produtos.map((produto) => (
-                    <SelectItem key={produto.id.toString()} value={produto.id.toString()}>
+                    <SelectItem key={produto.id} value={produto.id.toString()}>
                       {produto.nome}
                     </SelectItem>
                   ))}

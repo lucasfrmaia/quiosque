@@ -40,6 +40,7 @@ const CategoriaPage: FC = () => {
 
   const {
     queryParams,
+    categoryParams,
     handlePageChange,
     handleItemsPerPageChange,
     handleCreate,
@@ -47,10 +48,9 @@ const CategoriaPage: FC = () => {
     handleEdit,
     resetFilters,
     updateUrl,
-    getCategoriesByParams,
   } = useCategory();
 
-  const { data: response, isLoading } = getCategoriesByParams();
+  const { data: response, isLoading } = categoryParams;
 
   useEffect(() => {
     setLocalSearch(queryParams.search || '');

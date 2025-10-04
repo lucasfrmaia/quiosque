@@ -156,6 +156,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
               <Input
                 type="number"
                 value={pendingQuantity}
+                step="1"
                 onChange={(e) => setPendingQuantity(parseInt(e.target.value) || 1)}
                 placeholder="1"
                 className="h-10"

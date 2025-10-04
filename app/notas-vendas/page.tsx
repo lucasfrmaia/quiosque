@@ -29,6 +29,7 @@ import { ModalEditNotaVenda } from '../_components/modals/nota-vendas/ModalEditN
 import { ModalDeleteNotaVenda } from '../_components/modals/nota-vendas/ModalDeleteNotaVenda';
 import { NotaFiscalVendaSchema, notaFiscalVendaSchema } from '@/types/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
+import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const NotasVendasPage: FC = () => {
   const {
@@ -41,7 +42,6 @@ const NotasVendasPage: FC = () => {
     resetFilters,
     updateUrl,
     getNotasByParams,
-    handleSort,
     getActiveFilters,
     handleRemoveFilter,
   } = useNotasFiscaisVendas();
@@ -160,7 +160,7 @@ const NotasVendasPage: FC = () => {
     setSelectedNota(null);
   };
 
-  if (isLoading) return <>Carregando...</>;
+  if (isLoading) return <TableSkeleton />;
   if (error) return <>Error</>;
 
   const activeFilters = getActiveFilters();
@@ -268,7 +268,6 @@ const NotasVendasPage: FC = () => {
           <NotaFiscalVendaTable
             items={response?.notas || []}
             filterValues={appliedFilters}
-            onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(notaSelected) => {
               const nota = response?.notas?.find((n) => n.id === notaSelected.id);
