@@ -229,8 +229,6 @@ export const useProduto = () => {
     router.replace(`?${params.toString()}`);
   };
 
-  const handleSort = (field: string) => {};
-
   const handlePageChange = (page: number) => {
     const newFilters = { ...queryParams, currentPage: page };
     updateUrl(newFilters);
@@ -253,7 +251,6 @@ export const useProduto = () => {
     handlePageChange,
     handleItemsPerPageChange,
     handleRemoveFilter,
-    handleSort,
     updateUrl,
     getActiveFilters,
   };

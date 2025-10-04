@@ -48,7 +48,6 @@ const ProdutoPage: FC = () => {
     getProdutosByParams,
     handleItemsPerPageChange,
     handlePageChange,
-    handleSort
   } = useProduto();
   const { getAllCategories } = useCategory();
 
@@ -128,7 +127,7 @@ const ProdutoPage: FC = () => {
   const openEditModal = (produto: Produto) => {
     setSelectedProduto(produto);
     editForm.setValue('nome', produto.nome);
-    editForm.setValue('categoriaId', produto.categoriaId?.toString());
+    editForm.setValue('categoriaId', produto.categoriaId);
     editForm.setValue('ativo', produto.ativo);
     editForm.setValue('tipo', produto.tipo);
     editForm.setValue('descricao', produto.descricao || '');
@@ -285,7 +284,6 @@ const ProdutoPage: FC = () => {
           <ProdutoTable
             items={data?.produtos || []}
             filterValues={appliedFilters}
-            onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(product) => {
               const produto = data?.produtos.find(p => p.id === product.id);

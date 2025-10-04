@@ -37,7 +37,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
             render={({ field }) => (
               <Select
                 value={String(field.value)}
-                onValueChange={field.onChange}
+                onValueChange={(value) => String(value)}
               >
                 <SelectTrigger
                   id="produtoId"
@@ -51,7 +51,7 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
                 </SelectTrigger>
                 <SelectContent>
                   {produtos.map((produto) => (
-                    <SelectItem key={produto.id} value={produto.id.toString()}>
+                    <SelectItem key={produto.id.toString()} value={produto.id.toString()}>
                       {produto.nome}
                     </SelectItem>
                   ))}

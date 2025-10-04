@@ -173,13 +173,12 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
               <Label>Quantidade</Label>
               <Input
                 type="number"
-                value={pendingQuantity}
+                value={pendingQuantity}              
                 onChange={(e) =>
                   setPendingQuantity(parseInt(e.target.value) || 1)
                 }
                 placeholder="1"
                 className="h-10"
-                min="1"
               />
             </div>
           </div>

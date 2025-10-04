@@ -121,10 +121,15 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
   }
 
   async update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>): Promise<ProdutoEstoque> {
-    const data: any = { ...produtoEstoque };
+    const data = { 
+      ...produtoEstoque,
+      produtoId: Number(produtoEstoque.produtoId)  
+    };
+    
     if (data.dataValidade) {
       data.dataValidade = new Date(data.dataValidade);
     }
+    
     const updatedProdutoEstoque = await this.prisma.produtoEstoque.update({
       where: { id },
       data,

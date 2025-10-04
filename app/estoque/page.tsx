@@ -44,6 +44,7 @@ const EstoquePage: FC = () => {
     getActiveFilters,
   } = useEstoque();
   
+  
   const { getAllCategories } = useCategory();
   const { data: categories = [] } = getAllCategories();
   
@@ -57,7 +58,7 @@ const EstoquePage: FC = () => {
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterValues, setFilterValues] = useState({
-    categoryId: null as number | null,
+    categoryId: null as string | null,
     precoMin: '0',
     precoMax: '1000',
   });
@@ -124,7 +125,7 @@ const EstoquePage: FC = () => {
     handleCreate({
       preco: data.preco,
       quantidade: data.quantidade,
-      dataValidade: data.dataValidade,
+      dataValidade: data.dataValidade || null,
       unidade: data.unidade,
       produtoId: data.produtoId,
     });
@@ -262,9 +263,9 @@ const EstoquePage: FC = () => {
                 {categories.map((category) => (
                   <Button
                     key={category.id}
-                    variant={filterValues.categoryId === category.id ? "default" : "outline"}
-                    className={`rounded-full ${filterValues.categoryId === category.id ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
-                    onClick={() => setFilterValues({ ...filterValues, categoryId: category.id })}
+                    variant={filterValues.categoryId === String(category.id) ? "default" : "outline"}
+                    className={`rounded-full ${filterValues.categoryId === String(category.id) ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
+                    onClick={() => setFilterValues({ ...filterValues, categoryId: String(category.id) })}
                   >
                     {category.name}
                   </Button>

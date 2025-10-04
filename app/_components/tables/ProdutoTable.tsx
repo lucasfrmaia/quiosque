@@ -7,7 +7,6 @@ import { DataTable } from "../DataTable";
 interface ProdutoTableProps {
   items: Produto[];
   filterValues: FilterValues;
-  onSort: (field: string) => void;
   onEdit: (item: Produto) => void;
   onDelete: (id: Produto) => void;
 }
@@ -15,7 +14,6 @@ interface ProdutoTableProps {
 export const ProdutoTable: FC<ProdutoTableProps> = ({
   items,
   filterValues,
-  onSort,
   onEdit,
   onDelete,
 }) => {

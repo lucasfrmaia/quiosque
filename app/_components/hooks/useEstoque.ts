@@ -53,7 +53,7 @@ export const useEstoque = () => {
       quantidadeMax,
       precoMin,
       precoMax,
-      categoryId,
+      categoryId: categoryId?.toString(),
       toString: params.toString(),
     };
   }, [searchParams]);
@@ -146,7 +146,7 @@ export const useEstoque = () => {
       active.push({ label: 'Qtd Max', value: queryParams.quantidadeMax });
     if (queryParams.precoMin) active.push({ label: 'Preço Min', value: queryParams.precoMin });
     if (queryParams.precoMax) active.push({ label: 'Preço Max', value: queryParams.precoMax });
-    if (queryParams.categoryId !== null) active.push({ label: 'Categoria', value: queryParams.categoryId.toString() });
+    if (queryParams.categoryId !== null) active.push({ label: 'Categoria', value: queryParams.categoryId?.toString() || "" });
     return active;
   };
 
@@ -217,7 +217,7 @@ export const useEstoque = () => {
         newFilters.precoMax = '';
         break;
       case 'Categoria':
-        newFilters.categoryId = null;
+        newFilters.categoryId = undefined;
         break;
     }
     updateUrl(newFilters);

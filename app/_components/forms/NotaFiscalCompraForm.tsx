@@ -189,6 +189,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
               <Label>Quantidade</Label>
               <Input
                 type="number"
+                step='0.01'
                 value={quantidade}
                 onChange={(e) => setQuantidade(Number(e.target.value))}
                 placeholder="0"
@@ -201,6 +202,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
               <Input
                 type="number"
                 value={precoUnitario}
+                step='0.01'
                 onChange={(e) => setPrecoUnitario(Number(e.target.value))}
                 placeholder="0.00"
                 className="h-10"

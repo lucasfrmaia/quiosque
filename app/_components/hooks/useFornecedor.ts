@@ -91,6 +91,7 @@ export const useFornecedor = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
     },
   });
 
@@ -116,6 +117,7 @@ export const useFornecedor = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fornecedores', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
     },
   });
 

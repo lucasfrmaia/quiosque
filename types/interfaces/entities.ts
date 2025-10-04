@@ -28,7 +28,7 @@ export interface Produto {
   imagemUrl?: string | null;
   ativo: boolean;
   tipo: TipoProduto;
-  categoriaId?: number | null;
+  categoriaId?: number | undefined;
   categoria?: Category | null;
   estoques?: ProdutoEstoque[];
   compras?: ProdutoCompra[];

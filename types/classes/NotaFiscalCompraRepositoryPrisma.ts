@@ -10,7 +10,9 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
   }
 
   async create(notaFiscal: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }): Promise<NotaFiscalCompra> {
-    const { data, total, fornecedorId, produtos } = notaFiscal;
+    const { data, fornecedorId, produtos } = notaFiscal;
+    const total = produtos.reduce((acc, produto) => acc + produto.precoUnitario * produto.quantidade, 0)
+
     const createData = {
       data: new Date(data),
       total,
