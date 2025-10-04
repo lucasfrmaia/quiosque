@@ -87,7 +87,6 @@ export const useCategory = () => {
     },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['categories', paramsToString] });
-      queryClient.refetchQueries({ queryKey: ['categories'] });
     },
   });
 
@@ -113,7 +112,6 @@ export const useCategory = () => {
     },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['categories', paramsToString] });
-      queryClient.refetchQueries({ queryKey: ['categories'] });
     },
   });
 
@@ -137,7 +135,6 @@ export const useCategory = () => {
     },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ['categories', paramsToString] });
-      queryClient.refetchQueries({ queryKey: ['categories'] });
     },
   });
 

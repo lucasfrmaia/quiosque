@@ -221,6 +221,7 @@ export class Relatorio {
         FROM "produto_compra" pc
         GROUP BY pc."produtoId"
       ) cost ON cost."produtoId" = p.id
+      where p.id <> 1
       ORDER BY margem DESC
       LIMIT ${limit}`;
 
@@ -247,6 +248,7 @@ export class Relatorio {
         (COALESCE(SUM(pe.quantidade),0) * COALESCE(AVG(pe.preco),0))::double precision AS "valorTotal"
       FROM "produto_estoque" pe
       JOIN "produto" p ON p.id = pe."produtoId"
+      WHERE pe.id <> 1
       GROUP BY pe."produtoId", p.nome`;
 
     return rows.map((r) => ({
@@ -407,7 +409,7 @@ export class Relatorio {
         FLOOR(EXTRACT(EPOCH FROM (pe."dataValidade" - NOW())) / 86400)::int AS "diasParaVencimento"
       FROM "produto_estoque" pe
       JOIN "produto" p ON p.id = pe."produtoId"
-      WHERE pe."dataValidade" IS NOT NULL AND pe."dataValidade" <= ${cutoffDate} AND pe."quantidade" > 0
+      WHERE pe."dataValidade" IS NOT NULL AND pe."dataValidade" <= ${cutoffDate} AND pe."quantidade" > 0 and pe.id <> 1
       ORDER BY pe."dataValidade" ASC`;
 
     return rows.map((r) => ({
@@ -492,9 +494,7 @@ export class Relatorio {
   }
 
   // ===== Consolidated Reports =====
-  async getAnaliseCoberturaEstoque(
-    days: number = 30,
-  ): Promise<
+  async getAnaliseCoberturaEstoque(days: number = 30): Promise<
     {
       produtoId: number;
       nome: string;
