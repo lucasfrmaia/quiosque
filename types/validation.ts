@@ -17,42 +17,67 @@ export const fornecedorSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
   cnpj: z.string().max(18, 'CNPJ inválido').optional(),
   telefone: z.string().max(20, 'Telefone inválido').optional(),
-  email: z.email({ message: "E-mail inválido"}).max(150, 'E-mail muito longo'),
+  email: z.email({ message: 'E-mail inválido' }).max(150, 'E-mail muito longo'),
 });
 
 export const produtoEstoqueSchema = z.object({
   preco: z.number().min(0, 'Preço deve ser positivo').max(999999, 'Preço muito alto'),
-  quantidade: z.number().min(0, 'Quantidade deve ser positiva').max(1000000, 'Quantidade muito alta'),
-  dataValidade: z.date({ message: "Escolha uma Data!" }).optional(),
+  quantidade: z
+    .number()
+    .min(0, 'Quantidade deve ser positiva')
+    .max(1000000, 'Quantidade muito alta'),
+  dataValidade: z.date({ message: 'Escolha uma Data!' }).optional(),
   unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
-  produtoId: z.number({ message: 'Escolha um Produto!'}).int().positive(),
+  produtoId: z.number({ message: 'Escolha um Produto!' }).int().positive(),
 });
 
 export const notaFiscalCompraSchema = z.object({
-  data: z.date({ message: "Escolha uma Data!" }),
+  data: z.date({ message: 'Escolha uma Data!' }),
   fornecedorId: z.number({ message: 'Selecione um Fornecedor!' }).int().positive(),
-  produtos: z.array(z.object({
-    produtoId: z.number().int().positive(),
-    quantidade: z.number().positive().min(1, 'Quantidade deve ser positiva').max(100000, 'Quantidade muito alta'),
-    unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
-    precoUnitario: z.number().positive().min(0, 'Preço unitário deve ser positivo').max(999999, 'Preço unitário muito alto'),
-  })).min(1, 'Pelo menos um produto é obrigatório'),
+  produtos: z
+    .array(
+      z.object({
+        produtoId: z.number().int().positive(),
+        quantidade: z
+          .number()
+          .positive()
+          .min(1, 'Quantidade deve ser positiva')
+          .max(100000, 'Quantidade muito alta'),
+        unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
+        precoUnitario: z
+          .number()
+          .positive()
+          .min(0, 'Preço unitário deve ser positivo')
+          .max(999999, 'Preço unitário muito alto'),
+      }),
+    )
+    .min(1, 'Pelo menos um produto é obrigatório'),
 });
 
 export const notaFiscalVendaSchema = z.object({
-  data: z.date({ message: "Escolha uma Data!" }),
+  data: z.date({ message: 'Escolha uma Data!' }),
   total: z.number().min(0, 'Total deve ser positivo').max(999999999, 'Total muito alto'),
-  produtos: z.array(z.object({
-    produtoId: z.number().int().positive(),
-    quantidade: z.number().min(1, 'Quantidade deve ser positiva').max(100000, 'Quantidade muito alta'),
-    unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
-    precoUnitario: z.number().min(0, 'Preço unitário deve ser positivo').max(999999, 'Preço unitário muito alto'),
-  })).min(1, 'Pelo menos um produto é obrigatório'),
+  produtos: z
+    .array(
+      z.object({
+        produtoId: z.number().int().positive(),
+        quantidade: z
+          .number()
+          .min(1, 'Quantidade deve ser positiva')
+          .max(100000, 'Quantidade muito alta'),
+        unidade: z.string().min(1, 'Unidade é obrigatória').max(50, 'Unidade muito longa'),
+        precoUnitario: z
+          .number()
+          .min(0, 'Preço unitário deve ser positivo')
+          .max(999999, 'Preço unitário muito alto'),
+      }),
+    )
+    .min(1, 'Pelo menos um produto é obrigatório'),
 });
 
 export type NotaFiscalCompraSchema = z.infer<typeof notaFiscalCompraSchema>;
 export type NotaFiscalVendaSchema = z.infer<typeof notaFiscalVendaSchema>;
-export type CategorySchema = z.infer<typeof categorySchema>
-export type ProdutoSchema = z.infer<typeof produtoSchema>
-export type EstoqueSchema = z.infer<typeof produtoEstoqueSchema>
-export type FornecedorSchema = z.infer<typeof fornecedorSchema>
+export type CategorySchema = z.infer<typeof categorySchema>;
+export type ProdutoSchema = z.infer<typeof produtoSchema>;
+export type EstoqueSchema = z.infer<typeof produtoEstoqueSchema>;
+export type FornecedorSchema = z.infer<typeof fornecedorSchema>;

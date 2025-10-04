@@ -34,13 +34,30 @@ import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const NotasCompraPage: FC = () => {
   /** Extrai filtros da URL */
-  const { handleCreate, handleEdit, handleDelete, getNotasFiscaisCompras, updateUrl, resetFilters, queryParams, getActiveFilters, handleRemoveFilter } = useNotaFiscalCompra();
-  const { data: responseNotas, isLoading, error } = getNotasFiscaisCompras()
+  const {
+    handleCreate,
+    handleEdit,
+    handleDelete,
+    getNotasFiscaisCompras,
+    updateUrl,
+    resetFilters,
+    queryParams,
+    getActiveFilters,
+    handleRemoveFilter,
+  } = useNotaFiscalCompra();
+  const { data: responseNotas, isLoading, error } = getNotasFiscaisCompras();
 
   const { getAllFornecedores } = useFornecedor();
-  const { data: responsefornecedores, isLoading: isLoadingFornecedor, error: errorFornecedor } = getAllFornecedores()
+  const {
+    data: responsefornecedores,
+    isLoading: isLoadingFornecedor,
+    error: errorFornecedor,
+  } = getAllFornecedores();
 
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({ ...queryParams, search: '' });
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({
+    ...queryParams,
+    search: '',
+  });
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -63,7 +80,13 @@ const NotasCompraPage: FC = () => {
       totalMax: appliedFilters.totalMax || '10000',
       fornecedorId: appliedFilters.fornecedorId || '',
     });
-  }, [appliedFilters.dateStart, appliedFilters.dateEnd, appliedFilters.totalMin, appliedFilters.totalMax, appliedFilters.fornecedorId]);
+  }, [
+    appliedFilters.dateStart,
+    appliedFilters.dateEnd,
+    appliedFilters.totalMin,
+    appliedFilters.totalMax,
+    appliedFilters.fornecedorId,
+  ]);
 
   const createForm = useForm<NotaFiscalCompraSchema>({
     resolver: zodResolver(notaFiscalCompraSchema),
@@ -80,7 +103,7 @@ const NotasCompraPage: FC = () => {
       data: new Date(),
       fornecedorId: undefined,
       produtos: [],
-    }, 
+    },
   });
 
   const handleApplyFilters = () => {
@@ -106,7 +129,16 @@ const NotasCompraPage: FC = () => {
       totalMax: '10000',
       fornecedorId: '',
     });
-    const newFilters = { ...appliedFilters, dateStart: '', dateEnd: '', totalMin: '', totalMax: '', fornecedorId: '', search: '', currentPage: 1 };
+    const newFilters = {
+      ...appliedFilters,
+      dateStart: '',
+      dateEnd: '',
+      totalMin: '',
+      totalMax: '',
+      fornecedorId: '',
+      search: '',
+      currentPage: 1,
+    };
     setAppliedFilters(newFilters);
     updateUrl(newFilters);
   };
@@ -131,7 +163,7 @@ const NotasCompraPage: FC = () => {
       data: new Date(data.data),
       fornecedorId: data.fornecedorId,
       total: data.produtos.reduce((acc, value) => acc + value.precoUnitario, 0),
-      produtos: data.produtos.map(p => ({
+      produtos: data.produtos.map((p) => ({
         produtoId: p.produtoId,
         quantidade: p.quantidade,
         unidade: p.unidade,
@@ -174,14 +206,14 @@ const NotasCompraPage: FC = () => {
     setSelectedNota(null);
   };
 
- if (isLoading || isLoadingFornecedor) {
-    return <TableSkeleton/>
- }
+  if (isLoading || isLoadingFornecedor) {
+    return <TableSkeleton />;
+  }
 
- if (error || errorFornecedor) {
-    console.error(error, "ou", errorFornecedor)
-    return <>Error!</>
- }
+  if (error || errorFornecedor) {
+    console.error(error, 'ou', errorFornecedor);
+    return <>Error!</>;
+  }
 
   const activeFilters = getActiveFilters();
 
@@ -190,7 +222,9 @@ const NotasCompraPage: FC = () => {
       <div className="flex flex-row items-center justify-between mb-6">
         <div className="flex items-center">
           <FileText className="h-8 w-8 text-green-500 mr-3" />
-          <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Notas Fiscais de Compra</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Gerenciamento de Notas Fiscais de Compra
+          </h1>
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
@@ -239,9 +273,26 @@ const NotasCompraPage: FC = () => {
             <div className="space-y-2">
               <Label>Fornecedor</Label>
               <SearchableSelect
-                options={responsefornecedores?.map(f => ({ id: String(f.id), name: f.nome })) || []}
-                value={filterValues.fornecedorId ? { id: filterValues.fornecedorId, name: responsefornecedores?.find(f => f.id.toString() === filterValues.fornecedorId)?.nome || '' } : null}
-                onChange={(option) => setFilterValues({ ...filterValues, fornecedorId: option ? option.id.toString() : '' })}
+                options={
+                  responsefornecedores?.map((f) => ({ id: String(f.id), name: f.nome })) || []
+                }
+                value={
+                  filterValues.fornecedorId
+                    ? {
+                        id: filterValues.fornecedorId,
+                        name:
+                          responsefornecedores?.find(
+                            (f) => f.id.toString() === filterValues.fornecedorId,
+                          )?.nome || '',
+                      }
+                    : null
+                }
+                onChange={(option) =>
+                  setFilterValues({
+                    ...filterValues,
+                    fornecedorId: option ? option.id.toString() : '',
+                  })
+                }
                 placeholder="Selecione um fornecedor"
               />
             </div>
@@ -298,10 +349,10 @@ const NotasCompraPage: FC = () => {
           <NotaFiscalCompraTable
             items={responseNotas?.notas || []}
             filterValues={appliedFilters}
-            onSort={() => { }}
+            onSort={() => {}}
             onEdit={openEditModal}
             onDelete={(notaSelected) => {
-              const nota = responseNotas?.notas?.find(nota => nota.id === notaSelected.id);
+              const nota = responseNotas?.notas?.find((nota) => nota.id === notaSelected.id);
               if (nota) openDeleteModal(nota);
             }}
           />

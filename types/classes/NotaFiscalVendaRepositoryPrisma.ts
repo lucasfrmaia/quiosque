@@ -9,23 +9,30 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
     this.prisma = prisma;
   }
 
-  async create(notaFiscal: Omit<NotaFiscalVenda, 'id' | 'produtos'> & { produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal'>[] }): Promise<NotaFiscalVenda> {
+  async create(
+    notaFiscal: Omit<NotaFiscalVenda, 'id' | 'produtos'> & {
+      produtos: Omit<ProdutoVenda, 'id' | 'produto' | 'notaFiscal'>[];
+    },
+  ): Promise<NotaFiscalVenda> {
     const { data, produtos } = notaFiscal;
-    const total = produtos.reduce((acc, produto) => acc + produto.precoUnitario * produto.quantidade, 0)
+    const total = produtos.reduce(
+      (acc, produto) => acc + produto.precoUnitario * produto.quantidade,
+      0,
+    );
 
     const createData = {
       data: new Date(data),
       total,
       produtos: {
-        create: produtos.map(pv => ({
+        create: produtos.map((pv) => ({
           quantidade: pv.quantidade,
           unidade: pv.unidade,
           precoUnitario: pv.precoUnitario,
           produto: {
-            connect: { id: pv.produtoId }
-          }
-        }))
-      }
+            connect: { id: pv.produtoId },
+          },
+        })),
+      },
     };
 
     const createdNotaFiscal = await this.prisma.notaFiscalVenda.create({
@@ -34,10 +41,10 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     return createdNotaFiscal;
@@ -50,10 +57,10 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     if (!notaFiscal) return null;
@@ -67,10 +74,10 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     return notasFiscais;
@@ -110,7 +117,7 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
       where.OR = [
         { id: { equals: parseInt(search) || undefined } },
         { total: { contains: search } },
-        { produtos: { some: { produto: { nome: { contains: search } } } } }
+        { produtos: { some: { produto: { nome: { contains: search } } } } },
       ].filter(Boolean);
     }
 
@@ -121,10 +128,10 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
       include: {
         produtos: {
           include: {
-            produto: true
-          }
-        }
-      }
+            produto: true,
+          },
+        },
+      },
     });
 
     const total = await this.prisma.notaFiscalVenda.count({ where });
@@ -132,7 +139,10 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
     return { notas, total };
   }
 
-  async update(id: number, notaFiscal: Partial<Omit<NotaFiscalVenda, 'id' | 'produtos'>>): Promise<NotaFiscalVenda> {
+  async update(
+    id: number,
+    notaFiscal: Partial<Omit<NotaFiscalVenda, 'id' | 'produtos'>>,
+  ): Promise<NotaFiscalVenda> {
     const data: any = { ...notaFiscal };
 
     if (data.data) {
@@ -146,10 +156,10 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     return updatedNotaFiscal;
@@ -157,7 +167,7 @@ export class NotaFiscalVendaRepositoryPrisma implements INotaFiscalVendaReposito
 
   async delete(id: number): Promise<void> {
     await this.prisma.notaFiscalVenda.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

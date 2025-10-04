@@ -23,15 +23,23 @@ export async function GET(request: NextRequest) {
         const endDate1 = new Date(searchParams.get('endDate1') || '');
         const startDate2 = new Date(searchParams.get('startDate2') || '');
         const endDate2 = new Date(searchParams.get('endDate2') || '');
-        if (isNaN(startDate1.getTime()) || isNaN(endDate1.getTime()) || isNaN(startDate2.getTime()) || isNaN(endDate2.getTime())) {
-          return NextResponse.json({ error: 'Datas são obrigatórias e inválidas' }, { status: 400 });
+        if (
+          isNaN(startDate1.getTime()) ||
+          isNaN(endDate1.getTime()) ||
+          isNaN(startDate2.getTime()) ||
+          isNaN(endDate2.getTime())
+        ) {
+          return NextResponse.json(
+            { error: 'Datas são obrigatórias e inválidas' },
+            { status: 400 },
+          );
         }
         data = await relatorio.getComparativoPeriodos(startDate1, endDate1, startDate2, endDate2);
         break;
 
       case 'produtos-mais-vendidos':
         const limit = parseInt(searchParams.get('limit') || '10');
-        const by = searchParams.get('by') as 'quantidade' | 'faturamento' || 'faturamento';
+        const by = (searchParams.get('by') as 'quantidade' | 'faturamento') || 'faturamento';
         data = await relatorio.getProdutosMaisVendidos(limit, by);
         break;
 

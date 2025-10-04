@@ -16,13 +16,16 @@ export async function GET(request: NextRequest) {
     const filters: FilterValues = {
       currentPage,
       itemsPerPage,
-      search
+      search,
     };
 
     const result = await repositoryFactory.notaFiscalVendaRepository.findPerPage(filters);
-    return NextResponse.json(result );
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Error fetching nota fiscal venda per page:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Failed to fetch nota fiscal venda' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to fetch nota fiscal venda' },
+      { status: 500 },
+    );
   }
 }

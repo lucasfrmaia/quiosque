@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         break;
 
       case 'giro':
-        const periodoGiro = searchParams.get('periodo') as 'monthly' | 'annual' || 'monthly';
+        const periodoGiro = (searchParams.get('periodo') as 'monthly' | 'annual') || 'monthly';
         data = await relatorio.getGiroEstoque(periodoGiro);
         break;
 
@@ -39,7 +39,10 @@ export async function GET(request: NextRequest) {
         break;
 
       default:
-        return NextResponse.json({ error: 'Tipo de relatório de estoque inválido' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Tipo de relatório de estoque inválido' },
+          { status: 400 },
+        );
     }
 
     return NextResponse.json(data);

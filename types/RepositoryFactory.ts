@@ -1,5 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import { IProdutoEstoqueRepository, IProdutoRepository, IUserRepository, INotaFiscalCompraRepository, INotaFiscalVendaRepository, ICategoryRepository, IFornecedorRepository } from "./interfaces/repositories";
+import {
+  IProdutoEstoqueRepository,
+  IProdutoRepository,
+  IUserRepository,
+  INotaFiscalCompraRepository,
+  INotaFiscalVendaRepository,
+  ICategoryRepository,
+  IFornecedorRepository,
+} from './interfaces/repositories';
 import { UserRepositoryPrisma } from './classes/UserRepositoryPrisma';
 import { ProdutoEstoqueRepositoryPrisma } from './classes/ProdutoEstoqueRepositoryPrisma';
 import { ProdutoRepositoryPrisma } from './classes/ProdutoRepositoryPrisma';
@@ -18,9 +26,8 @@ class RepositoryFactory {
     public readonly notaFiscalVendaRepository: INotaFiscalVendaRepository,
     public readonly categoryRepository: ICategoryRepository,
     public readonly fornecedorRepository: IFornecedorRepository,
-    public readonly relatorio: Relatorio
-  ) {
-  }
+    public readonly relatorio: Relatorio,
+  ) {}
 }
 
 const prisma = new PrismaClient();
@@ -33,5 +40,5 @@ export const repositoryFactory = new RepositoryFactory(
   new NotaFiscalVendaRepositoryPrisma(prisma),
   new CategoryRepositoryPrisma(prisma),
   new FornecedorRepositoryPrisma(prisma),
-  new Relatorio(prisma)
+  new Relatorio(prisma),
 );

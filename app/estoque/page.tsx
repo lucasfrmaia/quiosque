@@ -4,17 +4,24 @@ import { FC, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { ProdutoEstoque, SortDirection } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Pagination } from '@/app/_components/Pagination';
 import { EstoqueTable } from '@/app/_components/tables/EstoqueTable';
@@ -25,7 +32,7 @@ import { ModalEstoqueCreate } from '../_components/modals/estoque/ModalEstoqueCr
 import { ModalEditEstoque } from '../_components/modals/estoque/ModalEditEstoque';
 import { ModalDeleteEstoque } from '../_components/modals/estoque/ModalDeleteEstoque';
 import { useProduto } from '../_components/hooks/useProduto';
-import { Filter, ChevronDown, Package, Plus, Search, X } from 'lucide-react';
+import { Filter, Package, Plus, Search, X } from 'lucide-react';
 import { EstoqueSchema, produtoEstoqueSchema } from '@/types/validation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
@@ -43,13 +50,16 @@ const EstoquePage: FC = () => {
     updateUrl,
     getActiveFilters,
   } = useEstoque();
-  
-  
+
   const { getAllCategories } = useCategory();
   const { data: categories = [] } = getAllCategories();
-  
-  const { getAllProdutos } = useProduto()
-  const { data: produtos = [], isLoading: isLoadingProduto, error: errorProduto } = getAllProdutos()
+
+  const { getAllProdutos } = useProduto();
+  const {
+    data: produtos = [],
+    isLoading: isLoadingProduto,
+    error: errorProduto,
+  } = getAllProdutos();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -169,7 +179,7 @@ const EstoquePage: FC = () => {
     setSelectedItem(null);
   };
 
-  if (isLoading || isLoadingProduto) return <TableSkeleton/>;
+  if (isLoading || isLoadingProduto) return <TableSkeleton />;
   if (error || errorProduto) return <p>Erro ao carregar estoque!</p>;
 
   return (
@@ -246,7 +256,9 @@ const EstoquePage: FC = () => {
         <DialogContent className="max-w-md sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Filtros</DialogTitle>
-            <DialogDescription>Ajuste os filtros para encontrar os produtos ideais.</DialogDescription>
+            <DialogDescription>
+              Ajuste os filtros para encontrar os produtos ideais.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
             {/* Category Filter */}
@@ -254,8 +266,12 @@ const EstoquePage: FC = () => {
               <Label>Categoria</Label>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  variant={filterValues.categoryId === null ? "default" : "outline"}
-                  className={`rounded-full ${filterValues.categoryId === null ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
+                  variant={filterValues.categoryId === null ? 'default' : 'outline'}
+                  className={`rounded-full ${
+                    filterValues.categoryId === null
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'border-green-300 hover:bg-green-50'
+                  }`}
                   onClick={() => setFilterValues({ ...filterValues, categoryId: null })}
                 >
                   Todas
@@ -263,9 +279,17 @@ const EstoquePage: FC = () => {
                 {categories.map((category) => (
                   <Button
                     key={category.id}
-                    variant={filterValues.categoryId === String(category.id) ? "default" : "outline"}
-                    className={`rounded-full ${filterValues.categoryId === String(category.id) ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
-                    onClick={() => setFilterValues({ ...filterValues, categoryId: String(category.id) })}
+                    variant={
+                      filterValues.categoryId === String(category.id) ? 'default' : 'outline'
+                    }
+                    className={`rounded-full ${
+                      filterValues.categoryId === String(category.id)
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'border-green-300 hover:bg-green-50'
+                    }`}
+                    onClick={() =>
+                      setFilterValues({ ...filterValues, categoryId: String(category.id) })
+                    }
                   >
                     {category.name}
                   </Button>
@@ -316,7 +340,9 @@ const EstoquePage: FC = () => {
             filterValues={appliedFilters}
             onEdit={openEditModal}
             onDelete={(produtoEstoque) => {
-              const item = response?.estoque.find((i: ProdutoEstoque) => i.id === produtoEstoque.id);
+              const item = response?.estoque.find(
+                (i: ProdutoEstoque) => i.id === produtoEstoque.id,
+              );
               if (item) openDeleteModal(item);
             }}
           />
@@ -327,9 +353,7 @@ const EstoquePage: FC = () => {
               totalPages={Math.ceil((response?.total || 0) / appliedFilters.itemsPerPage)}
               itemsPerPage={appliedFilters.itemsPerPage}
               totalItems={response?.total || 0}
-              startIndex={
-                (appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage
-              }
+              startIndex={(appliedFilters.currentPage - 1) * appliedFilters.itemsPerPage}
               onPageChange={handlePageChange}
               onItemsPerPageChange={handleItemsPerPageChange}
             />

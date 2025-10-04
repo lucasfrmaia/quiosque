@@ -1,8 +1,8 @@
-import { FC } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Box } from "lucide-react";
-import { ProdutoEstoque, FilterValues } from "@/types/interfaces/entities";
-import { DataTable } from "../DataTable";
+import { FC } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Box } from 'lucide-react';
+import { ProdutoEstoque, FilterValues } from '@/types/interfaces/entities';
+import { DataTable } from '../DataTable';
 
 interface EstoqueTableProps {
   items: ProdutoEstoque[];
@@ -13,8 +13,8 @@ interface EstoqueTableProps {
 
 const columns = [
   {
-    key: "imagem",
-    header: "Imagem",
+    key: 'imagem',
+    header: 'Imagem',
     render: (item: ProdutoEstoque) => (
       <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
         {item.produto?.imagemUrl ? (
@@ -31,40 +31,40 @@ const columns = [
     sortable: false,
   },
   {
-    key: "id",
-    header: "ID",
+    key: 'id',
+    header: 'ID',
     render: (item: ProdutoEstoque) => item.id,
     sortable: false,
   },
   {
-    key: "produto",
-    header: "Nome",
-    sortKey: "produto.nome",
+    key: 'produto',
+    header: 'Nome',
+    sortKey: 'produto.nome',
     render: (item: ProdutoEstoque) => (
       <div className="space-y-1">
-        <div className="font-bold text-sm">{item.produto?.nome || "N/A"}</div>
+        <div className="font-bold text-sm">{item.produto?.nome || 'N/A'}</div>
         <div className="text-gray-500 text-xs line-clamp-2">
-          {item.produto?.descricao || "Sem descrição"}
+          {item.produto?.descricao || 'Sem descrição'}
         </div>
       </div>
     ),
     sortable: true,
     sorter: (a: ProdutoEstoque, b: ProdutoEstoque) => {
-      const aName = a.produto?.nome || "";
-      const bName = b.produto?.nome || "";
+      const aName = a.produto?.nome || '';
+      const bName = b.produto?.nome || '';
       return aName.localeCompare(bName);
     },
   },
   {
-    key: "categoria",
-    header: "Categoria",
-    render: (item: ProdutoEstoque) => item.produto?.categoria?.name || "N/A",
+    key: 'categoria',
+    header: 'Categoria',
+    render: (item: ProdutoEstoque) => item.produto?.categoria?.name || 'N/A',
     sortable: false,
   },
   {
-    key: "preco",
-    header: "Preço",
-    sortKey: "preco",
+    key: 'preco',
+    header: 'Preço',
+    sortKey: 'preco',
     render: (item: ProdutoEstoque) => (
       <div className="font-bold text-sm">R$ {item.preco.toFixed(2)}</div>
     ),
@@ -72,21 +72,20 @@ const columns = [
     sorter: (a: ProdutoEstoque, b: ProdutoEstoque) => a.preco - b.preco,
   },
   {
-    key: "estoque",
-    header: "Estoque",
-    sortKey: "quantidade",
+    key: 'estoque',
+    header: 'Estoque',
+    sortKey: 'quantidade',
     render: (item: ProdutoEstoque) => (
       <div className="text-sm">
         {item.quantidade} {item.unidade}
       </div>
     ),
     sortable: true,
-    sorter: (a: ProdutoEstoque, b: ProdutoEstoque) =>
-      a.quantidade - b.quantidade,
+    sorter: (a: ProdutoEstoque, b: ProdutoEstoque) => a.quantidade - b.quantidade,
   },
   {
-    key: "status",
-    header: "Status",
+    key: 'status',
+    header: 'Status',
     render: (item: ProdutoEstoque) => (
       <Badge variant="default" className="bg-green-100 text-green-800">
         Ativo
@@ -95,22 +94,15 @@ const columns = [
     sortable: false,
   },
   {
-    key: "dataValidade",
-    header: "Validade",
+    key: 'dataValidade',
+    header: 'Validade',
     render: (item: ProdutoEstoque) =>
-      item.dataValidade
-        ? new Date(item.dataValidade).toLocaleDateString("pt-BR")
-        : "N/A",
+      item.dataValidade ? new Date(item.dataValidade).toLocaleDateString('pt-BR') : 'N/A',
     sortable: false,
   },
 ];
 
-export const EstoqueTable: FC<EstoqueTableProps> = ({
-  items,
-  filterValues,
-  onEdit,
-  onDelete,
-}) => {
+export const EstoqueTable: FC<EstoqueTableProps> = ({ items, filterValues, onEdit, onDelete }) => {
   return (
     <DataTable<ProdutoEstoque>
       items={items}

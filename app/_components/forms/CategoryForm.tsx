@@ -6,7 +6,10 @@ import { z } from 'zod';
 import { CategorySchema } from '@/types/validation';
 
 export const CategoryForm: FC = () => {
-  const { register, formState: { errors } } = useFormContext<CategorySchema>();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<CategorySchema>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -21,9 +24,7 @@ export const CategoryForm: FC = () => {
             className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Nome da categoria"
           />
-          {errors.name && (
-            <p className="text-sm text-red-500">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
         </div>
       </div>
     </div>

@@ -14,21 +14,13 @@ export const DateRangeFilter: FC<DateRangeFilterProps> = ({
   endDate,
   onStartDateChange,
   onEndDateChange,
-  label = "Período",
-  description = "Selecione o intervalo de datas"
+  label = 'Período',
+  description = 'Selecione o intervalo de datas',
 }) => {
   return (
     <div className="filter-group">
-      {label && (
-        <label className="filter-label font-bold">
-          {label}
-        </label>
-      )}
-      {description && (
-        <p className="filter-description">
-          {description}
-        </p>
-      )}
+      {label && <label className="filter-label font-bold">{label}</label>}
+      {description && <p className="filter-description">{description}</p>}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
           <label className="text-xs text-gray-600">Data inicial</label>

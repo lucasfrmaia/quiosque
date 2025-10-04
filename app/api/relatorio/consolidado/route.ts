@@ -31,7 +31,10 @@ export async function GET(request: NextRequest) {
         break;
 
       default:
-        return NextResponse.json({ error: 'Tipo de relatório consolidado inválido' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Tipo de relatório consolidado inválido' },
+          { status: 400 },
+        );
     }
 
     return NextResponse.json(data);

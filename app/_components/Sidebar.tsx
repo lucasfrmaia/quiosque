@@ -1,9 +1,20 @@
-'use client'
+'use client';
 
 import { FC, ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FaUtensils, FaMoneyBillWave, FaFileInvoice, FaChartLine, FaSignOutAlt, FaProductHunt, FaBook, FaTruck, FaBars, FaTimes } from 'react-icons/fa';
+import {
+  FaUtensils,
+  FaMoneyBillWave,
+  FaFileInvoice,
+  FaChartLine,
+  FaSignOutAlt,
+  FaProductHunt,
+  FaBook,
+  FaTruck,
+  FaBars,
+  FaTimes,
+} from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarItemProps {
@@ -19,9 +30,10 @@ const SidebarItem: FC<SidebarItemProps> = ({ icon, text, href, isActive, isExpan
     <Link
       href={href}
       className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ease-in-out group
-        ${isActive
-          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
-          : 'text-gray-600 hover:bg-gradient-to-r from-gray-100 to-gray-200 hover:text-blue-600'
+        ${
+          isActive
+            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+            : 'text-gray-600 hover:bg-gradient-to-r from-gray-100 to-gray-200 hover:text-blue-600'
         } ${!isExpanded ? 'justify-center space-x-0' : ''}`}
     >
       <span className="text-xl">{icon}</span>
@@ -43,51 +55,57 @@ const Sidebar: FC<SidebarProps> = ({ isExpanded, onToggle }) => {
     {
       icon: <FaChartLine size={20} className="text-blue-500" />,
       text: 'Dashboard',
-      href: '/'
+      href: '/',
     },
     {
       icon: <FaProductHunt size={20} className="text-green-500" />,
       text: 'Produtos',
-      href: '/produto'
+      href: '/produto',
     },
     {
       icon: <FaBook size={20} className="text-purple-500" />,
       text: 'Categorias',
-      href: '/categoria'
+      href: '/categoria',
     },
     {
       icon: <FaTruck size={20} className="text-orange-500" />,
       text: 'Fornecedores',
-      href: '/fornecedores'
+      href: '/fornecedores',
     },
     {
       icon: <FaUtensils size={20} className="text-indigo-500" />,
       text: 'Estoque',
-      href: '/estoque'
+      href: '/estoque',
     },
     {
       icon: <FaFileInvoice size={20} className="text-yellow-500" />,
       text: 'Notas de Compra',
-      href: '/notas-compra'
+      href: '/notas-compra',
     },
     {
       icon: <FaMoneyBillWave size={20} className="text-emerald-500" />,
       text: 'Notas de Venda',
-      href: '/notas-vendas'
+      href: '/notas-vendas',
     },
   ];
 
   return (
     <>
       {/* Sidebar */}
-      <aside className={`h-screen fixed left-0 top-0 transition-all duration-300 ease-in-out z-40 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-xl ${
-        isExpanded ? 'w-64' : 'w-16'
-      }`}>
-        <div className={`flex flex-col h-full transition-all duration-300 ${
-          isExpanded ? 'p-6' : 'p-2'
-        }`}>
+      <aside
+        className={`h-screen fixed left-0 top-0 transition-all duration-300 ease-in-out z-40 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-xl ${
+          isExpanded ? 'w-64' : 'w-16'
+        }`}
+      >
+        <div
+          className={`flex flex-col h-full transition-all duration-300 ${
+            isExpanded ? 'p-6' : 'p-2'
+          }`}
+        >
           {/* Header with Toggle Button on Right */}
-          <div className={`flex items-center justify-between border-b border-gray-200 pb-4 mb-4 ${isExpanded ? 'p-2' : 'p-1'}`}>
+          <div
+            className={`flex items-center justify-between border-b border-gray-200 pb-4 mb-4 ${isExpanded ? 'p-2' : 'p-1'}`}
+          >
             {isExpanded && (
               <>
                 <div>
@@ -101,7 +119,11 @@ const Sidebar: FC<SidebarProps> = ({ isExpanded, onToggle }) => {
               className="p-2 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-50"
               aria-label={isExpanded ? 'Minimizar sidebar' : 'Expandir sidebar'}
             >
-              {isExpanded ? <FaTimes size={16} className="text-gray-600" /> : <FaBars size={16} className="text-gray-600" />}
+              {isExpanded ? (
+                <FaTimes size={16} className="text-gray-600" />
+              ) : (
+                <FaBars size={16} className="text-gray-600" />
+              )}
             </button>
           </div>
 

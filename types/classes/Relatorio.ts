@@ -44,7 +44,9 @@ export class Relatorio {
   }
 
   // ===== Sales Reports =====
-  async getVendasPorPeriodo(periodo: 'daily' | 'weekly' | 'monthly' | 'annual'): Promise<{ data: Date; total: number; count: number }[]> {
+  async getVendasPorPeriodo(
+    periodo: 'daily' | 'weekly' | 'monthly' | 'annual',
+  ): Promise<{ data: Date; total: number; count: number }[]> {
     const now = new Date();
     let startDate: Date;
     let trunc: string;
@@ -82,7 +84,7 @@ export class Relatorio {
       GROUP BY 1
       ORDER BY 1`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       data: new Date(r.data),
       total: this.toNumber(r.total),
       count: Number(r.count ?? 0),
@@ -93,8 +95,11 @@ export class Relatorio {
     startDate1: Date,
     endDate1: Date,
     startDate2: Date,
-    endDate2: Date
-  ): Promise<{ periodo1: { total: number; count: number }; periodo2: { total: number; count: number } }> {
+    endDate2: Date,
+  ): Promise<{
+    periodo1: { total: number; count: number };
+    periodo2: { total: number; count: number };
+  }> {
     const p1 = await this.prisma.$queryRaw<
       Array<{ total: number | string; count: number | string }>
     >`SELECT COALESCE(SUM("total"),0)::double precision AS "total", COUNT("id")::int AS "count"
@@ -111,20 +116,30 @@ export class Relatorio {
     };
   }
 
-  async getProdutosMaisVendidos(limit: number = 10, by: 'quantidade' | 'faturamento' = 'faturamento'): Promise<{ produtoId: number; nome: string; totalQuantidade: number; totalFaturamento: number }[]> {
+  async getProdutosMaisVendidos(
+    limit: number = 10,
+    by: 'quantidade' | 'faturamento' = 'faturamento',
+  ): Promise<
+    { produtoId: number; nome: string; totalQuantidade: number; totalFaturamento: number }[]
+  > {
     // Validação do parâmetro 'by' para evitar injeção
     if (by !== 'quantidade' && by !== 'faturamento') by = 'faturamento';
 
     if (by === 'quantidade') {
       const rows = await this.prisma.$queryRaw<
-        Array<{ produtoId: number; nome: string; totalQuantidade: number | string; totalFaturamento: number | string }>
+        Array<{
+          produtoId: number;
+          nome: string;
+          totalQuantidade: number | string;
+          totalFaturamento: number | string;
+        }>
       >`SELECT pv."produtoId" AS "produtoId", p.nome AS nome, SUM(pv.quantidade)::int AS "totalQuantidade", COALESCE(SUM(pv."precoUnitario"*pv.quantidade),0)::double precision AS "totalFaturamento"
         FROM "produto_venda" pv
         JOIN "produto" p ON p.id = pv."produtoId"
         GROUP BY pv."produtoId", p.nome
         ORDER BY SUM(pv.quantidade) DESC
         LIMIT ${limit}`;
-      return rows.map(r => ({
+      return rows.map((r) => ({
         produtoId: Number(r.produtoId),
         nome: r.nome,
         totalQuantidade: Number(r.totalQuantidade ?? 0),
@@ -132,14 +147,19 @@ export class Relatorio {
       }));
     } else {
       const rows = await this.prisma.$queryRaw<
-        Array<{ produtoId: number; nome: string; totalQuantidade: number | string; totalFaturamento: number | string }>
+        Array<{
+          produtoId: number;
+          nome: string;
+          totalQuantidade: number | string;
+          totalFaturamento: number | string;
+        }>
       >`SELECT pv."produtoId" AS "produtoId", p.nome AS nome, SUM(pv.quantidade)::int AS "totalQuantidade", COALESCE(SUM(pv."precoUnitario"*pv.quantidade),0)::double precision AS "totalFaturamento"
         FROM "produto_venda" pv
         JOIN "produto" p ON p.id = pv."produtoId"
         GROUP BY pv."produtoId", p.nome
         ORDER BY COALESCE(SUM(pv."precoUnitario"*pv.quantidade),0) DESC
         LIMIT ${limit}`;
-      return rows.map(r => ({
+      return rows.map((r) => ({
         produtoId: Number(r.produtoId),
         nome: r.nome,
         totalQuantidade: Number(r.totalQuantidade ?? 0),
@@ -148,9 +168,16 @@ export class Relatorio {
     }
   }
 
-  async getVendasPorCategoria(): Promise<{ categoriaId: number; nome: string; totalVendas: number; totalQuantidade: number }[]> {
+  async getVendasPorCategoria(): Promise<
+    { categoriaId: number; nome: string; totalVendas: number; totalQuantidade: number }[]
+  > {
     const rows = await this.prisma.$queryRaw<
-      Array<{ categoriaId: number; nome: string; totalVendas: number | string; totalQuantidade: number | string }>
+      Array<{
+        categoriaId: number;
+        nome: string;
+        totalVendas: number | string;
+        totalQuantidade: number | string;
+      }>
     >`SELECT c.id AS "categoriaId", c.name AS nome,
         COALESCE(SUM(pv."precoUnitario"*pv.quantidade),0)::double precision AS "totalVendas",
         COALESCE(SUM(pv.quantidade),0)::int AS "totalQuantidade"
@@ -160,7 +187,7 @@ export class Relatorio {
       WHERE c.id IS NOT NULL
       GROUP BY c.id, c.name
       ORDER BY "totalVendas" DESC`;
-    return rows.map(r => ({
+    return rows.map((r) => ({
       categoriaId: Number(r.categoriaId),
       nome: r.nome,
       totalVendas: this.toNumber(r.totalVendas),
@@ -168,9 +195,17 @@ export class Relatorio {
     }));
   }
 
-  async getMargemLucroPorProduto(limit: number = 10): Promise<{ produtoId: number; nome: string; margem: number }[]> {
+  async getMargemLucroPorProduto(
+    limit: number = 10,
+  ): Promise<{ produtoId: number; nome: string; margem: number }[]> {
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; revenue: number | string; cost: number | string; margem: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        revenue: number | string;
+        cost: number | string;
+        margem: number | string;
+      }>
     >`SELECT p.id AS "produtoId", p.nome AS nome,
         COALESCE(rev.total_revenue,0)::double precision AS revenue,
         COALESCE(cost.total_cost,0)::double precision AS cost,
@@ -189,7 +224,7 @@ export class Relatorio {
       ORDER BY margem DESC
       LIMIT ${limit}`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       produtoId: Number(r.produtoId),
       nome: r.nome,
       margem: this.toNumber(r.margem),
@@ -197,16 +232,24 @@ export class Relatorio {
   }
 
   // ===== Stock Reports =====
-  async getPosicaoEstoqueAtual(): Promise<{ produtoId: number; nome: string; quantidade: number; preco: number; valorTotal: number }[]> {
+  async getPosicaoEstoqueAtual(): Promise<
+    { produtoId: number; nome: string; quantidade: number; preco: number; valorTotal: number }[]
+  > {
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; quantidade: number | string; preco: number | string; valorTotal: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        quantidade: number | string;
+        preco: number | string;
+        valorTotal: number | string;
+      }>
     >`SELECT pe."produtoId" AS "produtoId", p.nome AS nome, COALESCE(SUM(pe.quantidade),0)::int AS quantidade, COALESCE(AVG(pe.preco),0)::double precision AS preco,
         (COALESCE(SUM(pe.quantidade),0) * COALESCE(AVG(pe.preco),0))::double precision AS "valorTotal"
       FROM "produto_estoque" pe
       JOIN "produto" p ON p.id = pe."produtoId"
       GROUP BY pe."produtoId", p.nome`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       produtoId: Number(r.produtoId),
       nome: r.nome,
       quantidade: Number(r.quantidade ?? 0),
@@ -215,7 +258,9 @@ export class Relatorio {
     }));
   }
 
-  async getCurvaABCEstoque(): Promise<{ produtoId: number; nome: string; valorEstoque: number; categoria: 'A' | 'B' | 'C' }[]> {
+  async getCurvaABCEstoque(): Promise<
+    { produtoId: number; nome: string; valorEstoque: number; categoria: 'A' | 'B' | 'C' }[]
+  > {
     const rows = await this.prisma.$queryRaw<
       Array<{ produtoId: number; nome: string; valorEstoque: number | string }>
     >`SELECT p.id AS "produtoId", p.nome AS nome, COALESCE(SUM(pe.quantidade * pe.preco),0)::double precision AS "valorEstoque"
@@ -224,7 +269,7 @@ export class Relatorio {
       GROUP BY p.id, p.nome
       ORDER BY "valorEstoque" DESC`;
 
-    const results = rows.map(r => ({
+    const results = rows.map((r) => ({
       produtoId: Number(r.produtoId),
       nome: r.nome,
       valorEstoque: this.toNumber(r.valorEstoque),
@@ -244,7 +289,9 @@ export class Relatorio {
     return mapped;
   }
 
-  async getGiroEstoque(periodo: 'monthly' | 'annual' = 'monthly'): Promise<{ produtoId: number; nome: string; giro: number }[]> {
+  async getGiroEstoque(
+    periodo: 'monthly' | 'annual' = 'monthly',
+  ): Promise<{ produtoId: number; nome: string; giro: number }[]> {
     const now = new Date();
     let startDate: Date;
     if (periodo === 'monthly') {
@@ -256,7 +303,12 @@ export class Relatorio {
     const endDate = now;
 
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; custoVendido: number | string; estoqueMedio: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        custoVendido: number | string;
+        estoqueMedio: number | string;
+      }>
     >`SELECT p.id AS "produtoId", p.nome AS nome,
         COALESCE(c.total_custo,0)::double precision AS "custoVendido",
         COALESCE(AVG(pe.quantidade),0)::double precision AS "estoqueMedio"
@@ -272,7 +324,7 @@ export class Relatorio {
       GROUP BY p.id, p.nome, c.total_custo
       ORDER BY (CASE WHEN AVG(pe.quantidade) IS NOT NULL AND AVG(pe.quantidade) > 0 THEN (c.total_custo / AVG(pe.quantidade)) ELSE 0 END) DESC`;
 
-    const results = rows.map(r => {
+    const results = rows.map((r) => {
       const custoVendido = this.toNumber(r.custoVendido);
       const estoqueMedio = this.toNumber(r.estoqueMedio);
       const giro = estoqueMedio > 0 ? custoVendido / estoqueMedio : 0;
@@ -287,7 +339,9 @@ export class Relatorio {
     return results;
   }
 
-  async getProdutosBaixoEstoque(minLevel: number = 10): Promise<{ produtoId: number; nome: string; quantidadeAtual: number }[]> {
+  async getProdutosBaixoEstoque(
+    minLevel: number = 10,
+  ): Promise<{ produtoId: number; nome: string; quantidadeAtual: number }[]> {
     const rows = await this.prisma.$queryRaw<
       Array<{ produtoId: number; nome: string; quantidadeAtual: number | string }>
     >`SELECT p.id AS "produtoId", p.nome AS nome, COALESCE(SUM(pe.quantidade),0)::int AS "quantidadeAtual"
@@ -298,14 +352,16 @@ export class Relatorio {
       HAVING COALESCE(SUM(pe.quantidade),0) <= ${minLevel}
       ORDER BY "quantidadeAtual" ASC`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       produtoId: Number(r.produtoId),
       nome: r.nome,
       quantidadeAtual: Number(r.quantidadeAtual ?? 0),
     }));
   }
 
-  async getProdutosSemGiro(days: number = 90): Promise<{ produtoId: number; nome: string; diasSemVenda: number }[]> {
+  async getProdutosSemGiro(
+    days: number = 90,
+  ): Promise<{ produtoId: number; nome: string; diasSemVenda: number }[]> {
     // cutoffDate: consider products with last_sale < cutoff OR no sale at all
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -327,19 +383,26 @@ export class Relatorio {
         AND (ls."last_sale" IS NULL OR ls."last_sale" < ${cutoffDate})
       ORDER BY "diasSemVenda" DESC`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       produtoId: Number(r.produtoId),
       nome: r.nome,
       diasSemVenda: Number(r.diasSemVenda ?? 0),
     }));
   }
 
-  async getProdutosProximaValidade(days: number = 30): Promise<{ produtoId: number; nome: string; diasParaVencimento: number }[]> {
+  async getProdutosProximaValidade(
+    days: number = 30,
+  ): Promise<{ produtoId: number; nome: string; diasParaVencimento: number }[]> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() + days);
 
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; dataValidade: Date; diasParaVencimento: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        dataValidade: Date;
+        diasParaVencimento: number | string;
+      }>
     >`SELECT pe."produtoId" AS "produtoId", p.nome AS nome, pe."dataValidade" AS "dataValidade",
         FLOOR(EXTRACT(EPOCH FROM (pe."dataValidade" - NOW())) / 86400)::int AS "diasParaVencimento"
       FROM "produto_estoque" pe
@@ -347,7 +410,7 @@ export class Relatorio {
       WHERE pe."dataValidade" IS NOT NULL AND pe."dataValidade" <= ${cutoffDate} AND pe."quantidade" > 0
       ORDER BY pe."dataValidade" ASC`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       produtoId: Number(r.produtoId),
       nome: r.nome,
       diasParaVencimento: Number(r.diasParaVencimento ?? 0),
@@ -355,9 +418,19 @@ export class Relatorio {
   }
 
   // ===== Purchases Reports =====
-  async getHistoricoComprasPorProduto(produtoId: number): Promise<{ data: Date; quantidade: number; precoUnitario: number; total: number; fornecedor: string }[]> {
+  async getHistoricoComprasPorProduto(
+    produtoId: number,
+  ): Promise<
+    { data: Date; quantidade: number; precoUnitario: number; total: number; fornecedor: string }[]
+  > {
     const rows = await this.prisma.$queryRaw<
-      Array<{ data: Date; quantidade: number | string; precoUnitario: number | string; total: number | string; fornecedor: string }>
+      Array<{
+        data: Date;
+        quantidade: number | string;
+        precoUnitario: number | string;
+        total: number | string;
+        fornecedor: string;
+      }>
     >`SELECT nf."data" AS data, pc.quantidade AS quantidade, pc."precoUnitario" AS "precoUnitario",
         (pc.quantidade * pc."precoUnitario")::double precision AS total, f.nome AS fornecedor
       FROM "produto_compra" pc
@@ -366,7 +439,7 @@ export class Relatorio {
       WHERE pc."produtoId" = ${produtoId}
       ORDER BY nf."data" DESC`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       data: new Date(r.data),
       quantidade: Number(r.quantidade ?? 0),
       precoUnitario: this.toNumber(r.precoUnitario),
@@ -375,16 +448,23 @@ export class Relatorio {
     }));
   }
 
-  async getComprasPorFornecedor(): Promise<{ fornecedorId: number; nome: string; totalCompras: number; totalValor: number }[]> {
+  async getComprasPorFornecedor(): Promise<
+    { fornecedorId: number; nome: string; totalCompras: number; totalValor: number }[]
+  > {
     const rows = await this.prisma.$queryRaw<
-      Array<{ fornecedorId: number; nome: string; totalCompras: number | string; totalValor: number | string }>
+      Array<{
+        fornecedorId: number;
+        nome: string;
+        totalCompras: number | string;
+        totalValor: number | string;
+      }>
     >`SELECT nf."fornecedorId" AS "fornecedorId", f.nome AS nome, COUNT(nf.id)::int AS "totalCompras", COALESCE(SUM(nf."total"),0)::double precision AS "totalValor"
       FROM "nota_fiscal_compra" nf
       JOIN "fornecedor" f ON f.id = nf."fornecedorId"
       GROUP BY nf."fornecedorId", f.nome
       ORDER BY "totalValor" DESC`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       fornecedorId: Number(r.fornecedorId),
       nome: r.nome,
       totalCompras: Number(r.totalCompras ?? 0),
@@ -392,7 +472,9 @@ export class Relatorio {
     }));
   }
 
-  async getCustosAquisiçãoPorProduto(produtoId: number): Promise<{ data: Date; precoMedio: number }[]> {
+  async getCustosAquisiçãoPorProduto(
+    produtoId: number,
+  ): Promise<{ data: Date; precoMedio: number }[]> {
     const rows = await this.prisma.$queryRaw<
       Array<{ data: Date; precoMedio: number | string }>
     >`SELECT nf."data" AS data, AVG(pc."precoUnitario")::double precision AS "precoMedio"
@@ -403,19 +485,34 @@ export class Relatorio {
       HAVING AVG(pc."precoUnitario") IS NOT NULL
       ORDER BY nf."data" ASC`;
 
-    return rows.map(r => ({
+    return rows.map((r) => ({
       data: new Date(r.data),
       precoMedio: this.toNumber(r.precoMedio),
     }));
   }
 
   // ===== Consolidated Reports =====
-  async getAnaliseCoberturaEstoque(days: number = 30): Promise<{ produtoId: number; nome: string; estoqueAtual: number; mediaVendasDiaria: number; diasCobertura: number }[]> {
+  async getAnaliseCoberturaEstoque(
+    days: number = 30,
+  ): Promise<
+    {
+      produtoId: number;
+      nome: string;
+      estoqueAtual: number;
+      mediaVendasDiaria: number;
+      diasCobertura: number;
+    }[]
+  > {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; estoqueAtual: number | string; totalVendas: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        estoqueAtual: number | string;
+        totalVendas: number | string;
+      }>
     >`WITH vendas AS (
         SELECT pv."produtoId", SUM(pv.quantidade)::int AS totalVendas
         FROM "produto_venda" pv
@@ -432,7 +529,7 @@ export class Relatorio {
       LEFT JOIN estoques e ON e."produtoId" = v."produtoId"
       LEFT JOIN "produto" p ON p.id = v."produtoId"`;
 
-    const results = rows.map(r => {
+    const results = rows.map((r) => {
       const totalVendas = this.toNumber(r.totalVendas);
       const estoqueTotal = this.toNumber(r.estoqueAtual);
       const mediaVendasDiaria = totalVendas / days;
@@ -450,14 +547,22 @@ export class Relatorio {
     return results;
   }
 
-  async getNecessidadeCompra(leadTimeDias: number = 7, estoqueMinimo: number = 10): Promise<{ produtoId: number; nome: string; quantidadeSugestao: number; razao: string }[]> {
+  async getNecessidadeCompra(
+    leadTimeDias: number = 7,
+    estoqueMinimo: number = 10,
+  ): Promise<{ produtoId: number; nome: string; quantidadeSugestao: number; razao: string }[]> {
     // Usaremos um período base de 30 dias para média de vendas (mesma lógica original)
     const days = 30;
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; estoqueAtual: number | string; totalVendas: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        estoqueAtual: number | string;
+        totalVendas: number | string;
+      }>
     >`WITH vendas AS (
         SELECT pv."produtoId", SUM(pv.quantidade)::int AS totalVendas
         FROM "produto_venda" pv
@@ -474,29 +579,43 @@ export class Relatorio {
       LEFT JOIN estoques e ON e."produtoId" = v."produtoId"
       LEFT JOIN "produto" p ON p.id = v."produtoId"`;
 
-    const necessidades = rows.map(r => {
-      const totalVendas = this.toNumber(r.totalVendas);
-      const estoqueAtual = this.toNumber(r.estoqueAtual);
-      const mediaVendasDiaria = totalVendas / days;
-      const quantidadeSugestao = Math.max(0, Math.round((mediaVendasDiaria * leadTimeDias) + estoqueMinimo - estoqueAtual));
-      let razao = '';
-      const diasCobertura = mediaVendasDiaria > 0 ? estoqueAtual / mediaVendasDiaria : 999;
-      if (diasCobertura < leadTimeDias) razao = 'Cobertura insuficiente para lead time';
-      else if (estoqueAtual < estoqueMinimo) razao = 'Abaixo do estoque mínimo';
-      else if (quantidadeSugestao > 0) razao = 'Manter níveis de segurança';
-      else razao = 'Sem necessidade imediata';
-      return {
-        produtoId: Number(r.produtoId),
-        nome: r.nome,
-        quantidadeSugestao,
-        razao,
-      };
-    }).filter(n => n.quantidadeSugestao > 0);
+    const necessidades = rows
+      .map((r) => {
+        const totalVendas = this.toNumber(r.totalVendas);
+        const estoqueAtual = this.toNumber(r.estoqueAtual);
+        const mediaVendasDiaria = totalVendas / days;
+        const quantidadeSugestao = Math.max(
+          0,
+          Math.round(mediaVendasDiaria * leadTimeDias + estoqueMinimo - estoqueAtual),
+        );
+        let razao = '';
+        const diasCobertura = mediaVendasDiaria > 0 ? estoqueAtual / mediaVendasDiaria : 999;
+        if (diasCobertura < leadTimeDias) razao = 'Cobertura insuficiente para lead time';
+        else if (estoqueAtual < estoqueMinimo) razao = 'Abaixo do estoque mínimo';
+        else if (quantidadeSugestao > 0) razao = 'Manter níveis de segurança';
+        else razao = 'Sem necessidade imediata';
+        return {
+          produtoId: Number(r.produtoId),
+          nome: r.nome,
+          quantidadeSugestao,
+          razao,
+        };
+      })
+      .filter((n) => n.quantidadeSugestao > 0);
 
     return necessidades;
   }
 
-  async getLucratividadePorCategoria(): Promise<{ categoriaId: number; nome: string; receita: number; custo: number; lucro: number; margem: number }[]> {
+  async getLucratividadePorCategoria(): Promise<
+    {
+      categoriaId: number;
+      nome: string;
+      receita: number;
+      custo: number;
+      lucro: number;
+      margem: number;
+    }[]
+  > {
     const rows = await this.prisma.$queryRaw<
       Array<{ categoriaId: number; nome: string; receita: number | string; custo: number | string }>
     >`SELECT c.id AS "categoriaId", c.name AS nome,
@@ -520,7 +639,7 @@ export class Relatorio {
       WHERE c.id IS NOT NULL
       ORDER BY (COALESCE(v.receita,0) - COALESCE(comp.custo,0)) DESC`;
 
-    return rows.map(r => {
+    return rows.map((r) => {
       const receita = this.toNumber(r.receita);
       const custo = this.toNumber(r.custo);
       const lucro = receita - custo;
@@ -536,12 +655,21 @@ export class Relatorio {
     });
   }
 
-  async getAnaliseRupturaEstoque(days: number = 30): Promise<{ produtoId: number; nome: string; rupturas: number; vendasPerdidasEstimadas: number }[]> {
+  async getAnaliseRupturaEstoque(
+    days: number = 30,
+  ): Promise<
+    { produtoId: number; nome: string; rupturas: number; vendasPerdidasEstimadas: number }[]
+  > {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const rows = await this.prisma.$queryRaw<
-      Array<{ produtoId: number; nome: string; rupturas: number | string; totalVendas: number | string }>
+      Array<{
+        produtoId: number;
+        nome: string;
+        rupturas: number | string;
+        totalVendas: number | string;
+      }>
     >`WITH vendas AS (
         SELECT pv."produtoId", SUM(pv.quantidade)::int AS totalVendas
         FROM "produto_venda" pv
@@ -560,7 +688,7 @@ export class Relatorio {
       LEFT JOIN "produto" p ON p.id = r."produtoId"
       ORDER BY r.rupturas DESC`;
 
-    return rows.map(r => {
+    return rows.map((r) => {
       const rupturas = Number(r.rupturas ?? 0);
       const totalVendas = this.toNumber(r.totalVendas);
       const vendasPerdidasEstimadas = Math.round(rupturas * (totalVendas / days));

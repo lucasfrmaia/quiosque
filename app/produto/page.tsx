@@ -17,13 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { ProdutoTable } from '@/app/_components/tables/ProdutoTable';
 import { useProduto } from '@/app/_components/hooks/useProduto';
@@ -38,7 +32,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const ProdutoPage: FC = () => {
-
   const {
     queryParams: appliedFilters,
     handleCreate,
@@ -61,7 +54,7 @@ const ProdutoPage: FC = () => {
   });
 
   const [searchInput, setSearchInput] = useState(appliedFilters.search || '');
-  const { data, isLoading, error } = getProdutosByParams()
+  const { data, isLoading, error } = getProdutosByParams();
 
   useEffect(() => {
     setFilterValues({
@@ -73,8 +66,12 @@ const ProdutoPage: FC = () => {
     setSearchInput(appliedFilters.search || '');
   }, [appliedFilters.search]);
 
-  const { data: categories, isLoading: isLoadingCategories, error: erroCategories } = getAllCategories()
-  
+  const {
+    data: categories,
+    isLoading: isLoadingCategories,
+    error: erroCategories,
+  } = getAllCategories();
+
   const createForm = useForm<ProdutoSchema>({
     resolver: zodResolver(produtoSchema),
     defaultValues: {
@@ -165,7 +162,7 @@ const ProdutoPage: FC = () => {
     updateUrl(newFilters);
   };
 
-  if (isLoading || isLoadingCategories) return <TableSkeleton/>;
+  if (isLoading || isLoadingCategories) return <TableSkeleton />;
   if (error || erroCategories) return <p>Error!</p>;
 
   return (
@@ -202,7 +199,12 @@ const ProdutoPage: FC = () => {
                 className="absolute right-12 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
                 onClick={() => {
                   setSearchInput('');
-                  const newFilters = { ...appliedFilters, search: '', currentPage: 1, categoryId: appliedFilters.categoryId ?? undefined };
+                  const newFilters = {
+                    ...appliedFilters,
+                    search: '',
+                    currentPage: 1,
+                    categoryId: appliedFilters.categoryId ?? undefined,
+                  };
                   updateUrl(newFilters);
                 }}
               >
@@ -214,7 +216,12 @@ const ProdutoPage: FC = () => {
               size="sm"
               className="absolute right-2 top-1/2 transform -translate-y-1/2 h-9 px-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
               onClick={() => {
-                const newFilters = { ...appliedFilters, search: searchInput, currentPage: 1, categoryId: appliedFilters.categoryId };
+                const newFilters = {
+                  ...appliedFilters,
+                  search: searchInput,
+                  currentPage: 1,
+                  categoryId: appliedFilters.categoryId,
+                };
                 updateUrl(newFilters);
               }}
             >
@@ -238,7 +245,9 @@ const ProdutoPage: FC = () => {
         <DialogContent className="max-w-md sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Filtros</DialogTitle>
-            <DialogDescription>Ajuste os filtros para encontrar os produtos ideais.</DialogDescription>
+            <DialogDescription>
+              Ajuste os filtros para encontrar os produtos ideais.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
             {/* Category Filter */}
@@ -246,7 +255,7 @@ const ProdutoPage: FC = () => {
               <Label>Categoria</Label>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  variant={filterValues.categoryId === undefined ? "default" : "outline"}
+                  variant={filterValues.categoryId === undefined ? 'default' : 'outline'}
                   className={`rounded-full ${filterValues.categoryId === undefined ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
                   onClick={() => setFilterValues({ ...filterValues, categoryId: undefined })}
                 >
@@ -255,9 +264,13 @@ const ProdutoPage: FC = () => {
                 {categories?.map((category) => (
                   <Button
                     key={category.id}
-                    variant={filterValues.categoryId === String(category.id) ? "default" : "outline"}
+                    variant={
+                      filterValues.categoryId === String(category.id) ? 'default' : 'outline'
+                    }
                     className={`rounded-full ${filterValues.categoryId === String(category.id) ? 'bg-green-500 text-white hover:bg-green-600' : 'border-green-300 hover:bg-green-50'}`}
-                    onClick={() => setFilterValues({ ...filterValues, categoryId: String(category.id) })}
+                    onClick={() =>
+                      setFilterValues({ ...filterValues, categoryId: String(category.id) })
+                    }
                   >
                     {category.name}
                   </Button>
@@ -286,7 +299,7 @@ const ProdutoPage: FC = () => {
             filterValues={appliedFilters}
             onEdit={openEditModal}
             onDelete={(product) => {
-              const produto = data?.produtos.find(p => p.id === product.id);
+              const produto = data?.produtos.find((p) => p.id === product.id);
               if (produto) openDeleteModal(produto);
             }}
           />
@@ -327,8 +340,6 @@ const ProdutoPage: FC = () => {
         setIsDeleteModalOpen={setIsDeleteModalOpen}
         handleDeleteConfirm={handleDeleteConfirm}
       />
-
-
     </div>
   );
 };

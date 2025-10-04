@@ -15,9 +15,8 @@ export const ModalActions: FC<ModalActionsProps> = ({
   cancelLabel = 'Cancelar',
   confirmVariant = 'primary',
 }) => {
-  const confirmClasses = confirmVariant === 'primary' 
-    ? 'bg-blue-600 hover:bg-blue-700'
-    : 'bg-red-600 hover:bg-red-700';
+  const confirmClasses =
+    confirmVariant === 'primary' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-red-600 hover:bg-red-700';
 
   return (
     <div className="flex justify-end space-x-3 pt-4">

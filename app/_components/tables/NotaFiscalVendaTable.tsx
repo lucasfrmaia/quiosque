@@ -3,12 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Box, Receipt, X } from 'lucide-react';
 import { NotaFiscalVenda, FilterValues } from '@/types/interfaces/entities';
 import { DataTable } from '../DataTable';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { NotaDetails } from '../common/NotaDetails';
 import { Button } from '@/components/ui/button';
 import { HeaderNotaModal } from '../modals/HeaderNotaMotal';
@@ -72,7 +67,8 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
       header: 'Data',
       render: (item: NotaFiscalVenda) => new Date(item.data).toLocaleDateString('pt-BR'),
       sortable: true,
-      sorter: (a: NotaFiscalVenda, b: NotaFiscalVenda) => new Date(a.data).getTime() - new Date(b.data).getTime(),
+      sorter: (a: NotaFiscalVenda, b: NotaFiscalVenda) =>
+        new Date(a.data).getTime() - new Date(b.data).getTime(),
     },
     {
       key: 'produtos',
@@ -84,10 +80,7 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
       key: 'status',
       header: 'Status',
       render: (item: NotaFiscalVenda) => (
-        <Badge
-          variant="default"
-          className="bg-green-100 text-green-800"
-        >
+        <Badge variant="default" className="bg-green-100 text-green-800">
           Ativo
         </Badge>
       ),
@@ -112,7 +105,9 @@ export const NotaFiscalVendaTable: FC<NotaFiscalVendaTableProps> = ({
         <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-900">Detalhes da Nota Fiscal</DialogTitle>
+              <DialogTitle className="text-2xl font-bold text-gray-900">
+                Detalhes da Nota Fiscal
+              </DialogTitle>
             </DialogHeader>
             <HeaderNotaModal nota={selectedNota} />
             <NotaDetails nota={selectedNota} />

@@ -1,6 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { INotaFiscalCompraRepository } from '../interfaces/repositories';
-import { NotaFiscalCompra, ProdutoCompra, Produto, Fornecedor, FilterValues } from '../interfaces/entities';
+import {
+  NotaFiscalCompra,
+  ProdutoCompra,
+  Produto,
+  Fornecedor,
+  FilterValues,
+} from '../interfaces/entities';
 
 export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraRepository {
   private prisma: PrismaClient;
@@ -9,26 +15,33 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
     this.prisma = prisma;
   }
 
-  async create(notaFiscal: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & { produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[] }): Promise<NotaFiscalCompra> {
+  async create(
+    notaFiscal: Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'> & {
+      produtos: Omit<ProdutoCompra, 'id' | 'produto' | 'notaFiscal'>[];
+    },
+  ): Promise<NotaFiscalCompra> {
     const { data, fornecedorId, produtos } = notaFiscal;
-    const total = produtos.reduce((acc, produto) => acc + produto.precoUnitario * produto.quantidade, 0)
+    const total = produtos.reduce(
+      (acc, produto) => acc + produto.precoUnitario * produto.quantidade,
+      0,
+    );
 
     const createData = {
       data: new Date(data),
       total,
       fornecedor: {
-        connect: { id: fornecedorId }
+        connect: { id: fornecedorId },
       },
       produtos: {
-        create: produtos.map(pc => ({
+        create: produtos.map((pc) => ({
           quantidade: pc.quantidade,
           unidade: pc.unidade,
           precoUnitario: pc.precoUnitario,
           produto: {
-            connect: { id: pc.produtoId }
-          }
-        }))
-      }
+            connect: { id: pc.produtoId },
+          },
+        })),
+      },
     };
 
     const createdNotaFiscal = await this.prisma.notaFiscalCompra.create({
@@ -38,10 +51,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     return createdNotaFiscal;
@@ -55,10 +68,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     if (!notaFiscal) return null;
@@ -73,17 +86,26 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     return notasFiscais;
   }
 
   async findPerPage(filters: FilterValues) {
-    const { currentPage, itemsPerPage, search, dateStart, dateEnd, totalMin, totalMax, fornecedorId } = filters;
+    const {
+      currentPage,
+      itemsPerPage,
+      search,
+      dateStart,
+      dateEnd,
+      totalMin,
+      totalMax,
+      fornecedorId,
+    } = filters;
     const skip = (currentPage - 1) * itemsPerPage;
     const where: any = {};
 
@@ -122,7 +144,7 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         { id: { equals: parseInt(search) || undefined } },
         { total: { contains: search } },
         { fornecedor: { nome: { contains: search } } },
-        { produtos: { some: { produto: { nome: { contains: search } } } } }
+        { produtos: { some: { produto: { nome: { contains: search } } } } },
       ].filter(Boolean);
     }
 
@@ -134,10 +156,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         fornecedor: true,
         produtos: {
           include: {
-            produto: true
-          }
-        }
-      }
+            produto: true,
+          },
+        },
+      },
     });
 
     const total = await this.prisma.notaFiscalCompra.count({ where });
@@ -145,7 +167,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
     return { notas, total };
   }
 
-  async update(id: number, notaFiscal: Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>>): Promise<NotaFiscalCompra> {
+  async update(
+    id: number,
+    notaFiscal: Partial<Omit<NotaFiscalCompra, 'id' | 'fornecedor' | 'produtos'>>,
+  ): Promise<NotaFiscalCompra> {
     const data: any = { ...notaFiscal };
 
     if (data.data) {
@@ -154,7 +179,7 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
 
     if (data.fornecedorId) {
       data.fornecedor = {
-        connect: { id: data.fornecedorId }
+        connect: { id: data.fornecedorId },
       };
       delete data.fornecedorId;
     }
@@ -167,10 +192,10 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
         produtos: {
           include: {
             produto: true,
-            notaFiscal: true
-          }
-        }
-      }
+            notaFiscal: true,
+          },
+        },
+      },
     });
 
     return updatedNotaFiscal;

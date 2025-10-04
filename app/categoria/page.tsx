@@ -9,13 +9,7 @@ import { CategorySchema, categorySchema } from '@/types/validation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Tag, Plus, X } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { CategoryTable } from '@/app/_components/tables/CategoryTable';
 import { useCategory } from '@/app/_components/hooks/useCategory';
@@ -26,7 +20,6 @@ import { ModalDeleteCategory } from '../_components/modals/category/ModalDeleteC
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const CategoriaPage: FC = () => {
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -35,13 +28,13 @@ const CategoriaPage: FC = () => {
 
   const createMethods = useForm<CategorySchema>({
     resolver: zodResolver(categorySchema),
-    defaultValues: { name: '' }
+    defaultValues: { name: '' },
   });
   const createForm = createMethods;
 
   const editMethods = useForm<CategorySchema>({
     resolver: zodResolver(categorySchema),
-    defaultValues: { name: '' }
+    defaultValues: { name: '' },
   });
   const editForm = editMethods;
 
@@ -54,10 +47,10 @@ const CategoriaPage: FC = () => {
     handleEdit,
     resetFilters,
     updateUrl,
-    getCategoriesByParams
-  } = useCategory()
+    getCategoriesByParams,
+  } = useCategory();
 
-  const { data: response, isLoading } = getCategoriesByParams()
+  const { data: response, isLoading } = getCategoriesByParams();
 
   useEffect(() => {
     setLocalSearch(queryParams.search || '');
@@ -100,8 +93,7 @@ const CategoriaPage: FC = () => {
     setSelectedCategory(null);
   };
 
-  if (isLoading)
-    return <TableSkeleton/>
+  if (isLoading) return <TableSkeleton />;
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -166,7 +158,6 @@ const CategoriaPage: FC = () => {
         </div>
       </div>
 
-
       <Card>
         <CardContent className="pt-6 space-y-6">
           <CategoryTable
@@ -174,7 +165,7 @@ const CategoriaPage: FC = () => {
             filterValues={queryParams}
             onEdit={openEditModal}
             onDelete={(ctg) => {
-              const category = response?.categories?.find(c => c.id === ctg.id);
+              const category = response?.categories?.find((c) => c.id === ctg.id);
               if (category) openDeleteModal(category);
             }}
           />
@@ -214,7 +205,6 @@ const CategoriaPage: FC = () => {
         setIsDeleteModalOpen={setIsDeleteModalOpen}
         handleDeleteConfirm={handleDeleteConfirm}
       />
-
     </div>
   );
 };

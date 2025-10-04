@@ -1,8 +1,20 @@
 import { FC } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { NotaFiscalCompra, NotaFiscalVenda, ProdutoCompra, ProdutoVenda } from '@/types/interfaces/entities';
+import {
+  NotaFiscalCompra,
+  NotaFiscalVenda,
+  ProdutoCompra,
+  ProdutoVenda,
+} from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import { X, Calendar, User, Package, DollarSign, Receipt } from 'lucide-react';
 
@@ -11,17 +23,17 @@ interface NotaDetailsProps {
 }
 
 export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
-  const isCompra = 'fornecedorId' in nota
+  const isCompra = 'fornecedorId' in nota;
   const produtos = isCompra
-    ? (nota as NotaFiscalCompra).produtos as ProdutoCompra[]
-    : (nota as NotaFiscalVenda).produtos as ProdutoVenda[];
+    ? ((nota as NotaFiscalCompra).produtos as ProdutoCompra[])
+    : ((nota as NotaFiscalVenda).produtos as ProdutoVenda[]);
 
-  const total = produtos.reduce((sum, p) => sum + (p.quantidade * p.precoUnitario), 0);
-  const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  const total = produtos.reduce((sum, p) => sum + p.quantidade * p.precoUnitario, 0);
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
   return (
     <div className="flex flex-col max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-2xl border border-gray-200">
-     
       <div className="flex-1 overflow-hidden p-6">
         <div className="space-y-6 h-full flex flex-col">
           {/* Informações Gerais */}
@@ -36,7 +48,11 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
                   <Calendar className="h-4 w-4" />
                   Data
                 </label>
-                <p className="text-lg font-semibold text-gray-900">{new Date(nota.data).toLocaleDateString('pt-BR', { timeZone: 'America/Fortaleza' })}</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {new Date(nota.data).toLocaleDateString('pt-BR', {
+                    timeZone: 'America/Fortaleza',
+                  })}
+                </p>
               </div>
               {isCompra && (
                 <div className="space-y-2">
@@ -44,7 +60,10 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
                     <User className="h-4 w-4" />
                     Fornecedor
                   </label>
-                  <Badge variant="secondary" className="text-sm px-3 py-1 bg-blue-100 text-blue-800">
+                  <Badge
+                    variant="secondary"
+                    className="text-sm px-3 py-1 bg-blue-100 text-blue-800"
+                  >
                     {(nota as NotaFiscalCompra).fornecedor?.nome || 'N/A'}
                   </Badge>
                 </div>
@@ -72,15 +91,22 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
                     <TableRow>
                       <TableHead className="w-1/2 font-semibold text-gray-700">Produto</TableHead>
                       <TableHead className="text-right font-semibold text-gray-700">Qtd.</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700">Preço Unit.</TableHead>
-                      <TableHead className="text-right font-semibold text-gray-700">Subtotal</TableHead>
+                      <TableHead className="text-right font-semibold text-gray-700">
+                        Preço Unit.
+                      </TableHead>
+                      <TableHead className="text-right font-semibold text-gray-700">
+                        Subtotal
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {produtos.map((produto, index) => {
                       const subtotal = produto.quantidade * produto.precoUnitario;
                       return (
-                        <TableRow key={index} className="border-b hover:bg-gray-50 transition-colors">
+                        <TableRow
+                          key={index}
+                          className="border-b hover:bg-gray-50 transition-colors"
+                        >
                           <TableCell className="font-medium text-gray-900">
                             <div className="space-y-1">
                               <p>{produto.produto?.nome || 'Produto sem nome'}</p>
@@ -102,7 +128,10 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
                       );
                     })}
                     <TableRow className="bg-green-50">
-                      <TableCell colSpan={3} className="text-right font-bold text-lg text-gray-900 pr-4">
+                      <TableCell
+                        colSpan={3}
+                        className="text-right font-bold text-lg text-gray-900 pr-4"
+                      >
                         Total Geral
                       </TableCell>
                       <TableCell className="text-right font-bold text-xl text-green-600">

@@ -27,6 +27,9 @@ export async function GET(request: NextRequest) {
     const result = await repositoryFactory.userRepository.findPerPage(filters);
     return NextResponse.json({ success: true, data: result });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

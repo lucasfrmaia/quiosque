@@ -28,10 +28,9 @@ export const useEstoque = () => {
     const precoMax = params.get('precoMax') || '';
     const categoryId = params.get('categoryId') ? Number(params.get('categoryId')) : null;
 
-
     params.set('page', String(currentPage));
     params.set('limit', String(itemsPerPage));
-    
+
     if (search) params.set('search', search);
     else params.delete('search');
     if (quantidadeMin) params.set('quantidadeMin', quantidadeMin);
@@ -66,8 +65,7 @@ export const useEstoque = () => {
     queryFn: async () => {
       const response = await fetch(`/api/estoque/findPerPage?${paramsToString}`);
 
-      if (!response.ok) 
-        throw new Error('Failed to fetch estoque');
+      if (!response.ok) throw new Error('Failed to fetch estoque');
 
       const result = await response.json();
 
@@ -96,10 +94,7 @@ export const useEstoque = () => {
   };
 
   const editMutation = useMutation({
-    mutationFn: async ({
-      id,
-      updates,
-    }: EstoqueUpdatePayload) => {
+    mutationFn: async ({ id, updates }: EstoqueUpdatePayload) => {
       const response = await fetch(`/api/estoque/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -114,10 +109,7 @@ export const useEstoque = () => {
       queryClient.invalidateQueries({ queryKey: ['estoque', paramsToString] });
     },
   });
-  const handleEdit = (
-    id: EstoqueUpdatePayload['id'],
-    updates: EstoqueUpdatePayload['updates']
-  ) => {
+  const handleEdit = (id: EstoqueUpdatePayload['id'], updates: EstoqueUpdatePayload['updates']) => {
     editMutation.mutate({ id, updates });
   };
 
@@ -146,7 +138,8 @@ export const useEstoque = () => {
       active.push({ label: 'Qtd Max', value: queryParams.quantidadeMax });
     if (queryParams.precoMin) active.push({ label: 'Preço Min', value: queryParams.precoMin });
     if (queryParams.precoMax) active.push({ label: 'Preço Max', value: queryParams.precoMax });
-    if (queryParams.categoryId !== null) active.push({ label: 'Categoria', value: queryParams.categoryId?.toString() || "" });
+    if (queryParams.categoryId !== null)
+      active.push({ label: 'Categoria', value: queryParams.categoryId?.toString() || '' });
     return active;
   };
 
@@ -177,7 +170,7 @@ export const useEstoque = () => {
 
       router.replace(`?${params.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const handleApply = () => {
@@ -190,7 +183,7 @@ export const useEstoque = () => {
       ...queryParams,
       sortField: field,
       sortDirection: direction,
-      currentPage: 1
+      currentPage: 1,
     };
     updateUrl(newFilters);
   };
@@ -253,6 +246,6 @@ export const useEstoque = () => {
     handleRemoveFilter,
     updateUrl,
     getActiveFilters,
-    handleSort
+    handleSort,
   };
 };

@@ -3,10 +3,9 @@ import { repositoryFactory } from '@/types/RepositoryFactory';
 import { Category } from '@/types/interfaces/entities';
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-
   try {
     const { id } = await params;
-    const numberid = Number(id)
+    const numberid = Number(id);
 
     if (isNaN(numberid)) {
       return NextResponse.json({ success: false, error: 'Invalid ID' }, { status: 400 });

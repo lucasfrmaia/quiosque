@@ -16,15 +16,17 @@ export async function GET(request: NextRequest) {
     const filters: FilterValues = {
       currentPage,
       itemsPerPage,
-      search
+      search,
     };
 
     const result = await repositoryFactory.fornecedorRepository.findPerPage(filters);
-    
-    return NextResponse.json(result);
 
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Error fetching fornecedores per page:', error);
-    return NextResponse.json({ success: false, error: error.message || 'Failed to fetch fornecedores' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Failed to fetch fornecedores' },
+      { status: 500 },
+    );
   }
 }

@@ -8,7 +8,9 @@ export async function GET(request: NextRequest) {
     const currentPage = parseInt(searchParams.get('page') || '1');
     const itemsPerPage = parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || undefined;
-    const categoryId = searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined;
+    const categoryId = searchParams.get('categoryId')
+      ? parseInt(searchParams.get('categoryId')!)
+      : undefined;
     const precoMin = searchParams.get('precoMin') || undefined;
     const precoMax = searchParams.get('precoMax') || undefined;
     const quantidadeMin = searchParams.get('quantidadeMin') || undefined;
@@ -32,6 +34,9 @@ export async function GET(request: NextRequest) {
     const result = await repositoryFactory.produtoEstoqueRepository.findPerPage(filters);
     return NextResponse.json(result);
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

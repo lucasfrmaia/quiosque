@@ -1,13 +1,13 @@
-import { useCallback } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Produto, FilterValues } from "@/types/interfaces/entities";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ProdutoInsertData, ProdutoPatchData } from "@/types/types/types";
+import { useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Produto, FilterValues } from '@/types/interfaces/entities';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ProdutoInsertData, ProdutoPatchData } from '@/types/types/types';
 
 const defaultFilters: FilterValues & { categoryId?: number } = {
   currentPage: 1,
   itemsPerPage: 10,
-  search: "",
+  search: '',
   categoryId: undefined,
 };
 
@@ -19,20 +19,17 @@ export const useProduto = () => {
   const getFiltersFromParams = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    const currentPage =
-      Number(params.get("page")) || defaultFilters.currentPage;
-    const itemsPerPage =
-      Number(params.get("limit")) || defaultFilters.itemsPerPage;
-    const search = params.get("search") || defaultFilters.search;
-    const categoryId =
-      Number(params.get("category")) || defaultFilters.categoryId;
+    const currentPage = Number(params.get('page')) || defaultFilters.currentPage;
+    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage;
+    const search = params.get('search') || defaultFilters.search;
+    const categoryId = Number(params.get('category')) || defaultFilters.categoryId;
 
-    params.set("page", String(currentPage));
-    params.set("limit", String(itemsPerPage));
+    params.set('page', String(currentPage));
+    params.set('limit', String(itemsPerPage));
 
-    if (search) params.set("search", String(search));
+    if (search) params.set('search', String(search));
 
-    if (categoryId) params.set("category", String(categoryId));
+    if (categoryId) params.set('category', String(categoryId));
 
     return {
       currentPage,
@@ -48,12 +45,12 @@ export const useProduto = () => {
 
   const getAllProdutos = () => {
     return useQuery<Produto[]>({
-      queryKey: ["produtos-all"],
+      queryKey: ['produtos-all'],
       queryFn: async () => {
         const response = await fetch(`/api/produto/findAll`);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error('Failed to fetch products');
         }
 
         const result = await response.json();
@@ -65,14 +62,12 @@ export const useProduto = () => {
 
   const getProdutosByParams = () => {
     return useQuery<{ produtos: Produto[]; total: number }>({
-      queryKey: ["produtos", paramsToString],
+      queryKey: ['produtos', paramsToString],
       queryFn: async () => {
-        const response = await fetch(
-          `/api/produto/findPerPage?${paramsToString}`
-        );
+        const response = await fetch(`/api/produto/findPerPage?${paramsToString}`);
 
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error('Failed to fetch products');
         }
 
         const result = await response.json();
@@ -84,23 +79,23 @@ export const useProduto = () => {
 
   const createMutation = useMutation({
     mutationFn: async (produto: ProdutoInsertData) => {
-      const response = await fetch("/api/produto/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/produto/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(produto),
       });
       if (!response.ok) {
-        throw new Error("Failed to create produto");
+        throw new Error('Failed to create produto');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || "Failed to create produto");
+        throw new Error(result.error || 'Failed to create produto');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["produtos", paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ["produtos-all"] });
+      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -111,51 +106,48 @@ export const useProduto = () => {
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: ProdutoPatchData) => {
       const response = await fetch(`/api/produto/update/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update produto");
+        throw new Error('Failed to update produto');
       }
 
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || "Failed to update produto");
+        throw new Error(result.error || 'Failed to update produto');
       }
       return result.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["produtos", paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ["produtos-all"] });
+      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
     },
   });
 
-  const handleEdit = (
-    id: ProdutoPatchData['id'],
-    updates: ProdutoPatchData['updates']
-  ) => {
+  const handleEdit = (id: ProdutoPatchData['id'], updates: ProdutoPatchData['updates']) => {
     editMutation.mutate({ id, updates });
   };
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/produto/delete/${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
       if (!response.ok) {
-        throw new Error("Failed to delete produto");
+        throw new Error('Failed to delete produto');
       }
       const result = await response.json();
       if (!result.success) {
-        throw new Error(result.error || "Failed to delete produto");
+        throw new Error(result.error || 'Failed to delete produto');
       }
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["produtos", paramsToString] });
-      queryClient.invalidateQueries({ queryKey: ["produtos-all"] });
+      queryClient.invalidateQueries({ queryKey: ['produtos', paramsToString] });
+      queryClient.invalidateQueries({ queryKey: ['produtos-all'] });
     },
   });
 
@@ -166,11 +158,11 @@ export const useProduto = () => {
   const getActiveFilters = () => {
     const active = [];
     if (queryParams.search) {
-      active.push({ label: "Nome", value: queryParams.search });
+      active.push({ label: 'Nome', value: queryParams.search });
     }
     if (queryParams.categoryId) {
       active.push({
-        label: "Categoria",
+        label: 'Categoria',
         value: queryParams.categoryId.toString(),
       });
     }
@@ -181,24 +173,24 @@ export const useProduto = () => {
     (newFilters: FilterValues & { categoryId: string | null | undefined }) => {
       const params = new URLSearchParams(searchParams.toString());
 
-      params.set("page", String(newFilters.currentPage));
-      params.set("limit", String(newFilters.itemsPerPage));
+      params.set('page', String(newFilters.currentPage));
+      params.set('limit', String(newFilters.itemsPerPage));
 
       if (newFilters.search) {
-        params.set("search", newFilters.search);
+        params.set('search', newFilters.search);
       } else {
-        params.delete("search");
+        params.delete('search');
       }
 
       if (newFilters.categoryId) {
-        params.set("category", String(newFilters.categoryId));
+        params.set('category', String(newFilters.categoryId));
       } else {
-        params.delete("category");
+        params.delete('category');
       }
 
       router.replace(`?${params.toString()}`);
     },
-    [router, searchParams]
+    [router, searchParams],
   );
 
   const handleApply = () => {
@@ -212,10 +204,10 @@ export const useProduto = () => {
 
     let newFilters = { ...queryParams };
     switch (filterToRemove.label) {
-      case "Nome":
-        newFilters = { ...newFilters, search: "" };
+      case 'Nome':
+        newFilters = { ...newFilters, search: '' };
         break;
-      case "Categoria":
+      case 'Categoria':
         newFilters = { ...newFilters, categoryId: undefined };
         break;
     }
@@ -224,8 +216,8 @@ export const useProduto = () => {
 
   const resetFilters = () => {
     const params = new URLSearchParams();
-    params.set("page", "1");
-    params.set("limit", "10");
+    params.set('page', '1');
+    params.set('limit', '10');
     router.replace(`?${params.toString()}`);
   };
 

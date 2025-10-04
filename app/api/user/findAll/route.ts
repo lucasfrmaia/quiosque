@@ -6,6 +6,9 @@ export async function GET() {
     const users = await repositoryFactory.userRepository.findAll();
     return NextResponse.json({ success: true, data: users });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

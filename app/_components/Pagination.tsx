@@ -1,6 +1,6 @@
-import { FC } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { FC } from 'react';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -34,10 +34,10 @@ export const Pagination: FC<PaginationProps> = ({
       range.push(i);
     }
     if (currentPage - delta > 2) {
-      range.unshift("...");
+      range.unshift('...');
     }
     if (currentPage + delta < totalPages - 1) {
-      range.push("...");
+      range.push('...');
     }
     if (totalPages > 1) {
       range.unshift(1);
@@ -53,11 +53,9 @@ export const Pagination: FC<PaginationProps> = ({
       {/* Info and Items per page */}
       <div className="flex flex-1 items-center justify-between sm:justify-start">
         <div className="text-sm text-gray-700 flex-shrink-0">
-          Mostrando <span className="font-medium">{startIndex + 1}</span> até{" "}
-          <span className="font-medium">
-            {Math.min(startIndex + itemsPerPage, totalItems)}
-          </span>{" "}
-          de <span className="font-medium">{totalItems}</span> resultados
+          Mostrando <span className="font-medium">{startIndex + 1}</span> até{' '}
+          <span className="font-medium">{Math.min(startIndex + itemsPerPage, totalItems)}</span> de{' '}
+          <span className="font-medium">{totalItems}</span> resultados
         </div>
         <div className="ml-4 flex sm:ml-6 items-center space-x-2">
           <span className="text-sm text-gray-500">Itens por página:</span>
@@ -91,17 +89,17 @@ export const Pagination: FC<PaginationProps> = ({
         {visiblePages.map((page, index) => (
           <Button
             key={index}
-            variant={page === currentPage ? "default" : "outline"}
+            variant={page === currentPage ? 'default' : 'outline'}
             size="sm"
-            onClick={() => typeof page === "number" && onPageChange(page)}
-            disabled={page === "..."}
+            onClick={() => typeof page === 'number' && onPageChange(page)}
+            disabled={page === '...'}
             className={`h-9 w-9 p-0 rounded-full ${
               page === currentPage
-                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md"
-                : "border-gray-300 hover:bg-gray-50 text-gray-700"
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'
+                : 'border-gray-300 hover:bg-gray-50 text-gray-700'
             }`}
           >
-            {page === "..." ? <MoreHorizontal className="h-4 w-4" /> : page}
+            {page === '...' ? <MoreHorizontal className="h-4 w-4" /> : page}
           </Button>
         ))}
 

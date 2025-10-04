@@ -6,13 +6,7 @@ import { FilterValues, NotaFiscalVenda } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FileText, Plus, Search, X, Filter } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +31,6 @@ import { NotaFiscalVendaSchema, notaFiscalVendaSchema } from '@/types/validation
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const NotasVendasPage: FC = () => {
-
   const {
     queryParams,
     handlePageChange,
@@ -50,13 +43,15 @@ const NotasVendasPage: FC = () => {
     getNotasByParams,
     handleSort,
     getActiveFilters,
-    handleRemoveFilter
+    handleRemoveFilter,
   } = useNotasFiscaisVendas();
 
   const { data: response, isLoading, error } = getNotasByParams();
 
-  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({ ...queryParams, search: '' });
-
+  const [appliedFilters, setAppliedFilters] = useState<FilterValues>({
+    ...queryParams,
+    search: '',
+  });
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -78,7 +73,12 @@ const NotasVendasPage: FC = () => {
       totalMin: appliedFilters.totalMin || '0',
       totalMax: appliedFilters.totalMax || '10000',
     });
-  }, [appliedFilters.dateStart, appliedFilters.dateEnd, appliedFilters.totalMin, appliedFilters.totalMax]);
+  }, [
+    appliedFilters.dateStart,
+    appliedFilters.dateEnd,
+    appliedFilters.totalMin,
+    appliedFilters.totalMax,
+  ]);
 
   const createForm = useForm<NotaFiscalVendaSchema>({
     resolver: zodResolver(notaFiscalVendaSchema),
@@ -96,7 +96,6 @@ const NotasVendasPage: FC = () => {
       produtos: [],
     },
   });
-
 
   const handleApplyFilters = () => {
     const newFilters = {
@@ -136,7 +135,7 @@ const NotasVendasPage: FC = () => {
   const openEditModal = (nota: NotaFiscalVenda) => {
     setSelectedNota(nota);
     editForm.setValue('data', nota.data);
-    editForm.setValue('total', nota.total)
+    editForm.setValue('total', nota.total);
     editForm.setValue(
       'produtos',
       nota.produtos?.map((p) => ({
@@ -144,7 +143,7 @@ const NotasVendasPage: FC = () => {
         quantidade: p.quantidade,
         unidade: p.unidade,
         precoUnitario: p.precoUnitario,
-      })) || []
+      })) || [],
     );
     setIsEditModalOpen(true);
   };
@@ -162,7 +161,7 @@ const NotasVendasPage: FC = () => {
   };
 
   if (isLoading) return <>Carregando...</>;
-  if (error) return <>Error</>
+  if (error) return <>Error</>;
 
   const activeFilters = getActiveFilters();
 
@@ -171,7 +170,9 @@ const NotasVendasPage: FC = () => {
       <div className="flex flex-row items-center justify-between mb-6">
         <div className="flex items-center">
           <FileText className="h-8 w-8 text-green-500 mr-3" />
-          <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Notas Fiscais de Venda</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Gerenciamento de Notas Fiscais de Venda
+          </h1>
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}

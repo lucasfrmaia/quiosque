@@ -10,18 +10,17 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
   }
 
   async create(produtoEstoque: Omit<ProdutoEstoque, 'id' | 'produto'>): Promise<ProdutoEstoque> {
-    
     const createdProdutoEstoque = await this.prisma.produtoEstoque.create({
       data: {
         quantidade: produtoEstoque.quantidade,
         preco: produtoEstoque.preco,
         unidade: produtoEstoque.unidade,
         dataValidade: produtoEstoque.dataValidade,
-        produtoId: Number(produtoEstoque.produtoId)
+        produtoId: Number(produtoEstoque.produtoId),
       },
       include: {
-        produto: true
-      }
+        produto: true,
+      },
     });
 
     return createdProdutoEstoque;
@@ -31,8 +30,8 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
     const produtoEstoque = await this.prisma.produtoEstoque.findUnique({
       where: { id },
       include: {
-        produto: true
-      }
+        produto: true,
+      },
     });
 
     if (!produtoEstoque) return null;
@@ -43,15 +42,24 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
   async findAll(): Promise<ProdutoEstoque[]> {
     const produtoEstoques = await this.prisma.produtoEstoque.findMany({
       include: {
-        produto: true
-      }
+        produto: true,
+      },
     });
 
-    return produtoEstoques
+    return produtoEstoques;
   }
 
   async findPerPage(filters: FilterValues) {
-    const { currentPage, itemsPerPage, search, categoryId, precoMin, precoMax, quantidadeMin, quantidadeMax } = filters;
+    const {
+      currentPage,
+      itemsPerPage,
+      search,
+      categoryId,
+      precoMin,
+      precoMax,
+      quantidadeMin,
+      quantidadeMax,
+    } = filters;
     const skip = (currentPage - 1) * itemsPerPage;
     const where: any = {};
 
@@ -59,43 +67,43 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       where.produto = {
         nome: {
           contains: search,
-          mode: 'insensitive'
-        }
+          mode: 'insensitive',
+        },
       };
     }
 
     if (categoryId !== undefined && categoryId !== null) {
       where.produto = {
         ...where.produto,
-        categoriaId: categoryId
+        categoriaId: categoryId,
       };
     }
 
     if (precoMin) {
       where.preco = {
         ...where.preco,
-        gte: parseFloat(precoMin)
+        gte: parseFloat(precoMin),
       };
     }
 
     if (precoMax) {
       where.preco = {
         ...where.preco,
-        lte: parseFloat(precoMax)
+        lte: parseFloat(precoMax),
       };
     }
 
     if (quantidadeMin) {
       where.quantidade = {
         ...where.quantidade,
-        gte: parseFloat(quantidadeMin)
+        gte: parseFloat(quantidadeMin),
       };
     }
 
     if (quantidadeMax) {
       where.quantidade = {
         ...where.quantidade,
-        lte: parseFloat(quantidadeMax)
+        lte: parseFloat(quantidadeMax),
       };
     }
 
@@ -106,36 +114,38 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
       include: {
         produto: {
           include: {
-            categoria: true
-          }
-        }
-      }
+            categoria: true,
+          },
+        },
+      },
     });
 
     const total = await this.prisma.produtoEstoque.count();
     return {
       estoque: produtoEstoques,
-      total
-    }
-
+      total,
+    };
   }
 
-  async update(id: number, produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>): Promise<ProdutoEstoque> {
-    const data = { 
+  async update(
+    id: number,
+    produtoEstoque: Partial<Omit<ProdutoEstoque, 'id' | 'produto'>>,
+  ): Promise<ProdutoEstoque> {
+    const data = {
       ...produtoEstoque,
-      produtoId: Number(produtoEstoque.produtoId)  
+      produtoId: Number(produtoEstoque.produtoId),
     };
-    
+
     if (data.dataValidade) {
       data.dataValidade = new Date(data.dataValidade);
     }
-    
+
     const updatedProdutoEstoque = await this.prisma.produtoEstoque.update({
       where: { id },
       data,
       include: {
-        produto: true
-      }
+        produto: true,
+      },
     });
 
     return updatedProdutoEstoque;

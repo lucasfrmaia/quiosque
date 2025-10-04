@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     let categoryId;
 
     if (categoryParam != undefined) {
-      categoryId = Number(categoryParam)
+      categoryId = Number(categoryParam);
     }
 
     if (isNaN(currentPage) || isNaN(itemsPerPage) || currentPage < 1 || itemsPerPage < 1) {
@@ -23,12 +23,15 @@ export async function GET(request: NextRequest) {
       currentPage,
       itemsPerPage,
       search,
-      categoryId
+      categoryId,
     };
 
     const result = await repositoryFactory.produtoRepository.findPerPage(filters);
     return NextResponse.json(result);
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

@@ -8,25 +8,17 @@ interface TextFilterProps {
   description?: string;
 }
 
-export const TextFilter: FC<TextFilterProps> = ({ 
-  value, 
-  onChange, 
+export const TextFilter: FC<TextFilterProps> = ({
+  value,
+  onChange,
   placeholder,
   label,
-  description 
+  description,
 }) => {
   return (
     <div className="filter-group">
-      {label && (
-        <label className="filter-label font-bold">
-          {label}
-        </label>
-      )}
-      {description && (
-        <p className="filter-description">
-          {description}
-        </p>
-      )}
+      {label && <label className="filter-label font-bold">{label}</label>}
+      {description && <p className="filter-description">{description}</p>}
       <input
         type="text"
         value={value}

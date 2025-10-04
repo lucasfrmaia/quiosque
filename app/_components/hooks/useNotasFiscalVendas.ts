@@ -1,10 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 // Assumindo que você definirá os novos tipos neste arquivo ou similar
-import {
-  NotaFiscalVenda,
-  FilterValues,
-} from '@/types/interfaces/entities';
+import { NotaFiscalVenda, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { NotaFiscalCreatePayload, NotaFiscalEditPayload } from '@/types/types/types';
 
@@ -131,7 +128,7 @@ export const useNotasFiscaisVendas = () => {
 
   const handleEdit = (
     id: NotaFiscalEditPayload['id'],
-    updates: NotaFiscalEditPayload['updates']
+    updates: NotaFiscalEditPayload['updates'],
   ) => {
     editMutation.mutate({ id, updates });
   };
@@ -163,10 +160,20 @@ export const useNotasFiscaisVendas = () => {
   const getActiveFilters = useCallback(() => {
     const active = [];
     if (queryParams.search) active.push({ label: 'Pesquisa', value: queryParams.search });
-    if (queryParams.dateStart) active.push({ label: 'Data Início', value: new Date(queryParams.dateStart).toLocaleDateString('pt-BR') });
-    if (queryParams.dateEnd) active.push({ label: 'Data Fim', value: new Date(queryParams.dateEnd).toLocaleDateString('pt-BR') });
-    if (queryParams.totalMin) active.push({ label: 'Total Mín', value: `R$ ${queryParams.totalMin}` });
-    if (queryParams.totalMax) active.push({ label: 'Total Máx', value: `R$ ${queryParams.totalMax}` });
+    if (queryParams.dateStart)
+      active.push({
+        label: 'Data Início',
+        value: new Date(queryParams.dateStart).toLocaleDateString('pt-BR'),
+      });
+    if (queryParams.dateEnd)
+      active.push({
+        label: 'Data Fim',
+        value: new Date(queryParams.dateEnd).toLocaleDateString('pt-BR'),
+      });
+    if (queryParams.totalMin)
+      active.push({ label: 'Total Mín', value: `R$ ${queryParams.totalMin}` });
+    if (queryParams.totalMax)
+      active.push({ label: 'Total Máx', value: `R$ ${queryParams.totalMax}` });
     return active;
   }, [queryParams]);
 
@@ -185,7 +192,7 @@ export const useNotasFiscaisVendas = () => {
 
       router.replace(`?${params.toString()}`);
     },
-    [router]
+    [router],
   );
 
   const resetFilters = useCallback(() => {
@@ -216,7 +223,6 @@ export const useNotasFiscaisVendas = () => {
     }
     updateUrl(newFilters);
   };
-
 
   const handleSort = (field: string) => {
     // implementar se quiser ordenação por campo específico

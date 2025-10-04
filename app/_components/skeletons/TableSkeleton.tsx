@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { FC } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { FC } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TableSkeleton: FC<{ lines?: number }> = ({ lines = 5 }) => {
   return (

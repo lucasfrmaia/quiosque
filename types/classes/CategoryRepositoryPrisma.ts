@@ -11,7 +11,7 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
 
   async create(category: Omit<Category, 'id' | 'produtos'>): Promise<Category> {
     const createdCategory = await this.prisma.category.create({
-      data: category
+      data: category,
     });
 
     return createdCategory;
@@ -19,7 +19,7 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
 
   async findById(id: number): Promise<Category | null> {
     const category = await this.prisma.category.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!category) return null;
@@ -30,13 +30,13 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
   async findAll(): Promise<Category[]> {
     const categories = await this.prisma.category.findMany();
 
-    return categories.map(c => ({
+    return categories.map((c) => ({
       id: c.id,
       name: c.name,
     }));
   }
 
-  async findPerPage(filters: FilterValues): Promise<{ categories: Category[], total: number }> {
+  async findPerPage(filters: FilterValues): Promise<{ categories: Category[]; total: number }> {
     const { currentPage, itemsPerPage, search } = filters;
     const skip = (currentPage - 1) * itemsPerPage;
     const where: any = {};
@@ -48,18 +48,21 @@ export class CategoryRepositoryPrisma implements ICategoryRepository {
     const categories = await this.prisma.category.findMany({
       where,
       skip,
-      take: itemsPerPage
+      take: itemsPerPage,
     });
 
     const total = await this.prisma.category.count();
 
     return {
       categories: categories,
-      total
+      total,
     };
   }
 
-  async update(id: number, category: Partial<Omit<Category, 'id' | 'produtos'>>): Promise<Category> {
+  async update(
+    id: number,
+    category: Partial<Omit<Category, 'id' | 'produtos'>>,
+  ): Promise<Category> {
     const updatedCategory = await this.prisma.category.update({
       where: { id },
       data: category,

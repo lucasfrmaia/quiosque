@@ -7,39 +7,38 @@ import { CategoryNewData, CategoryUpdateData } from '@/types/types/types';
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 5,
-  search: ''
+  search: '',
 };
 
 export const useCategory = () => {
   const queryClient = useQueryClient();
-  const router = useRouter()
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const getFiltersFromParams = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    const currentPage = Number(params.get('page')) || defaultFilters.currentPage
-    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage
-    const search = params.get('search') || defaultFilters.search
+    const currentPage = Number(params.get('page')) || defaultFilters.currentPage;
+    const itemsPerPage = Number(params.get('limit')) || defaultFilters.itemsPerPage;
+    const search = params.get('search') || defaultFilters.search;
 
-    params.set('page', String(currentPage))
-    params.set('limit', String(itemsPerPage))
-    params.set('search', String(search))
+    params.set('page', String(currentPage));
+    params.set('limit', String(itemsPerPage));
+    params.set('search', String(search));
 
     return {
       currentPage,
       itemsPerPage,
       search,
-      toString: params.toString()
+      toString: params.toString(),
     };
-
   }, [searchParams]);
 
-  const queryParams = getFiltersFromParams()
-  const paramsToString = queryParams.toString
+  const queryParams = getFiltersFromParams();
+  const paramsToString = queryParams.toString;
 
   const getCategoriesByParams = () => {
-    return useQuery<{ categories: Category[], total: number }>({
+    return useQuery<{ categories: Category[]; total: number }>({
       queryKey: ['categories', paramsToString],
       queryFn: async () => {
         const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
@@ -53,7 +52,7 @@ export const useCategory = () => {
         return result;
       },
     });
-  }
+  };
 
   const getAllCategories = () => {
     return useQuery<Category[]>({
@@ -70,7 +69,7 @@ export const useCategory = () => {
         return result;
       },
     });
-  }
+  };
 
   const createMutation = useMutation({
     mutationFn: async (category: CategoryNewData) => {
@@ -153,20 +152,23 @@ export const useCategory = () => {
     return active;
   };
 
-  const updateUrl = useCallback((newFilters: FilterValues) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const updateUrl = useCallback(
+    (newFilters: FilterValues) => {
+      const params = new URLSearchParams(searchParams.toString());
 
-    params.set('page', String(newFilters.currentPage));
-    params.set('limit', String(newFilters.itemsPerPage));
+      params.set('page', String(newFilters.currentPage));
+      params.set('limit', String(newFilters.itemsPerPage));
 
-    if (newFilters.search) {
-      params.set('search', newFilters.search);
-    } else {
-      params.delete('search');
-    }
+      if (newFilters.search) {
+        params.set('search', newFilters.search);
+      } else {
+        params.delete('search');
+      }
 
-    router.replace(`?${params.toString()}`);
-  }, [router, searchParams]);
+      router.replace(`?${params.toString()}`);
+    },
+    [router, searchParams],
+  );
 
   const handleApply = () => {
     const newFilters = { ...queryParams, currentPage: 1 };
@@ -214,6 +216,6 @@ export const useCategory = () => {
     handleRemoveFilter,
     updateUrl,
     getActiveFilters,
-    getAllCategories
+    getAllCategories,
   };
 };

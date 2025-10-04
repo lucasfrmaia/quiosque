@@ -1,6 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { IProdutoRepository } from '../interfaces/repositories';
-import { Produto, Category, ProdutoEstoque, ProdutoCompra, ProdutoVenda, NotaFiscalCompra, NotaFiscalVenda, Fornecedor, FilterValues } from '../interfaces/entities';
+import {
+  Produto,
+  Category,
+  ProdutoEstoque,
+  ProdutoCompra,
+  ProdutoVenda,
+  NotaFiscalCompra,
+  NotaFiscalVenda,
+  Fornecedor,
+  FilterValues,
+} from '../interfaces/entities';
 
 export class ProdutoRepositoryPrisma implements IProdutoRepository {
   private prisma: PrismaClient;
@@ -9,16 +19,18 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     this.prisma = prisma;
   }
 
-  async create(produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>): Promise<Produto> {
+  async create(
+    produto: Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>,
+  ): Promise<Produto> {
     const createdProduto = await this.prisma.produto.create({
       data: {
-         ...produto,
-         categoriaId: Number(produto.categoriaId)
+        ...produto,
+        categoriaId: Number(produto.categoriaId),
       },
       include: {
         categoria: true,
-        estoques: true
-      }
+        estoques: true,
+      },
     });
 
     return createdProduto;
@@ -30,7 +42,7 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
       include: {
         categoria: true,
         estoques: true,
-      }
+      },
     });
 
     if (!produto) return null;
@@ -42,8 +54,8 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
     const produtos = await this.prisma.produto.findMany({
       include: {
         categoria: true,
-        estoques: true
-      }
+        estoques: true,
+      },
     });
 
     return produtos;
@@ -70,29 +82,32 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
       take: itemsPerPage,
       include: {
         categoria: true,
-        estoques: true
-      }
+        estoques: true,
+      },
     });
 
     const total = await this.prisma.produto.count();
 
     return {
       produtos: response,
-      total: total
-    }
+      total: total,
+    };
   }
 
-  async update(id: number, produto: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>): Promise<Produto> {
+  async update(
+    id: number,
+    produto: Partial<Omit<Produto, 'id' | 'categoria' | 'estoques' | 'compras' | 'vendas'>>,
+  ): Promise<Produto> {
     const updatedProduto = await this.prisma.produto.update({
       where: { id },
       data: {
         ...produto,
-        categoriaId: Number(produto.categoriaId)
+        categoriaId: Number(produto.categoriaId),
       },
       include: {
         categoria: true,
         estoques: true,
-      }
+      },
     });
 
     return updatedProduto;

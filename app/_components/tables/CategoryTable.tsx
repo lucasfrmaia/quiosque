@@ -1,8 +1,8 @@
-import { FC } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Box } from "lucide-react";
-import { Category, FilterValues } from "@/types/interfaces/entities";
-import { DataTable } from "../DataTable";
+import { FC } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Box } from 'lucide-react';
+import { Category, FilterValues } from '@/types/interfaces/entities';
+import { DataTable } from '../DataTable';
 
 interface CategoryTableProps {
   items: Category[];
@@ -13,15 +13,15 @@ interface CategoryTableProps {
 
 const columns = [
   {
-    key: "id",
-    header: "ID",
+    key: 'id',
+    header: 'ID',
     render: (item: Category) => item.id,
     sortable: false,
   },
   {
-    key: "name",
-    header: "Nome",
-    sortKey: "name",
+    key: 'name',
+    header: 'Nome',
+    sortKey: 'name',
     render: (item: Category) => (
       <div className="space-y-1">
         <div className="font-bold text-sm">{item.name}</div>
@@ -31,14 +31,14 @@ const columns = [
     sorter: (a: Category, b: Category) => a.name.localeCompare(b.name),
   },
   {
-    key: "produtos",
-    header: "Número de Produtos",
+    key: 'produtos',
+    header: 'Número de Produtos',
     render: (item: Category) => item.produtos?.length || 0,
     sortable: false,
   },
   {
-    key: "status",
-    header: "Status",
+    key: 'status',
+    header: 'Status',
     render: (item: Category) => (
       <Badge variant="default" className="bg-green-100 text-green-800">
         Ativo

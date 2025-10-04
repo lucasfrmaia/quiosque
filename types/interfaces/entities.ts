@@ -24,12 +24,12 @@ export type TipoProduto = 'INSUMO' | 'CARDAPIO';
 export interface Produto {
   id: number;
   nome: string;
-  descricao?: string | null;
-  imagemUrl?: string | null;
+  descricao?: string | undefined | null;
+  imagemUrl?: string | undefined | null;
   ativo: boolean;
   tipo: TipoProduto;
-  categoriaId?: number | undefined;
-  categoria?: Category | null;
+  categoriaId?: number | undefined | null;
+  categoria?: Category | undefined | null;
   estoques?: ProdutoEstoque[];
   compras?: ProdutoCompra[];
   vendas?: ProdutoVenda[];

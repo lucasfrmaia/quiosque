@@ -19,20 +19,12 @@ export const NumberRangeFilter: FC<NumberRangeFilterProps> = ({
   minPlaceholder,
   maxPlaceholder,
   label,
-  description
+  description,
 }) => {
   return (
     <div className="filter-group">
-      {label && (
-        <label className="filter-label font-bold">
-          {label}
-        </label>
-      )}
-      {description && (
-        <p className="filter-description">
-          {description}
-        </p>
-      )}
+      {label && <label className="filter-label font-bold">{label}</label>}
+      {description && <p className="filter-description">{description}</p>}
       <div className="grid grid-cols-2 gap-2">
         <input
           type="number"

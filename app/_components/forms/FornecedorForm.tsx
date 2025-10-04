@@ -8,7 +8,10 @@ import { fornecedorSchema } from '@/types/validation';
 type FornecedorFormData = z.infer<typeof fornecedorSchema>;
 
 export const FornecedorForm: FC = () => {
-  const { register, formState: { errors } } = useFormContext<FornecedorFormData>();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<FornecedorFormData>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -23,9 +26,7 @@ export const FornecedorForm: FC = () => {
             className={errors.nome ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Nome do fornecedor"
           />
-          {errors.nome && (
-            <p className="text-sm text-red-500">{errors.nome.message}</p>
-          )}
+          {errors.nome && <p className="text-sm text-red-500">{errors.nome.message}</p>}
         </div>
       </div>
 
@@ -40,9 +41,7 @@ export const FornecedorForm: FC = () => {
             className={errors.cnpj ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="CNPJ (opcional)"
           />
-          {errors.cnpj && (
-            <p className="text-sm text-red-500">{errors.cnpj.message}</p>
-          )}
+          {errors.cnpj && <p className="text-sm text-red-500">{errors.cnpj.message}</p>}
         </div>
       </div>
 
@@ -57,9 +56,7 @@ export const FornecedorForm: FC = () => {
             className={errors.telefone ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Telefone (opcional)"
           />
-          {errors.telefone && (
-            <p className="text-sm text-red-500">{errors.telefone.message}</p>
-          )}
+          {errors.telefone && <p className="text-sm text-red-500">{errors.telefone.message}</p>}
         </div>
       </div>
 
@@ -74,9 +71,7 @@ export const FornecedorForm: FC = () => {
             className={errors.email ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Email (opcional)"
           />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
         </div>
       </div>
     </div>

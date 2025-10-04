@@ -28,6 +28,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching categories per page:', error);
-    return NextResponse.json({ success: false, error: 'Failed to fetch categories' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch categories' },
+      { status: 500 },
+    );
   }
 }

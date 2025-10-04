@@ -70,10 +70,7 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       key: 'status',
       header: 'Status',
       render: (item: Fornecedor) => (
-        <Badge
-          variant="default"
-          className="bg-green-100 text-green-800"
-        >
+        <Badge variant="default" className="bg-green-100 text-green-800">
           Ativo
         </Badge>
       ),
@@ -88,7 +85,7 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       filterValues={filterValues}
       actions={{
         onEdit,
-        onDelete
+        onDelete,
       }}
       emptyMessage="Nenhum fornecedor encontrado."
     />

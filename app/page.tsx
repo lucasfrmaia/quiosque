@@ -1,15 +1,9 @@
-"use client";
+'use client';
 
-import React, { FC } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TablePagination } from "./_components/TablePagination";
+import React, { FC } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { TablePagination } from './_components/TablePagination';
 import {
   useRelatorio,
   useProdutosMaisVendidos,
@@ -19,61 +13,57 @@ import {
   useProdutosBaixoEstoque,
   useProdutosProximaValidade,
   useComprasPorFornecedor,
-} from "@/app/_components/hooks/useRelatorio";
-import { FilterValues } from "@/types/interfaces/entities";
-import DashboardSkeleton from "./_components/skeletons/DashboardSkeleton";
+} from '@/app/_components/hooks/useRelatorio';
+import { FilterValues } from '@/types/interfaces/entities';
+import DashboardSkeleton from './_components/skeletons/DashboardSkeleton';
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+};
 
-  const formatNumber = (value: number) => {
-    return new Intl.NumberFormat("pt-BR").format(value);
-  };
+const formatNumber = (value: number) => {
+  return new Intl.NumberFormat('pt-BR').format(value);
+};
 
 const produtosVendidosColumns = [
-  { key: "nome", header: "Produto", render: (item: any) => item.nome },
+  { key: 'nome', header: 'Produto', render: (item: any) => item.nome },
   {
-    key: "totalQuantidade",
-    header: "Quantidade",
+    key: 'totalQuantidade',
+    header: 'Quantidade',
     render: (item: any) => formatNumber(item.totalQuantidade),
   },
   {
-    key: "totalFaturamento",
-    header: "Faturamento",
+    key: 'totalFaturamento',
+    header: 'Faturamento',
     render: (item: any) => formatCurrency(item.totalFaturamento),
   },
 ];
 
 const vendasCategoriaColumns = [
-  { key: "nome", header: "Categoria", render: (item: any) => item.nome },
+  { key: 'nome', header: 'Categoria', render: (item: any) => item.nome },
   {
-    key: "totalVendas",
-    header: "Total Vendas",
+    key: 'totalVendas',
+    header: 'Total Vendas',
     render: (item: any) => formatCurrency(item.totalVendas),
   },
   {
-    key: "totalQuantidade",
-    header: "Quantidade",
+    key: 'totalQuantidade',
+    header: 'Quantidade',
     render: (item: any) => formatNumber(item.totalQuantidade),
   },
 ];
 
 const margemProdutosColumns = [
-  { key: "nome", header: "Produto", render: (item: any) => item.nome },
+  { key: 'nome', header: 'Produto', render: (item: any) => item.nome },
   {
-    key: "margem",
-    header: "Margem (%)",
+    key: 'margem',
+    header: 'Margem (%)',
     render: (item: any) => (
       <span
-        className={
-          item.margem > 50
-            ? "text-green-600 font-semibold"
-            : "text-red-600 font-semibold"
-        }
+        className={item.margem > 50 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}
       >
         {item.margem.toFixed(2)}%
       </span>
@@ -82,70 +72,61 @@ const margemProdutosColumns = [
 ];
 
 const posicaoEstoqueColumns = [
-  { key: "nome", header: "Produto", render: (item: any) => item.nome },
+  { key: 'nome', header: 'Produto', render: (item: any) => item.nome },
   {
-    key: "quantidade",
-    header: "Quantidade",
+    key: 'quantidade',
+    header: 'Quantidade',
     render: (item: any) => formatNumber(item.quantidade),
   },
   {
-    key: "valorTotal",
-    header: "Valor Total",
+    key: 'valorTotal',
+    header: 'Valor Total',
     render: (item: any) => formatCurrency(item.valorTotal),
   },
 ];
 
 const baixoEstoqueColumns = [
   {
-    key: "nome",
-    header: "Produto",
+    key: 'nome',
+    header: 'Produto',
     render: (item: any) => <span className="font-medium">{item.nome}</span>,
   },
   {
-    key: "quantidadeAtual",
-    header: "Quantidade Atual",
+    key: 'quantidadeAtual',
+    header: 'Quantidade Atual',
     render: (item: any) => (
-      <span className="text-red-600 font-semibold">
-        {formatNumber(item.quantidadeAtual)}
-      </span>
+      <span className="text-red-600 font-semibold">{formatNumber(item.quantidadeAtual)}</span>
     ),
   },
 ];
 
 const proximaValidadeColumns = [
-  { key: "nome", header: "Produto", render: (item: any) => item.nome },
+  { key: 'nome', header: 'Produto', render: (item: any) => item.nome },
   {
-    key: "diasParaVencimento",
-    header: "Dias para Vencimento",
+    key: 'diasParaVencimento',
+    header: 'Dias para Vencimento',
     render: (item: any) => (
-      <span className="text-yellow-600 font-semibold">
-        {item.diasParaVencimento} dias
-      </span>
+      <span className="text-yellow-600 font-semibold">{item.diasParaVencimento} dias</span>
     ),
   },
 ];
 
 const comprasFornecedorColumns = [
-  { key: "nome", header: "Fornecedor", render: (item: any) => item.nome },
+  { key: 'nome', header: 'Fornecedor', render: (item: any) => item.nome },
   {
-    key: "totalCompras",
-    header: "Total Compras",
+    key: 'totalCompras',
+    header: 'Total Compras',
     render: (item: any) => formatNumber(item.totalCompras),
   },
   {
-    key: "totalValor",
-    header: "Total Valor",
+    key: 'totalValor',
+    header: 'Total Valor',
     render: (item: any) => formatCurrency(item.totalValor),
   },
 ];
 
 const Dashboard: FC = () => {
-
-  const {
-    data: basicData,
-    isLoading: basicLoading,
-    error: basicError,
-  } = useRelatorio();
+  const { data: basicData, isLoading: basicLoading, error: basicError } = useRelatorio();
 
   const { data: produtosVendidos } = useProdutosMaisVendidos(5);
   const { data: vendasCategoria } = useVendasPorCategoria();
@@ -156,9 +137,7 @@ const Dashboard: FC = () => {
   const { data: comprasFornecedor } = useComprasPorFornecedor();
 
   if (basicLoading) {
-    return (
-      <DashboardSkeleton/>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (basicError || !basicData) {
@@ -181,18 +160,14 @@ const Dashboard: FC = () => {
               Dashboard de Relatórios
             </h1>
             <p className="text-gray-600 mt-2">
-              Análises detalhadas e insights em tempo real sobre vendas, estoque
-              e compras
+              Análises detalhadas e insights em tempo real sobre vendas, estoque e compras
             </p>
           </div>
           <div className="flex space-x-4">
             <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg">
               Exportar Relatórios
             </Button>
-            <Button
-              variant="outline"
-              className="border-gray-300 hover:bg-gray-50"
-            >
+            <Button variant="outline" className="border-gray-300 hover:bg-gray-50">
               Configurações
             </Button>
           </div>
@@ -203,57 +178,41 @@ const Dashboard: FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-green-50 to-green-100">
           <CardHeader className="pb-2">
-            <CardDescription className="text-green-600 font-medium">
-              Receita Total
-            </CardDescription>
+            <CardDescription className="text-green-600 font-medium">Receita Total</CardDescription>
             <CardTitle className="text-2xl">Vendas Totais</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-green-700">
-              {formatCurrency(totalVendas)}
-            </p>
+            <p className="text-3xl font-bold text-green-700">{formatCurrency(totalVendas)}</p>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-red-50 to-red-100">
           <CardHeader className="pb-2">
-            <CardDescription className="text-red-600 font-medium">
-              Despesas Totais
-            </CardDescription>
+            <CardDescription className="text-red-600 font-medium">Despesas Totais</CardDescription>
             <CardTitle className="text-2xl">Gastos Totais</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-red-700">
-              {formatCurrency(totalGastos)}
-            </p>
+            <p className="text-3xl font-bold text-red-700">{formatCurrency(totalGastos)}</p>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-blue-50 to-blue-100">
           <CardHeader className="pb-2">
-            <CardDescription className="text-blue-600 font-medium">
-              Inventário
-            </CardDescription>
+            <CardDescription className="text-blue-600 font-medium">Inventário</CardDescription>
             <CardTitle className="text-2xl">Produtos em Estoque</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-blue-700">
-              {formatNumber(produtosEmEstoque)}
-            </p>
+            <p className="text-3xl font-bold text-blue-700">{formatNumber(produtosEmEstoque)}</p>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-gradient-to-br from-purple-50 to-purple-100">
           <CardHeader className="pb-2">
-            <CardDescription className="text-purple-600 font-medium">
-              Documentos
-            </CardDescription>
+            <CardDescription className="text-purple-600 font-medium">Documentos</CardDescription>
             <CardTitle className="text-2xl">Notas Emitidas</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-purple-700">
-              {formatNumber(totalNotas)}
-            </p>
+            <p className="text-3xl font-bold text-purple-700">{formatNumber(totalNotas)}</p>
           </CardContent>
         </Card>
       </div>

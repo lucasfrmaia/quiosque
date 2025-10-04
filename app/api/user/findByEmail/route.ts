@@ -13,6 +13,9 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({ success: true, data: user });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

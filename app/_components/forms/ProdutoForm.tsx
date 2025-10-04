@@ -21,7 +21,11 @@ interface ProdutoFormProps {
 }
 
 export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false }) => {
-  const { control, register, formState: { errors } } = useFormContext<ProdutoSchema>();
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<ProdutoSchema>();
 
   return (
     <div className="grid gap-4 py-4">
@@ -36,9 +40,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             className={errors.nome ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Nome do produto"
           />
-          {errors.nome && (
-            <p className="text-sm text-red-500">{errors.nome.message}</p>
-          )}
+          {errors.nome && <p className="text-sm text-red-500">{errors.nome.message}</p>}
         </div>
       </div>
 
@@ -53,9 +55,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             className={errors.descricao ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Descrição do produto (opcional)"
           />
-          {errors.descricao && (
-            <p className="text-sm text-red-500">{errors.descricao.message}</p>
-          )}
+          {errors.descricao && <p className="text-sm text-red-500">{errors.descricao.message}</p>}
         </div>
       </div>
 
@@ -70,12 +70,10 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             className={errors.imagemUrl ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="URL da imagem (opcional)"
           />
-          {errors.imagemUrl && (
-            <p className="text-sm text-red-500">{errors.imagemUrl.message}</p>
-          )}
+          {errors.imagemUrl && <p className="text-sm text-red-500">{errors.imagemUrl.message}</p>}
         </div>
       </div>
-   
+
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="categoriaId" className="text-right">
           Categoria
@@ -86,7 +84,10 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             name="categoriaId"
             render={({ field }) => (
               <Select value={String(field.value) || '0'} onValueChange={field.onChange}>
-                <SelectTrigger id="categoriaId" className={errors.categoriaId ? 'border-red-500 focus:border-red-500' : ''}>
+                <SelectTrigger
+                  id="categoriaId"
+                  className={errors.categoriaId ? 'border-red-500 focus:border-red-500' : ''}
+                >
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -104,7 +105,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
           )}
         </div>
       </div>
-   
+
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="ativo" className="text-right">
           Ativo
@@ -114,8 +115,14 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             control={control}
             name="ativo"
             render={({ field }) => (
-              <Select value={String(field.value)} onValueChange={(value) => field.onChange(value === 'true')}>
-                <SelectTrigger id="ativo" className={errors.ativo ? 'border-red-500 focus:border-red-500' : ''}>
+              <Select
+                value={String(field.value)}
+                onValueChange={(value) => field.onChange(value === 'true')}
+              >
+                <SelectTrigger
+                  id="ativo"
+                  className={errors.ativo ? 'border-red-500 focus:border-red-500' : ''}
+                >
                   <SelectValue placeholder="Selecione se está ativo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -125,12 +132,10 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
               </Select>
             )}
           />
-          {errors.ativo && (
-            <p className="text-sm text-red-500">{errors.ativo.message}</p>
-          )}
+          {errors.ativo && <p className="text-sm text-red-500">{errors.ativo.message}</p>}
         </div>
       </div>
-   
+
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="tipo" className="text-right">
           Tipo
@@ -141,7 +146,10 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
             name="tipo"
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="tipo" className={errors.tipo ? 'border-red-500 focus:border-red-500' : ''}>
+                <SelectTrigger
+                  id="tipo"
+                  className={errors.tipo ? 'border-red-500 focus:border-red-500' : ''}
+                >
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,9 +159,7 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
               </Select>
             )}
           />
-          {errors.tipo && (
-            <p className="text-sm text-red-500">{errors.tipo.message}</p>
-          )}
+          {errors.tipo && <p className="text-sm text-red-500">{errors.tipo.message}</p>}
         </div>
       </div>
     </div>

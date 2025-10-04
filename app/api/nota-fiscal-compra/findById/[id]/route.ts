@@ -10,6 +10,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
     return NextResponse.json({ success: true, data: nota });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

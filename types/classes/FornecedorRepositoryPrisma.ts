@@ -1,6 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { IFornecedorRepository } from '../interfaces/repositories';
-import { Fornecedor, NotaFiscalCompra, ProdutoCompra, Produto, FilterValues } from '../interfaces/entities';
+import {
+  Fornecedor,
+  NotaFiscalCompra,
+  ProdutoCompra,
+  Produto,
+  FilterValues,
+} from '../interfaces/entities';
 
 export class FornecedorRepositoryPrisma implements IFornecedorRepository {
   private prisma: PrismaClient;
@@ -10,7 +16,6 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
   }
 
   async create(fornecedor: Omit<Fornecedor, 'id' | 'compras'>): Promise<Fornecedor> {
-
     const createdFornecedor = await this.prisma.fornecedor.create({
       data: fornecedor,
     });
@@ -20,7 +25,7 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
 
   async findById(id: number): Promise<Fornecedor | null> {
     const fornecedor = await this.prisma.fornecedor.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!fornecedor) return null;
@@ -44,7 +49,7 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
         { nome: { contains: search } },
         { cnpj: { contains: search } },
         { email: { contains: search } },
-        { telefone: { contains: search } }
+        { telefone: { contains: search } },
       ];
     }
 
@@ -58,14 +63,17 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
 
     return {
       fornecedores: data,
-      total
+      total,
     };
   }
 
-  async update(id: number, fornecedor: Partial<Omit<Fornecedor, 'id' | 'compras'>>): Promise<Fornecedor> {
+  async update(
+    id: number,
+    fornecedor: Partial<Omit<Fornecedor, 'id' | 'compras'>>,
+  ): Promise<Fornecedor> {
     const updatedFornecedor = await this.prisma.fornecedor.update({
       where: { id },
-      data: fornecedor
+      data: fornecedor,
     });
 
     return updatedFornecedor;
@@ -73,7 +81,7 @@ export class FornecedorRepositoryPrisma implements IFornecedorRepository {
 
   async delete(id: number): Promise<void> {
     await this.prisma.fornecedor.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

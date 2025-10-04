@@ -6,6 +6,9 @@ export async function GET() {
     const produtos = await repositoryFactory.produtoRepository.findAll();
     return NextResponse.json(produtos);
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

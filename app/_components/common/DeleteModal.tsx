@@ -18,15 +18,11 @@ export const DeleteModal: FC<DeleteModalProps> = ({
   itemType,
 }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Excluir ${itemType}`}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={`Excluir ${itemType}`}>
       <div className="space-y-4">
         <p className="text-gray-600">
-          Tem certeza que deseja excluir {itemType.toLowerCase()} &quot;{itemName}&quot;?
-          Esta ação não pode ser desfeita.
+          Tem certeza que deseja excluir {itemType.toLowerCase()} &quot;{itemName}&quot;? Esta ação
+          não pode ser desfeita.
         </p>
         <ModalActions
           onCancel={onClose}

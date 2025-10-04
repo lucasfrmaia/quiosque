@@ -11,7 +11,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 
   async create(user: Omit<User, 'id'>): Promise<User> {
     const createdUser = await this.prisma.user.create({
-      data: user
+      data: user,
     });
 
     return createdUser;
@@ -19,7 +19,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 
   async findById(id: number): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
-      where: { id }
+      where: { id },
     });
     return user;
   }
@@ -35,30 +35,27 @@ export class UserRepositoryPrisma implements IUserRepository {
     const where: any = {};
 
     if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { email: { contains: search } }
-      ];
+      where.OR = [{ name: { contains: search } }, { email: { contains: search } }];
     }
 
     const users = await this.prisma.user.findMany({
       where,
       skip,
-      take: itemsPerPage
+      take: itemsPerPage,
     });
 
     const total = await this.prisma.user.count();
 
     return {
       users,
-      total
+      total,
     };
   }
 
   async update(id: number, user: Partial<Omit<User, 'id'>>): Promise<User> {
     const updatedUser = await this.prisma.user.update({
       where: { id },
-      data: user
+      data: user,
     });
 
     return updatedUser;
@@ -66,7 +63,7 @@ export class UserRepositoryPrisma implements IUserRepository {
 
   async delete(id: number): Promise<void> {
     await this.prisma.user.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +6,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { FormProvider } from "react-hook-form";
-import { EstoqueForm } from "../../forms/EstoqueForm";
-import { Produto } from "@/types/interfaces/entities";
+} from '@/components/ui/dialog';
+import { FormProvider } from 'react-hook-form';
+import { EstoqueForm } from '../../forms/EstoqueForm';
+import { Produto } from '@/types/interfaces/entities';
 
 interface ModalEditEstoqueProps {
   isEditModalOpen: boolean;
@@ -37,11 +37,7 @@ export function ModalEditEstoque({
             </DialogHeader>
             <EstoqueForm produtos={produtos} />
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsEditModalOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
                 Cancelar
               </Button>
               <Button type="submit">Salvar</Button>

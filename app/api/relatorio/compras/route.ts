@@ -33,7 +33,10 @@ export async function GET(request: NextRequest) {
         break;
 
       default:
-        return NextResponse.json({ error: 'Tipo de relatório de compras inválido' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Tipo de relatório de compras inválido' },
+          { status: 400 },
+        );
     }
 
     await prisma.$disconnect();

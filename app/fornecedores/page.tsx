@@ -6,13 +6,7 @@ import { Search, User, Plus, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Fornecedor } from '@/types/interfaces/entities';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Pagination } from '@/app/_components/Pagination';
 import { FornecedorTable } from '@/app/_components/tables/FornecedorTable';
 import { useFornecedor } from '@/app/_components/hooks/useFornecedor';
@@ -25,7 +19,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import TableSkeleton from '../_components/skeletons/TableSkeleton';
 
 const FornecedoresPage: FC = () => {
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -35,12 +28,12 @@ const FornecedoresPage: FC = () => {
   const createForm = useForm<FornecedorSchema>({
     resolver: zodResolver(fornecedorSchema),
     mode: 'onChange',
-    defaultValues: { nome: '', cnpj: '', telefone: '', email: '' }
+    defaultValues: { nome: '', cnpj: '', telefone: '', email: '' },
   });
   const editForm = useForm<FornecedorSchema>({
     resolver: zodResolver(fornecedorSchema),
     mode: 'onChange',
-    defaultValues: { nome: '', cnpj: '', telefone: '', email: '' }
+    defaultValues: { nome: '', cnpj: '', telefone: '', email: '' },
   });
 
   const {
@@ -53,7 +46,7 @@ const FornecedoresPage: FC = () => {
     handleSort,
     updateUrl,
     appliedFilters,
-    resetFilters
+    resetFilters,
   } = useFornecedor();
 
   const { data: response, isLoading, error } = fornecedorQuery;
@@ -66,7 +59,6 @@ const FornecedoresPage: FC = () => {
     const newFilters = { ...appliedFilters, search: localSearch, currentPage: 1 };
     updateUrl(newFilters);
   }, [appliedFilters, localSearch, updateUrl]);
-
 
   const onSubmitCreate = (data: FornecedorSchema) => {
     handleCreate({
@@ -113,7 +105,7 @@ const FornecedoresPage: FC = () => {
     setSelectedFornecedor(null);
   };
 
-  if (isLoading) return <TableSkeleton/>;
+  if (isLoading) return <TableSkeleton />;
   if (error) return <p>Erro!</p>;
 
   return (
@@ -187,7 +179,9 @@ const FornecedoresPage: FC = () => {
             onSort={handleSort}
             onEdit={openEditModal}
             onDelete={(fornecedorSelected) => {
-              const fornecedor = response?.fornecedores.find((f: Fornecedor) => f.id === fornecedorSelected.id);
+              const fornecedor = response?.fornecedores.find(
+                (f: Fornecedor) => f.id === fornecedorSelected.id,
+              );
               if (fornecedor) openDeleteModal(fornecedor);
             }}
           />
@@ -212,7 +206,6 @@ const FornecedoresPage: FC = () => {
         onSubmit={onSubmitCreate}
       />
 
-
       {/* Edit Dialog */}
       <ModalEditFornecedor
         isEditModalOpen={isEditModalOpen}
@@ -228,7 +221,6 @@ const FornecedoresPage: FC = () => {
         selectedFornecedor={selectedFornecedor}
         handleDeleteConfirm={handleDeleteConfirm}
       />
-
     </div>
   );
 };

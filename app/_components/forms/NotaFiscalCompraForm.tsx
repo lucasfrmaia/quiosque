@@ -1,25 +1,25 @@
-import { FC, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Controller, useFormContext } from "react-hook-form";
-import { useFieldArray } from "react-hook-form";
+import { FC, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Controller, useFormContext } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SearchableSelect } from "../common/SearchableSelect";
-import { useProduto } from "../hooks/useProduto";
-import { Fornecedor } from "@/types/interfaces/entities";
-import type { Option } from "../common/SearchableSelect";
-import { z } from "zod";
-import { notaFiscalCompraSchema } from "@/types/validation";
-import { Package, X } from "lucide-react";
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SearchableSelect } from '../common/SearchableSelect';
+import { useProduto } from '../hooks/useProduto';
+import { Fornecedor } from '@/types/interfaces/entities';
+import type { Option } from '../common/SearchableSelect';
+import { z } from 'zod';
+import { notaFiscalCompraSchema } from '@/types/validation';
+import { Package, X } from 'lucide-react';
 
 type NotaFiscalCompraFormData = z.infer<typeof notaFiscalCompraSchema>;
 
@@ -38,10 +38,10 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
     watch,
     formState: { errors },
   } = useFormContext<NotaFiscalCompraFormData>();
-  const produtosWatch = watch("produtos") || [];
+  const produtosWatch = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "produtos",
+    name: 'produtos',
   });
 
   const { getAllProdutos } = useProduto();
@@ -54,9 +54,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
   const [selectedProduto, setSelectedProduto] = useState<Option | null>(null);
   const [quantidade, setQuantidade] = useState(0);
   const [precoUnitario, setPrecoUnitario] = useState(0);
-  const produtoOptions = allProdutos.map(
-    (p) => ({ name: p.nome, id: p.id.toString() } as Option)
-  );
+  const produtoOptions = allProdutos.map((p) => ({ name: p.nome, id: p.id.toString() }) as Option);
 
   const handleAddProduto = () => {
     if (!selectedProduto || !quantidade || !precoUnitario) return;
@@ -64,7 +62,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
     append({
       produtoId: Number(selectedProduto!.id),
       quantidade,
-      unidade: "Unidade",
+      unidade: 'Unidade',
       precoUnitario,
     });
 
@@ -95,17 +93,11 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 <Input
                   id="data"
                   type="date"
-                  {...register("data", { valueAsDate: true })}
-                  className={
-                    errors.data
-                      ? "h-10 border-red-500 focus:border-red-500"
-                      : "h-10"
-                  }
-                  defaultValue={new Date().toISOString().split("T")[0]}
+                  {...register('data', { valueAsDate: true })}
+                  className={errors.data ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}
+                  defaultValue={new Date().toISOString().split('T')[0]}
                 />
-                {errors.data && (
-                  <p className="text-sm text-red-500">{errors.data.message}</p>
-                )}
+                {errors.data && <p className="text-sm text-red-500">{errors.data.message}</p>}
               </div>
             </div>
 
@@ -117,26 +109,19 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                   name="fornecedorId"
                   render={({ field }) => (
                     <Select
-                      value={field.value ? String(field.value) : ""}
-                      onValueChange={(val) =>
-                        field.onChange(val ? Number(val) : undefined)
-                      }
+                      value={field.value ? String(field.value) : ''}
+                      onValueChange={(val) => field.onChange(val ? Number(val) : undefined)}
                     >
                       <SelectTrigger
                         className={
-                          errors.fornecedorId
-                            ? "h-10 border-red-500 focus:border-red-500"
-                            : "h-10"
+                          errors.fornecedorId ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'
                         }
                       >
                         <SelectValue placeholder="Selecione um fornecedor" />
                       </SelectTrigger>
                       <SelectContent>
                         {fornecedores.map((fornecedor) => (
-                          <SelectItem
-                            key={fornecedor.id}
-                            value={fornecedor.id.toString()}
-                          >
+                          <SelectItem key={fornecedor.id} value={fornecedor.id.toString()}>
                             {fornecedor.nome}
                           </SelectItem>
                         ))}
@@ -145,9 +130,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                   )}
                 />
                 {errors.fornecedorId && (
-                  <p className="text-sm text-red-500">
-                    {errors.fornecedorId.message}
-                  </p>
+                  <p className="text-sm text-red-500">{errors.fornecedorId.message}</p>
                 )}
               </div>
             </div>
@@ -155,9 +138,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
             <div className="space-y-2">
               <Label>Total Estimado</Label>
               <div className="h-10 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-center">
-                <span className="text-lg font-bold text-green-600">
-                  R$ {total.toFixed(2)}
-                </span>
+                <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -189,7 +170,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
               <Label>Quantidade</Label>
               <Input
                 type="number"
-                step='0.01'
+                step="0.01"
                 value={quantidade}
                 onChange={(e) => setQuantidade(Number(e.target.value))}
                 placeholder="0"
@@ -202,7 +183,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
               <Input
                 type="number"
                 value={precoUnitario}
-                step='0.01'
+                step="0.01"
                 onChange={(e) => setPrecoUnitario(Number(e.target.value))}
                 placeholder="0.00"
                 className="h-10"
@@ -235,22 +216,15 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
               {fields.map((field, index) => {
                 const produtoCompra = produtosWatch[index];
                 if (!produtoCompra) return null;
-                const produto = allProdutos.find(
-                  (p) => p.id === produtoCompra.produtoId
-                );
+                const produto = allProdutos.find((p) => p.id === produtoCompra.produtoId);
                 if (!produto) return null;
 
-                const subtotal =
-                  produtoCompra.precoUnitario * produtoCompra.quantidade;
+                const subtotal = produtoCompra.precoUnitario * produtoCompra.quantidade;
 
                 return (
-                  <div
-                    key={field.id}
-                    className="flex items-center justify-between p-2"
-                  >
+                  <div key={field.id} className="flex items-center justify-between p-2">
                     <Badge variant="secondary" className="mr-2">
-                      {produto.nome} • Qtd: {produtoCompra.quantidade}{" "}
-                      {produtoCompra.unidade} • R${" "}
+                      {produto.nome} • Qtd: {produtoCompra.quantidade} {produtoCompra.unidade} • R${' '}
                       {produtoCompra.precoUnitario.toFixed(2)}
                     </Badge>
                     <div className="flex items-center gap-2 min-w-0">
@@ -278,9 +252,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
           </CardContent>
         </Card>
       )}
-      {errors.produtos && (
-        <p className="text-sm text-red-500">{errors.produtos.message}</p>
-      )}
+      {errors.produtos && <p className="text-sm text-red-500">{errors.produtos.message}</p>}
     </div>
   );
 };

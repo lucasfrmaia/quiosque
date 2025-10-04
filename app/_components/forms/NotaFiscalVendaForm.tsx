@@ -1,22 +1,18 @@
-import { FC, useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useFormContext } from "react-hook-form";
-import { useFieldArray } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SearchableSelect, Option } from "../common/SearchableSelect";
-import {
-  NotaFiscalVenda,
-  ProdutoVenda,
-  ProdutoEstoque,
-} from "@/types/interfaces/entities";
-import { z } from "zod";
-import { notaFiscalVendaSchema } from "@/types/validation";
-import { Package } from "lucide-react";
+import { FC, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useFormContext } from 'react-hook-form';
+import { useFieldArray } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
+import { X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SearchableSelect, Option } from '../common/SearchableSelect';
+import { NotaFiscalVenda, ProdutoVenda, ProdutoEstoque } from '@/types/interfaces/entities';
+import { z } from 'zod';
+import { notaFiscalVendaSchema } from '@/types/validation';
+import { Package } from 'lucide-react';
 
 type NotaFiscalVendaFormData = z.infer<typeof notaFiscalVendaSchema>;
 
@@ -24,19 +20,17 @@ interface NotaFiscalVendaFormProps {
   editing?: boolean;
 }
 
-export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
-  editing = false,
-}) => {
+export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = false }) => {
   const {
     register,
     watch,
     setValue,
     formState: { errors },
   } = useFormContext<NotaFiscalVendaFormData>();
-  const produtos = watch("produtos") || [];
+  const produtos = watch('produtos') || [];
   const { fields, append, remove } = useFieldArray({
     control: useFormContext().control,
-    name: "produtos",
+    name: 'produtos',
   });
 
   const [selectedEstoque, setSelectedEstoque] = useState<{
@@ -48,8 +42,8 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
   useEffect(() => {
     const today = new Date();
 
-    if (!watch("data")) {
-      setValue("data", today);
+    if (!watch('data')) {
+      setValue('data', today);
     }
   }, [setValue, watch]);
 
@@ -58,11 +52,11 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
     isLoading,
     error,
   } = useQuery<ProdutoEstoque[]>({
-    queryKey: ["all-estoque-venda"],
+    queryKey: ['all-estoque-venda'],
     queryFn: async () => {
-      const response = await fetch("/api/estoque/findAll");
+      const response = await fetch('/api/estoque/findAll');
       if (!response.ok) {
-        throw new Error("Failed to fetch estoque");
+        throw new Error('Failed to fetch estoque');
       }
       const result = await response.json();
       return result;
@@ -76,23 +70,19 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
   const estoqueOptions =
     allEstoque?.map((estoque) => ({
       id: String(estoque.id),
-      name: `${estoque.produto?.nome || "Sem nome"} (Estoque: ${
-        estoque.quantidade
-      })`,
+      name: `${estoque.produto?.nome || 'Sem nome'} (Estoque: ${estoque.quantidade})`,
     })) || [];
 
   const handleAddProduto = () => {
     if (!selectedEstoque || pendingQuantity < 1) return;
 
-    const estoque = allEstoque?.find(
-      (e) => String(e.id) === selectedEstoque.id
-    );
+    const estoque = allEstoque?.find((e) => String(e.id) === selectedEstoque.id);
     if (!estoque || !estoque.produto) return;
 
     append({
       produtoId: estoque!.produto!.id,
       quantidade: pendingQuantity,
-      unidade: estoque.unidade || "Unidade",
+      unidade: estoque.unidade || 'Unidade',
       precoUnitario: estoque.preco || 0,
     });
 
@@ -122,26 +112,18 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
                 <Input
                   id="data"
                   type="date"
-                  {...register("data", { valueAsDate: true })}
-                  className={
-                    errors.data
-                      ? "h-10 border-red-500 focus:border-red-500"
-                      : "h-10"
-                  }
-                  defaultValue={new Date().toISOString().split("T")[0]}
+                  {...register('data', { valueAsDate: true })}
+                  className={errors.data ? 'h-10 border-red-500 focus:border-red-500' : 'h-10'}
+                  defaultValue={new Date().toISOString().split('T')[0]}
                 />
-                {errors.data && (
-                  <p className="text-sm text-red-500">{errors.data.message}</p>
-                )}
+                {errors.data && <p className="text-sm text-red-500">{errors.data.message}</p>}
               </div>
             </div>
 
             <div className="space-y-2">
               <Label>Total Estimado</Label>
               <div className="h-10 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 flex items-center justify-center">
-                <span className="text-lg font-bold text-green-600">
-                  R$ {total.toFixed(2)}
-                </span>
+                <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -173,10 +155,8 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
               <Label>Quantidade</Label>
               <Input
                 type="number"
-                value={pendingQuantity}              
-                onChange={(e) =>
-                  setPendingQuantity(parseInt(e.target.value) || 1)
-                }
+                value={pendingQuantity}
+                onChange={(e) => setPendingQuantity(parseInt(e.target.value) || 1)}
                 placeholder="1"
                 className="h-10"
               />
@@ -209,22 +189,17 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
                 const produtoVenda = produtos[index];
                 if (!produtoVenda) return null;
                 const estoqueItem = allEstoque?.find(
-                  (e) => e.produto!.id === produtoVenda.produtoId
+                  (e) => e.produto!.id === produtoVenda.produtoId,
                 );
                 const produto = estoqueItem?.produto;
                 if (!estoqueItem || !produto) return null;
 
-                const subtotal =
-                  produtoVenda.precoUnitario * produtoVenda.quantidade;
+                const subtotal = produtoVenda.precoUnitario * produtoVenda.quantidade;
 
                 return (
-                  <div
-                    key={field.id}
-                    className="flex items-center justify-between p-2"
-                  >
+                  <div key={field.id} className="flex items-center justify-between p-2">
                     <Badge variant="secondary" className="mr-2">
-                      {produto.nome} • Qtd: {produtoVenda.quantidade}{" "}
-                      {produtoVenda.unidade} • R${" "}
+                      {produto.nome} • Qtd: {produtoVenda.quantidade} {produtoVenda.unidade} • R${' '}
                       {produtoVenda.precoUnitario.toFixed(2)}
                     </Badge>
                     <div className="flex items-center gap-2 min-w-0">
@@ -252,9 +227,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({
           </CardContent>
         </Card>
       )}
-      {errors.produtos && (
-        <p className="text-sm text-red-500">{errors.produtos.message}</p>
-      )}
+      {errors.produtos && <p className="text-sm text-red-500">{errors.produtos.message}</p>}
     </div>
   );
 };

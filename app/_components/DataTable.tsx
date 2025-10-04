@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { FC, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { FC, useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -11,10 +11,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Edit, Trash2 } from "lucide-react";
-import { SortIcon } from "./SortIcon";
-import { FilterValues } from "@/types/interfaces/entities";
+} from '@/components/ui/table';
+import { Edit, Trash2 } from 'lucide-react';
+import { SortIcon } from './SortIcon';
+import { FilterValues } from '@/types/interfaces/entities';
 
 interface Column<T> {
   key: string;
@@ -42,17 +42,17 @@ export const DataTable = <T extends { id: number }>({
   columns,
   filterValues,
   actions,
-  emptyMessage = "Nenhum item encontrado.",
+  emptyMessage = 'Nenhum item encontrado.',
 }: DataTableProps<T>) => {
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [sortField, setSortField] = useState<string | null>(null);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
-      setSortDirection("asc");
+      setSortDirection('asc');
     }
   };
 
@@ -66,16 +66,16 @@ export const DataTable = <T extends { id: number }>({
     const sorter = getSorter(sortField);
     if (sorter) {
       const result = sorter(a, b);
-      return sortDirection === "asc" ? result : -result;
+      return sortDirection === 'asc' ? result : -result;
     }
     // Default sorter
     const aValue = (a as any)[sortField];
     const bValue = (b as any)[sortField];
     if (aValue < bValue) {
-      return sortDirection === "asc" ? -1 : 1;
+      return sortDirection === 'asc' ? -1 : 1;
     }
     if (aValue > bValue) {
-      return sortDirection === "asc" ? 1 : -1;
+      return sortDirection === 'asc' ? 1 : -1;
     }
     return 0;
   });
@@ -144,22 +144,18 @@ export const DataTable = <T extends { id: number }>({
                     <TableHead
                       key={column.key}
                       className={`${
-                        column.sortable
-                          ? "cursor-pointer select-none hover:bg-gray-100"
-                          : ""
+                        column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
                       } px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wide bg-gray-100 border-b-2 border-gray-200 w-24 ${
-                        column.key === "imagem" ? "w-20" : ""
+                        column.key === 'imagem' ? 'w-20' : ''
                       } font-sans`}
-                      onClick={() =>
-                        column.sortable && handleSort(columnSortKey)
-                      }
+                      onClick={() => column.sortable && handleSort(columnSortKey)}
                     >
                       <div className="flex items-center space-x-1">
                         <span>{column.header}</span>
                         {column.sortable && sortField === columnSortKey && (
                           <SortIcon
                             field={columnSortKey}
-                            currentSortField={sortField || ""}
+                            currentSortField={sortField || ''}
                             currentSortDirection={sortDirection}
                           />
                         )}
@@ -185,9 +181,7 @@ export const DataTable = <T extends { id: number }>({
                     <TableCell
                       key={column.key}
                       className={`px-6 py-4 text-sm text-center font-medium text-gray-900 ${
-                        column.key === "imagem"
-                          ? "p-2"
-                          : ""
+                        column.key === 'imagem' ? 'p-2' : ''
                       }`}
                     >
                       {column.render(item)}
@@ -201,9 +195,7 @@ export const DataTable = <T extends { id: number }>({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                              actions.onView && actions?.onView(item)
-                            }
+                            onClick={() => actions.onView && actions?.onView(item)}
                           >
                             Ver
                           </Button>
@@ -237,11 +229,8 @@ export const DataTable = <T extends { id: number }>({
       </div>
 
       {sortedItems.length === 0 && (
-        <div className="rounded-md border p-8 text-center text-gray-500">
-          {emptyMessage}
-        </div>
+        <div className="rounded-md border p-8 text-center text-gray-500">{emptyMessage}</div>
       )}
     </>
   );
 };
-

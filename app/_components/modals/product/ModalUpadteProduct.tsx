@@ -1,7 +1,14 @@
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { FormProvider } from "react-hook-form"
-import { ProdutoForm } from "../../forms/ProdutoForm"
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { FormProvider } from 'react-hook-form';
+import { ProdutoForm } from '../../forms/ProdutoForm';
 
 interface ModalUpdateProductProps {
   isEditModalOpen: boolean;
@@ -11,8 +18,13 @@ interface ModalUpdateProductProps {
   onSubmit: (data: any) => void;
 }
 
-export function ModalUpdateProduct({ isEditModalOpen, setIsEditModalOpen, editForm, onSubmit, categories }: ModalUpdateProductProps) {
- 
+export function ModalUpdateProduct({
+  isEditModalOpen,
+  setIsEditModalOpen,
+  editForm,
+  onSubmit,
+  categories,
+}: ModalUpdateProductProps) {
   return (
     <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
       <DialogContent className="sm:max-w-[425px]">
@@ -24,13 +36,14 @@ export function ModalUpdateProduct({ isEditModalOpen, setIsEditModalOpen, editFo
             </DialogHeader>
             <ProdutoForm categories={categories} />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+              <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
+                Cancelar
+              </Button>
               <Button type="submit">Salvar</Button>
             </DialogFooter>
           </form>
         </FormProvider>
       </DialogContent>
     </Dialog>
-  )
- 
+  );
 }

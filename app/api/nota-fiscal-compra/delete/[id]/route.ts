@@ -7,6 +7,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     await repositoryFactory.notaFiscalCompraRepository.delete(Number(id));
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal server error' },
+      { status: 500 },
+    );
   }
 }

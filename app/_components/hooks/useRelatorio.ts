@@ -33,11 +33,25 @@ export const useVendasPorPeriodo = (periodo: 'daily' | 'weekly' | 'monthly' | 'a
   });
 };
 
-export const useComparativoPeriodos = (startDate1: string, endDate1: string, startDate2: string, endDate2: string) => {
+export const useComparativoPeriodos = (
+  startDate1: string,
+  endDate1: string,
+  startDate2: string,
+  endDate2: string,
+) => {
   return useQuery({
-    queryKey: [VENDAS_QUERY_KEY, 'comparativo-periodos', startDate1, endDate1, startDate2, endDate2],
+    queryKey: [
+      VENDAS_QUERY_KEY,
+      'comparativo-periodos',
+      startDate1,
+      endDate1,
+      startDate2,
+      endDate2,
+    ],
     queryFn: async () => {
-      const response = await fetch(`/api/relatorio/vendas?type=comparativo-periodos&startDate1=${startDate1}&endDate1=${endDate1}&startDate2=${startDate2}&endDate2=${endDate2}`);
+      const response = await fetch(
+        `/api/relatorio/vendas?type=comparativo-periodos&startDate1=${startDate1}&endDate1=${endDate1}&startDate2=${startDate2}&endDate2=${endDate2}`,
+      );
       if (!response.ok) {
         throw new Error('Erro ao buscar comparativo de períodos');
       }
@@ -47,11 +61,16 @@ export const useComparativoPeriodos = (startDate1: string, endDate1: string, sta
   });
 };
 
-export const useProdutosMaisVendidos = (limit: number = 10, by: 'quantidade' | 'faturamento' = 'faturamento') => {
+export const useProdutosMaisVendidos = (
+  limit: number = 10,
+  by: 'quantidade' | 'faturamento' = 'faturamento',
+) => {
   return useQuery({
     queryKey: [VENDAS_QUERY_KEY, 'produtos-mais-vendidos', limit, by],
     queryFn: async () => {
-      const response = await fetch(`/api/relatorio/vendas?type=produtos-mais-vendidos&limit=${limit}&by=${by}`);
+      const response = await fetch(
+        `/api/relatorio/vendas?type=produtos-mais-vendidos&limit=${limit}&by=${by}`,
+      );
       if (!response.ok) {
         throw new Error('Erro ao buscar produtos mais vendidos');
       }
@@ -130,7 +149,9 @@ export const useProdutosBaixoEstoque = (minLevel: number = 10) => {
   return useQuery({
     queryKey: [ESTOQUE_QUERY_KEY, 'baixo-estoque', minLevel],
     queryFn: async () => {
-      const response = await fetch(`/api/relatorio/estoque?type=baixo-estoque&minLevel=${minLevel}`);
+      const response = await fetch(
+        `/api/relatorio/estoque?type=baixo-estoque&minLevel=${minLevel}`,
+      );
       if (!response.ok) {
         throw new Error('Erro ao buscar produtos com baixo estoque');
       }
@@ -170,7 +191,9 @@ export const useHistoricoComprasPorProduto = (produtoId: number) => {
   return useQuery({
     queryKey: [COMPRAS_QUERY_KEY, 'historico-produto', produtoId],
     queryFn: async () => {
-      const response = await fetch(`/api/relatorio/compras?type=historico-produto&produtoId=${produtoId}`);
+      const response = await fetch(
+        `/api/relatorio/compras?type=historico-produto&produtoId=${produtoId}`,
+      );
       if (!response.ok) {
         throw new Error('Erro ao buscar histórico de compras por produto');
       }
@@ -197,7 +220,9 @@ export const useCustosAquisiçãoPorProduto = (produtoId: number) => {
   return useQuery({
     queryKey: [COMPRAS_QUERY_KEY, 'custos-aquisicao', produtoId],
     queryFn: async () => {
-      const response = await fetch(`/api/relatorio/compras?type=custos-aquisicao&produtoId=${produtoId}`);
+      const response = await fetch(
+        `/api/relatorio/compras?type=custos-aquisicao&produtoId=${produtoId}`,
+      );
       if (!response.ok) {
         throw new Error('Erro ao buscar custos de aquisição por produto');
       }

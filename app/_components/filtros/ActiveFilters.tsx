@@ -30,11 +30,7 @@ const ActiveFilter: FC<ActiveFilterProps> = ({ label, value, onRemove }) => (
   </div>
 );
 
-export const ActiveFilters: FC<ActiveFiltersProps> = ({
-  filters,
-  onRemoveFilter,
-  onClearAll,
-}) => {
+export const ActiveFilters: FC<ActiveFiltersProps> = ({ filters, onRemoveFilter, onClearAll }) => {
   if (filters.length === 0) return null;
 
   return (

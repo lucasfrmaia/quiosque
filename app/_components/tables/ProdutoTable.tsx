@@ -1,8 +1,8 @@
-import { FC } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Box } from "lucide-react";
-import { Produto, FilterValues } from "@/types/interfaces/entities";
-import { DataTable } from "../DataTable";
+import { FC } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Box } from 'lucide-react';
+import { Produto, FilterValues } from '@/types/interfaces/entities';
+import { DataTable } from '../DataTable';
 
 interface ProdutoTableProps {
   items: Produto[];
@@ -11,16 +11,11 @@ interface ProdutoTableProps {
   onDelete: (id: Produto) => void;
 }
 
-export const ProdutoTable: FC<ProdutoTableProps> = ({
-  items,
-  filterValues,
-  onEdit,
-  onDelete,
-}) => {
+export const ProdutoTable: FC<ProdutoTableProps> = ({ items, filterValues, onEdit, onDelete }) => {
   const columns = [
     {
-      key: "imagem",
-      header: "Imagem",
+      key: 'imagem',
+      header: 'Imagem',
       render: (item: Produto) => (
         <div className="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
           {item.imagemUrl ? (
@@ -37,44 +32,38 @@ export const ProdutoTable: FC<ProdutoTableProps> = ({
       sortable: false,
     },
     {
-      key: "nome",
-      header: "Nome",
-      sortKey: "nome",
-      render: (item: Produto) => (
-        <div className="font-bold text-sm">{item.nome}</div>
-      ),
+      key: 'nome',
+      header: 'Nome',
+      sortKey: 'nome',
+      render: (item: Produto) => <div className="font-bold text-sm">{item.nome}</div>,
       sortable: true,
       sorter: (a: Produto, b: Produto) => a.nome.localeCompare(b.nome),
     },
     {
-      key: "categoria",
-      header: "Categoria",
-      render: (item: Produto) => item.categoria?.name || "N/A",
+      key: 'categoria',
+      header: 'Categoria',
+      render: (item: Produto) => item.categoria?.name || 'N/A',
       sortable: false,
     },
     {
-      key: "status",
-      header: "Status",
+      key: 'status',
+      header: 'Status',
       render: (item: Produto) => (
         <Badge
-          variant={item.ativo ? "default" : "secondary"}
-          className={
-            item.ativo
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
-          }
+          variant={item.ativo ? 'default' : 'secondary'}
+          className={item.ativo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
         >
-          {item.ativo ? "Ativo" : "Inativo"}
+          {item.ativo ? 'Ativo' : 'Inativo'}
         </Badge>
       ),
       sortable: false,
     },
     {
-      key: "desc",
-      header: "Descrição",
+      key: 'desc',
+      header: 'Descrição',
       render: (item: Produto) => (
         <div className="text-gray-500 text-xs line-clamp-2">
-          {item.descricao || "Sem descrição"}
+          {item.descricao || 'Sem descrição'}
         </div>
       ),
       sortable: false,
