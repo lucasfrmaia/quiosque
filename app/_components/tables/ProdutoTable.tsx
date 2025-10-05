@@ -32,6 +32,11 @@ export const ProdutoTable: FC<ProdutoTableProps> = ({ items, filterValues, onEdi
       sortable: false,
     },
     {
+      key: 'id',
+      header: 'ID',
+      render: (item: Produto) => item.id,
+    },
+    {
       key: 'nome',
       header: 'Nome',
       sortKey: 'nome',

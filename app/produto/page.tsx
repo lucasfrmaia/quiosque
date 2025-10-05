@@ -78,7 +78,8 @@ const ProdutoPage: FC = () => {
       nome: '',
       descricao: '',
       imagemUrl: '',
-      ativo: false,
+      ativo: true,
+      tipo: 'CARDAPIO',
       categoriaId: undefined,
     },
   });

@@ -1,3 +1,5 @@
+import { TipoUnidade } from '../types/types';
+
 export interface User {
   id: number;
   name: string;
@@ -16,6 +18,8 @@ export interface Fornecedor {
 export interface Category {
   id: number;
   name: string;
+  description: string;
+  color: string;
   produtos?: Produto[];
 }
 
@@ -49,6 +53,7 @@ export interface NotaFiscalCompra {
   id: number;
   data: Date;
   total: number;
+  ativo: boolean;
   fornecedorId: number;
   fornecedor?: Fornecedor;
   produtos?: ProdutoCompra[];
@@ -59,7 +64,7 @@ export interface ProdutoCompra {
   notaFiscalId: number;
   produtoId: number;
   quantidade: number;
-  unidade: string;
+  unidade: TipoUnidade;
   precoUnitario: number;
   produto?: Produto;
   notaFiscal?: NotaFiscalCompra;
@@ -69,6 +74,7 @@ export interface NotaFiscalVenda {
   id: number;
   data: Date;
   total: number;
+  ativo: boolean;
   produtos?: ProdutoVenda[];
 }
 

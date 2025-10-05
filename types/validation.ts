@@ -5,7 +5,7 @@ export const produtoSchema = z.object({
   descricao: z.string().max(255, 'Descrição deve ter no máximo 255 caracteres').optional(),
   imagemUrl: z.string().max(255, 'URL muito longa').optional(),
   ativo: z.boolean(),
-  tipo: z.enum(['INSUMO', 'CARDAPIO'], { error: 'Selecione um Tipo!' }),
+  tipo: z.enum(['INSUMO', 'CARDAPIO']),
   categoriaId: z.number().int().positive().max(999999, 'ID de categoria inválido').optional(),
 });
 
@@ -34,6 +34,7 @@ export const produtoEstoqueSchema = z.object({
 export const notaFiscalCompraSchema = z.object({
   data: z.date({ message: 'Escolha uma Data!' }),
   fornecedorId: z.number({ message: 'Selecione um Fornecedor!' }).int().positive(),
+  ativo: z.boolean(),
   produtos: z
     .array(
       z.object({
@@ -57,6 +58,7 @@ export const notaFiscalCompraSchema = z.object({
 export const notaFiscalVendaSchema = z.object({
   data: z.date({ message: 'Escolha uma Data!' }),
   total: z.number().min(0, 'Total deve ser positivo').max(999999999, 'Total muito alto'),
+  ativo: z.boolean(),
   produtos: z
     .array(
       z.object({

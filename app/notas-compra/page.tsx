@@ -163,6 +163,7 @@ const NotasCompraPage: FC = () => {
       data: new Date(data.data),
       fornecedorId: data.fornecedorId,
       total: data.produtos.reduce((acc, value) => acc + value.precoUnitario, 0),
+      ativo: data.ativo,
       produtos: data.produtos.map((p) => ({
         produtoId: p.produtoId,
         quantidade: p.quantidade,

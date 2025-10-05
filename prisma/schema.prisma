@@ -51,8 +51,10 @@ model Fornecedor {
 // Categorias de Produto
 // =====================
 model Category {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  color       String?
 
   produtos Produto[]
 
@@ -117,7 +119,7 @@ model ProdutoCompra {
   id            Int                @id @default(autoincrement())
   notaFiscalId  Int
   produtoId     Int
-  quantidade    Int
+  quantidade    Float
   precoUnitario Float
   unidade       TipoUnidadeProduto @default(UNIDADE)
 
@@ -145,7 +147,7 @@ model ProdutoVenda {
   id            Int             @id @default(autoincrement())
   notaFiscalId  Int
   produtoId     Int
-  quantidade    Int
+  quantidade    Float
   precoUnitario Float
   produto       Produto         @relation(fields: [produtoId], references: [id], onDelete: Cascade)
   notaFiscal    NotaFiscalVenda @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)

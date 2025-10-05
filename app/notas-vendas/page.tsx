@@ -116,6 +116,7 @@ const NotasVendasPage: FC = () => {
       data: new Date(data.data),
       total: data.total,
       produtos: data.produtos,
+      ativo: data.ativo,
     });
     setIsCreateModalOpen(false);
     createForm.reset();
@@ -141,7 +142,6 @@ const NotasVendasPage: FC = () => {
       nota.produtos?.map((p) => ({
         produtoId: p.produtoId,
         quantidade: p.quantidade,
-        unidade: p.unidade,
         precoUnitario: p.precoUnitario,
       })) || [],
     );

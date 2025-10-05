@@ -54,8 +54,8 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
   } = getAllProdutos();
 
   const [selectedProduto, setSelectedProduto] = useState<Option | null>(null);
-  const [quantidade, setQuantidade] = useState(0);
-  const [precoUnitario, setPrecoUnitario] = useState(0);
+  const [quantidade, setQuantidade] = useState<number | string>('');
+  const [precoUnitario, setPrecoUnitario] = useState<number | string>('');
   const [selectedTipoUnidade, setSelectedTipoUnidade] = useState<TipoUnidade>('UNIDADE');
 
   const produtoOptions = allProdutos.map((p) => ({ name: p.nome, id: p.id.toString() }) as Option);
@@ -64,15 +64,15 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
     if (!selectedProduto || !quantidade || !precoUnitario) return;
 
     append({
-      produtoId: Number(selectedProduto.id),
-      quantidade,
       unidade: selectedTipoUnidade,
-      precoUnitario,
+      produtoId: Number(selectedProduto.id),
+      precoUnitario: Number(precoUnitario),
+      quantidade: Number(quantidade),
     });
 
     setSelectedProduto(null);
-    setQuantidade(0);
-    setPrecoUnitario(0);
+    setQuantidade('');
+    setPrecoUnitario('');
   };
 
   const total = produtosWatch.reduce((sum, produto) => {
@@ -145,6 +145,11 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
               </div>
             </div>
+
+            <div className="flex items-center space-x-1">
+              <input id="status" {...register('ativo')} type="checkbox" defaultChecked={true} />
+              <Label htmlFor="status">Nota Ativa</Label>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -176,8 +181,11 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 type="number"
                 step="0.01"
                 value={quantidade}
-                onChange={(e) => setQuantidade(Number(e.target.value))}
-                placeholder="0"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setQuantidade(value == '' ? '' : Number(value));
+                }}
+                placeholder="Digite a quantidade..."
                 className="h-10"
               />
             </div>
@@ -188,14 +196,18 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 type="number"
                 value={precoUnitario}
                 step="0.01"
-                onChange={(e) => setPrecoUnitario(Number(e.target.value))}
-                placeholder="0.00"
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setPrecoUnitario(value == '' ? '' : Number(value));
+                }}
+                placeholder="Digite o preço..."
                 className="h-10"
               />
             </div>
           </div>
 
-          <div>
+          <div className="space-y-2">
+            <Label>Unidade</Label>
             <SelectTipoUnidade changeUnidade={setSelectedTipoUnidade} control={control} />
           </div>
 

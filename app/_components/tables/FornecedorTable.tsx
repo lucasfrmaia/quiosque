@@ -31,6 +31,11 @@ export const FornecedorTable: FC<FornecedorTableProps> = ({
       sortable: false,
     },
     {
+      key: 'id',
+      header: 'ID',
+      render: (item: Fornecedor) => item.id,
+    },
+    {
       key: 'nome',
       header: 'Nome',
       sortKey: 'nome',

@@ -94,11 +94,13 @@ export const ProdutoForm: FC<ProdutoFormProps> = ({ categories, editing = false 
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
+                  {categories
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             )}

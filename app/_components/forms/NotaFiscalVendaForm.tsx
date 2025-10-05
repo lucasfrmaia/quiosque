@@ -125,6 +125,11 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
                 <span className="text-lg font-bold text-green-600">R$ {total.toFixed(2)}</span>
               </div>
             </div>
+
+            <div className="flex items-center space-x-1">
+              <input id="status" {...register('ativo')} type="checkbox" defaultChecked={true} />
+              <Label htmlFor="status">Status</Label>
+            </div>
           </div>
         </CardContent>
       </Card>

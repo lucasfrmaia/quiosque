@@ -32,18 +32,14 @@ const columns = [
   },
   {
     key: 'produtos',
-    header: 'Número de Produtos',
+    header: 'Total de Produtos',
     render: (item: Category) => item.produtos?.length || 0,
     sortable: false,
   },
   {
-    key: 'status',
-    header: 'Status',
-    render: (item: Category) => (
-      <Badge variant="default" className="bg-green-100 text-green-800">
-        Ativo
-      </Badge>
-    ),
+    key: 'description',
+    header: 'Descrição',
+    render: (item: Category) => item.description?.slice(0, 18) + '...',
     sortable: false,
   },
 ];

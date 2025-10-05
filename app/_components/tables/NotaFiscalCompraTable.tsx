@@ -42,6 +42,11 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
       sortable: false,
     },
     {
+      key: 'id',
+      header: 'ID',
+      render: (item: NotaFiscalCompra) => item.id,
+    },
+    {
       key: 'fornecedor',
       header: 'Fornecedor',
       sortKey: 'fornecedor.nome',
@@ -80,11 +85,9 @@ export const NotaFiscalCompraTable: FC<NotaFiscalCompraTableProps> = ({
     },
     {
       key: 'status',
-      header: 'Status',
+      header: 'Ativo',
       render: (item: NotaFiscalCompra) => (
-        <Badge variant="default" className="bg-green-100 text-green-800">
-          Ativo
-        </Badge>
+        <Badge variant={item.ativo ? 'default' : 'destructive'}>{item.ativo ? 'Sim' : 'Não'}</Badge>
       ),
       sortable: false,
     },
