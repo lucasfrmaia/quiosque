@@ -85,10 +85,10 @@ const columns = [
   },
   {
     key: 'status',
-    header: 'Status',
+    header: 'Estocável',
     render: (item: ProdutoEstoque) => (
-      <Badge variant="default" className="bg-green-100 text-green-800">
-        Ativo
+      <Badge variant={item.estocavel ? 'default' : 'destructive'}>
+        {item.estocavel ? 'Sim' : 'Não'}
       </Badge>
     ),
     sortable: false,

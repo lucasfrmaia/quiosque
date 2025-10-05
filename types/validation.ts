@@ -30,7 +30,7 @@ export const produtoEstoqueSchema = z.object({
     .max(1000000, 'Quantidade muito alta'),
   dataValidade: z.date({ message: 'Escolha uma Data!' }).optional(),
   estocavel: z.boolean(),
-  unidade: z.enum(['UNIDADE', 'KG', 'MG']).optional(),
+  unidade: z.enum(['UNIDADE', 'KG', 'MG', 'G']).optional(),
   produtoId: z.number({ message: 'Escolha um Produto!' }).int().positive(),
 });
 

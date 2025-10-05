@@ -32,7 +32,7 @@ export class Relatorio {
   async getProdutosEmEstoque(): Promise<number> {
     const res = await this.prisma.$queryRaw<
       Array<{ total: number | string }>
-    >`SELECT COALESCE(SUM("quantidade"),0) AS "total" FROM "produto_estoque" p where p.id <> 1`;
+    >`SELECT COALESCE(SUM("quantidade"),0) AS "total" FROM "produto_estoque" p where p.id <> 1 and p.estocavel = true`;
     return this.toNumber(res[0]?.total);
   }
 

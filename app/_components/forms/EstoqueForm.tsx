@@ -111,6 +111,21 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
         </div>
       </div>
 
+      <div className="flex items-center gap-4">
+        <Label htmlFor="estocavel" className="text-right">
+          Produto Estocavel
+        </Label>
+        <Input
+          id="estocavel"
+          defaultChecked={true}
+          type="checkbox"
+          {...register('estocavel')}
+          className={errors.estocavel ? 'border-red-500 focus:border-red-500' : '' + 'w-4 h-4'}
+        />
+        <Label>Sim/Não</Label>
+        {errors.estocavel && <p className="text-sm text-red-500">{errors.estocavel.message}</p>}
+      </div>
+
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="unidade" className="text-right">
           Unidade

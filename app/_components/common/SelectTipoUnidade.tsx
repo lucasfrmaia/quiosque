@@ -13,7 +13,7 @@ interface Props {
   changeUnidade?: (value: TipoUnidade) => void;
 }
 
-const tiposProdutos = ['UNIDADE', 'KG', 'MG'];
+const tiposProdutos: TipoUnidade[] = ['UNIDADE', 'KG', 'MG', 'G'];
 
 export function SelectTipoUnidade({ control, changeUnidade }: Props) {
   return (
@@ -26,7 +26,6 @@ export function SelectTipoUnidade({ control, changeUnidade }: Props) {
             value={field.value}
             onValueChange={(value) => {
               if (changeUnidade) changeUnidade(value as TipoUnidade);
-
               field.onChange(value);
             }}
           >
@@ -35,7 +34,7 @@ export function SelectTipoUnidade({ control, changeUnidade }: Props) {
             </SelectTrigger>
             <SelectContent>
               {tiposProdutos.map((unidade) => (
-                <SelectItem key={unidade} value={unidade}>
+                <SelectItem key={unidade} value={unidade || 'Null'}>
                   {unidade}
                 </SelectItem>
               ))}
