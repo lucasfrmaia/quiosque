@@ -18,8 +18,8 @@ export interface Fornecedor {
 export interface Category {
   id: number;
   name: string;
-  description: string;
-  color: string;
+  description?: string | null;
+  color?: string | null;
   produtos?: Produto[];
 }
 
@@ -44,7 +44,8 @@ export interface ProdutoEstoque {
   preco: number;
   quantidade: number;
   dataValidade: Date | null;
-  unidade: string;
+  estocavel: boolean;
+  unidade: TipoUnidade;
   produtoId: number;
   produto?: Produto;
 }

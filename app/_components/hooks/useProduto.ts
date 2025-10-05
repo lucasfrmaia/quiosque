@@ -6,7 +6,7 @@ import { ProdutoInsertData, ProdutoPatchData } from '@/types/types/types';
 
 const defaultFilters: FilterValues & { categoryId?: number } = {
   currentPage: 1,
-  itemsPerPage: 10,
+  itemsPerPage: 5,
   search: '',
   categoryId: undefined,
 };

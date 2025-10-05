@@ -12,20 +12,41 @@ export const CategoryForm: FC = () => {
   } = useFormContext<CategorySchema>();
 
   return (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="name" className="text-right">
-          Nome
-        </Label>
-        <div className="col-span-3 space-y-1">
-          <Input
-            id="name"
-            {...register('name')}
-            className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
-            placeholder="Nome da categoria"
-          />
-          {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-        </div>
+    <div className="">
+      <Label htmlFor="name" className="text-right">
+        Nome
+      </Label>
+      <div className="col-span-3 space-y-1">
+        <Input
+          id="name"
+          {...register('name')}
+          className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
+          placeholder="Nome da categoria"
+        />
+        {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+      </div>
+
+      <div className="mt-4">
+        <Label>Descrição (Opcional)</Label>
+        <Input
+          id="description"
+          {...register('description')}
+          placeholder="Digite uma descrição...."
+          className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
+        />
+        {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
+      </div>
+
+      <div className="mt-4">
+        <Label>Cor (Opcional)</Label>
+        <Input
+          id="description"
+          {...register('color')}
+          type="color"
+          placeholder="Digite uma cor...."
+          className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
+        />
+        {errors.color && <p className="text-sm text-red-500">{errors.color.message}</p>}
       </div>
     </div>
   );

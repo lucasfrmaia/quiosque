@@ -11,6 +11,8 @@ export const produtoSchema = z.object({
 
 export const categorySchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
+  description: z.string().max(100, 'Descrição deve ter no máximo 100 caracteres').optional(),
+  color: z.string().max(7, 'Cor deve ter no máximo 15 caracteres').optional(),
 });
 
 export const fornecedorSchema = z.object({
@@ -27,6 +29,7 @@ export const produtoEstoqueSchema = z.object({
     .min(0, 'Quantidade deve ser positiva')
     .max(1000000, 'Quantidade muito alta'),
   dataValidade: z.date({ message: 'Escolha uma Data!' }).optional(),
+  estocavel: z.boolean(),
   unidade: z.enum(['UNIDADE', 'KG', 'MG']).optional(),
   produtoId: z.number({ message: 'Escolha um Produto!' }).int().positive(),
 });

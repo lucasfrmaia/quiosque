@@ -84,4 +84,4 @@ export type CategoryUpdateData = {
   updates: Partial<Omit<Category, 'id' | 'produtos'>>;
 };
 
-export type TipoUnidade = 'UNIDADE' | 'KG' | 'MG' | undefined;
+export type TipoUnidade = 'UNIDADE' | 'KG' | 'MG' | 'G' | undefined;

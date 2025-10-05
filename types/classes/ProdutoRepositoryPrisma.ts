@@ -27,10 +27,6 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
         ...produto,
         categoriaId: Number(produto.categoriaId),
       },
-      include: {
-        categoria: true,
-        estoques: true,
-      },
     });
 
     return createdProduto;

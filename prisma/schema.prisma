@@ -19,6 +19,7 @@ enum TipoUnidadeProduto {
   UNIDADE
   KG
   MG
+  G
 }
 
 // =====================
@@ -90,6 +91,7 @@ model ProdutoEstoque {
   preco        Float
   quantidade   Int
   dataValidade DateTime?
+  estocavel    Boolean            @default(true)
   unidade      TipoUnidadeProduto @default(UNIDADE)
 
   produtoId Int

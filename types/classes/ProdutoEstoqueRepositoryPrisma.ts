@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { IProdutoEstoqueRepository } from '../interfaces/repositories';
-import { ProdutoEstoque, Produto, FilterValues } from '../interfaces/entities';
+import { ProdutoEstoque, Produto, FilterValues, TipoProduto } from '../interfaces/entities';
 
 export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository {
   private prisma: PrismaClient;
