@@ -47,7 +47,7 @@ export const notaFiscalCompraSchema = z.object({
           .positive()
           .min(0, 'Quantidade deve ser positiva')
           .max(100000, 'Quantidade muito alta'),
-        unidade: z.enum(['UNIDADE', 'KG', 'MG']).optional(),
+        unidade: z.enum(['UNIDADE', 'KG', 'MG', 'G']).optional(),
         precoUnitario: z
           .number()
           .positive()

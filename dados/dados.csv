@@ -1,104 +1,142 @@
 nome,descricao,imagemUrl,ativo,tipo,categoriaId,estocavel
-Refrigerante Coca-Cola Lata,"Coca-Cola lata 350ml bem gelada.","https://www.coca-cola.com/content/dam/onexp/br/pt/products/coca-cola-lata-350ml.png",true,CARDAPIO,21,true
-Refrigerante Coca-Cola 1L,"Coca-Cola garrafa 1L ideal para compartilhar.","https://www.coca-cola.com/content/dam/onexp/br/pt/products/coca-cola-1l.png",true,CARDAPIO,21,true
-Refrigerante Pepsi Lata,"Pepsi lata 350ml gelada.","https://www.pepsi.com/en-us/uploads/images/product/can.png",true,CARDAPIO,21,true
-Refrigerante Guaraná Antarctica Lata,"Guaraná Antarctica 350ml bem gelado.","https://www.ambev.com.br/conteudos/uploads/2021/07/guarana-lata-350ml.png",true,CARDAPIO,21,true
-Refrigerante Fanta Uva 2L,"Fanta Uva garrafa 2L.","https://www.fanta.com/content/dam/nagbrands/br/fanta/packshots/fanta-uva-2l.png",true,CARDAPIO,21,true
-Água Mineral 500ml,"Água mineral sem gás 500ml.","https://static.paodeacucar.com/img/uploads/1/0/569001.png",true,CARDAPIO,21,true
-Suco de Acerola,"Suco natural de acerola batido na hora.","https://example.com/suco-acerola.png",true,CARDAPIO,14,true
-Suco de Maracujá,"Suco natural de maracujá da polpa.","https://example.com/suco-maracuja.png",true,CARDAPIO,14,true
-Suco de Goiaba,"Suco cremoso de goiaba da polpa.","https://example.com/suco-goiaba.png",true,CARDAPIO,14,true
-Suco de Manga,"Suco de manga natural, polpa congelada.","https://example.com/suco-manga.png",true,CARDAPIO,14,true
-Suco de Caju,"Suco natural de caju da polpa.","https://example.com/suco-caju.png",true,CARDAPIO,14,true
-Suco Detox,"Suco verde detox com couve, limão e gengibre.","https://example.com/suco-detox.png",true,CARDAPIO,18,true
-Tapioca de Frango,"Tapioca recheada com frango desfiado e queijo coalho.","https://example.com/tapioca-frango.png",true,CARDAPIO,18,true
-Tapioca de Coco,"Tapioca doce com coco ralado e leite condensado.","https://example.com/tapioca-coco.png",true,CARDAPIO,18,true
-Prato Feito de Frango,"Arroz, feijão, frango grelhado, salada e farofa.","https://example.com/pf-frango.png",true,CARDAPIO,12,true
-Prato Feito de Carne de Sol,"Carne de sol, feijão verde, arroz e macaxeira.","https://example.com/pf-carne-de-sol.png",true,CARDAPIO,12,true
-Prato Feito de Bife,"Arroz, feijão, bife acebolado e salada.","https://example.com/pf-bife.png",true,CARDAPIO,12,true
-Prato Feito de Fígado,"Fígado acebolado, arroz, feijão e purê.","https://example.com/pf-figado.png",true,CARDAPIO,12,true
-Quentinha de Frango,"Marmita com frango, arroz, feijão e salada.","https://example.com/quentinha-frango.png",true,CARDAPIO,12,true
-Quentinha de Carne de Sol,"Marmita com carne de sol, feijão e macaxeira.","https://example.com/quentinha-carne.png",true,CARDAPIO,12,true
-Coxinha de Frango,"Coxinha crocante com recheio de frango e catupiry.","https://example.com/coxinha.png",true,CARDAPIO,13,true
-Pastel de Queijo,"Pastel frito recheado com queijo derretido.","https://example.com/pastel-queijo.png",true,CARDAPIO,13,true
-Pastel de Carne,"Pastel frito recheado com carne moída e temperos.","https://example.com/pastel-carne.png",true,CARDAPIO,13,true
-Enroladinho de Salsicha,"Salsicha envolta em massa crocante.","https://example.com/enroladinho.png",true,CARDAPIO,13,true
-Pão de Queijo,"Pão de queijo mineiro, macio e quentinho.","https://example.com/pao-de-queijo.png",true,CARDAPIO,13,true
-Mousse de Maracujá,"Mousse leve e cremosa de maracujá.","https://example.com/mousse-maracuja.png",true,CARDAPIO,15,true
-Mousse de Chocolate,"Mousse de chocolate ao leite, cremosa.","https://example.com/mousse-chocolate.png",true,CARDAPIO,15,true
-Pudim de Leite,"Pudim tradicional de leite condensado com calda.","https://example.com/pudim.png",true,CARDAPIO,15,true
-Gelatina Colorida,"Gelatina em camadas coloridas e refrescantes.","https://example.com/gelatina.png",true,CARDAPIO,15,true
-Batata Frita,"Porção de batata frita crocante.","https://example.com/batata-frita.png",true,CARDAPIO,16,true
-Pastel de Calabresa,"Pastel recheado com calabresa e queijo.","https://example.com/pastel-calabresa.png",true,CARDAPIO,16,true
-Calabresa Acebolada,"Porção de calabresa acebolada na chapa.","https://example.com/calabresa-acebolada.png",true,CARDAPIO,16,true
-Amendoim Torrado,"Amendoim torrado salgado, ideal para petiscar.","https://example.com/amendoim.png",true,CARDAPIO,16,true
-Pipoca Salgada,"Pipoca salgada crocante.","https://example.com/pipoca.png",true,CARDAPIO,19,true
-Pipoca Doce,"Pipoca doce caramelizada.","https://example.com/pipoca-doce.png",true,CARDAPIO,19,true
-Pastilha Halls,"Pastilha refrescante sabor menta.","https://example.com/halls.png",true,CARDAPIO,19,true
-Água de Coco,"Água de coco natural gelada.","https://example.com/agua-de-coco.png",true,CARDAPIO,14,true
-Salada de Frutas,"Salada de frutas mistas, leve e saudável.","https://example.com/salada-frutas.png",true,CARDAPIO,18,true
-Café Expresso,"Café expresso forte e encorpado.","https://example.com/cafe-expresso.png",true,CARDAPIO,17,true
-Cappuccino Cremoso,"Cappuccino cremoso com canela.","https://example.com/cappuccino.png",true,CARDAPIO,17,true
-Pão com Ovo,"Pão francês com ovo frito na chapa.","https://example.com/pao-ovo.png",true,CARDAPIO,13,true
-Tapioca de Banana,"Tapioca doce com banana e canela.","https://example.com/tapioca-banana.png",true,CARDAPIO,18,true
-Arroz Branco,"Acompanhamento de arroz branco soltinho.","https://example.com/arroz.png",true,CARDAPIO,20,true
-Feijão Tropeiro,"Feijão tropeiro com bacon e farinha.","https://example.com/feijao-tropeiro.png",true,CARDAPIO,20,true
-Farofa Crocante,"Farofa temperada com manteiga e cebola.","https://example.com/farofa.png",true,CARDAPIO,20,true
-Maionese Caseira,"Acompanhamento cremoso de batata e legumes.","https://example.com/maionese.png",true,CARDAPIO,20,true
-Suco de Limão,"Suco natural de limão com açúcar e gelo.","https://example.com/suco-limao.png",true,CARDAPIO,14,true
-Suco de Morango,"Suco natural de morango da polpa.","https://example.com/suco-morango.png",true,CARDAPIO,14,true
-Refrigerante Pepsi 1L,"Pepsi garrafa 1 litro bem gelada.","https://www.pepsi.com/en-us/uploads/images/product/bottle.png",true,CARDAPIO,21,true
-Refrigerante Sprite Lata,"Sprite 350ml gelada e refrescante.","https://www.sprite.com/content/dam/nagbrands/br/sprite/packshots/sprite-lata-350ml.png",true,CARDAPIO,21,true
-Refrigerante Fanta Laranja Lata,"Fanta Laranja 350ml bem gelada.","https://www.fanta.com/content/dam/nagbrands/br/fanta/packshots/fanta-laranja-350ml.png",true,CARDAPIO,21,true
-Refrigerante Guaraná 1L,"Guaraná Antarctica 1 litro, ideal para o almoço.","https://www.ambev.com.br/conteudos/uploads/2021/07/guarana-1l.png",true,CARDAPIO,21,true
-Água com Gás 500ml,"Água mineral com gás 500ml.","https://static.paodeacucar.com/img/uploads/1/0/569002.png",true,CARDAPIO,21,true
-Água Mineral 1L,"Água mineral natural 1 litro.","https://static.paodeacucar.com/img/uploads/1/0/569001.png",true,CARDAPIO,21,true
-Suco de Laranja,"Suco natural de laranja, sem adição de açúcar.","https://example.com/suco-laranja.png",true,CARDAPIO,14,true
-Suco de Melancia,"Suco natural de melancia gelado.","https://example.com/suco-melancia.png",true,CARDAPIO,14,true
-Suco de Abacaxi com Hortelã,"Suco natural de abacaxi com hortelã.","https://example.com/suco-abacaxi.png",true,CARDAPIO,14,true
-Suco de Graviola,"Suco de polpa de graviola cremoso.","https://example.com/suco-graviola.png",true,CARDAPIO,14,true
-Suco de Cajá,"Suco natural de cajá, levemente ácido e refrescante.","https://example.com/suco-caja.png",true,CARDAPIO,14,true
-Suco de Melão,"Suco leve e adocicado de melão.","https://example.com/suco-melao.png",true,CARDAPIO,14,true
-Pastel de Frango,"Pastel frito com recheio de frango e catupiry.","https://example.com/pastel-frango.png",true,CARDAPIO,13,true
-Pastel de Pizza,"Pastel com queijo, presunto e orégano.","https://example.com/pastel-pizza.png",true,CARDAPIO,13,true
-Empada de Frango,"Empada de frango com massa amanteigada.","https://example.com/empada-frango.png",true,CARDAPIO,13,true
-Empada de Camarão,"Empada de camarão cremosa e saborosa.","https://example.com/empada-camarao.png",true,CARDAPIO,13,true
-Cachorro-Quente Simples,"Pão, salsicha, batata palha e molho.","https://example.com/cachorro-quente.png",true,CARDAPIO,13,true
-Cachorro-Quente Completo,"Pão, salsicha, milho, ervilha, purê e molho especial.","https://example.com/cachorro-quente-completo.png",true,CARDAPIO,13,true
-Hambúrguer Tradicional,"Pão, carne, queijo, alface, tomate e maionese.","https://example.com/hamburguer-tradicional.png",true,CARDAPIO,13,true
-X-Burguer,"Pão, carne, queijo e molho especial.","https://example.com/x-burguer.png",true,CARDAPIO,13,true
-X-Salada,"Hambúrguer com alface, tomate, queijo e maionese.","https://example.com/x-salada.png",true,CARDAPIO,13,true
-X-Frango,"Sanduíche com frango grelhado, queijo e maionese.","https://example.com/x-frango.png",true,CARDAPIO,13,true
-Prato Feito de Peixe,"Filé de peixe, arroz, feijão, salada e purê.","https://example.com/pf-peixe.png",true,CARDAPIO,12,true
-Prato Feito de Linguiça,"Linguiça frita, arroz, feijão e farofa.","https://example.com/pf-linguica.png",true,CARDAPIO,12,true
-Prato Feito de Bisteca,"Bisteca suína grelhada com arroz e feijão.","https://example.com/pf-bisteca.png",true,CARDAPIO,12,true
-Prato Executivo de Frango,"Prato executivo com frango grelhado, arroz e legumes.","https://example.com/executivo-frango.png",true,CARDAPIO,12,true
-Quentinha de Peixe,"Marmita com peixe frito, arroz, feijão e salada.","https://example.com/quentinha-peixe.png",true,CARDAPIO,12,true
-Quentinha de Bife,"Marmita com bife acebolado e acompanhamentos.","https://example.com/quentinha-bife.png",true,CARDAPIO,12,true
-Feijoada Completa,"Feijoada com carnes, arroz, farofa e couve.","https://example.com/feijoada.png",true,CARDAPIO,12,true
-Carne de Sol Acebolada,"Carne de sol acebolada na chapa com macaxeira.","https://example.com/carne-de-sol.png",true,CARDAPIO,12,true
-Frango à Parmegiana,"Frango empanado com molho e queijo.","https://example.com/frango-parmegiana.png",true,CARDAPIO,12,true
-Arroz à Grega,"Acompanhamento colorido com passas e legumes.","https://example.com/arroz-grega.png",true,CARDAPIO,20,true
-Purê de Batata,"Purê cremoso de batata.","https://example.com/pure-batata.png",true,CARDAPIO,20,true
-Vinagrete,"Molho à base de tomate, cebola e pimentão.","https://example.com/vinagrete.png",true,CARDAPIO,20,true
-Torta de Limão,"Torta de limão com merengue suave.","https://example.com/torta-limao.png",true,CARDAPIO,15,true
-Torta de Chocolate,"Torta doce de chocolate com cobertura cremosa.","https://example.com/torta-chocolate.png",true,CARDAPIO,15,true
-Brownie,"Brownie de chocolate com pedaços de nozes.","https://example.com/brownie.png",true,CARDAPIO,15,true
-Brigadeiro Gourmet,"Brigadeiro de chocolate belga enrolado no granulado.","https://example.com/brigadeiro.png",true,CARDAPIO,15,true
-Beijinho,"Docinho de coco e leite condensado.","https://example.com/beijinho.png",true,CARDAPIO,15,true
-Croquete de Carne,"Croquete frito de carne moída.","https://example.com/croquete.png",true,CARDAPIO,16,true
-Bolinha de Queijo,"Bolinha frita com recheio cremoso de queijo.","https://example.com/bolinha-queijo.png",true,CARDAPIO,16,true
-Torresmo,"Torresmo crocante e sequinho.","https://example.com/torresmo.png",true,CARDAPIO,16,true
-Mandioca Frita,"Porção de mandioca frita crocante.","https://example.com/mandioca-frita.png",true,CARDAPIO,16,true
-Espetinho de Frango,"Espetinho de frango grelhado na brasa.","https://example.com/espetinho-frango.png",true,CARDAPIO,16,true
-Espetinho de Carne,"Espetinho de carne bovina com tempero da casa.","https://example.com/espetinho-carne.png",true,CARDAPIO,16,true
-Tapioca de Queijo Coalho,"Tapioca recheada com queijo coalho derretido.","https://example.com/tapioca-queijo.png",true,CARDAPIO,18,true
-Crepioca de Frango,"Crepioca de frango leve e proteica.","https://example.com/crepioca-frango.png",true,CARDAPIO,18,true
-Salada Tropical,"Salada mista com frutas e legumes frescos.","https://example.com/salada-tropical.png",true,CARDAPIO,18,true
-Salada Caesar,"Salada com alface, frango, parmesão e molho especial.","https://example.com/salada-caesar.png",true,CARDAPIO,18,true
-Smoothie de Morango,"Bebida natural cremosa de morango com iogurte.","https://example.com/smoothie-morango.png",true,CARDAPIO,18,true
-Smoothie de Banana,"Bebida natural de banana, aveia e mel.","https://example.com/smoothie-banana.png",true,CARDAPIO,18,true
-Chá Gelado de Pêssego,"Chá gelado sabor pêssego refrescante.","https://example.com/cha-pessego.png",true,CARDAPIO,14,true
-Chá Gelado de Limão,"Chá gelado sabor limão natural.","https://example.com/cha-limao.png",true,CARDAPIO,14,true
-Chocolate Quente,"Bebida quente cremosa de chocolate ao leite.","https://example.com/chocolate-quente.png",true,CARDAPIO,17,true
-Leite com Café,"Leite quente com café solúvel.","https://example.com/leite-cafe.png",true,CARDAPIO,17,true
+Coca-Cola 350ml,"Refrigerante tradicional em lata",https://example.com/img/coca350.jpg,true,CARDAPIO,14,true
+Coca-Cola 500ml,"Garrafa plástica de 500ml",https://example.com/img/coca500.jpg,true,CARDAPIO,14,true
+Coca-Cola 1L,"Garrafa PET de 1 litro",https://example.com/img/coca1l.jpg,true,CARDAPIO,14,true
+Coca-Cola 2L,"Garrafa PET de 2 litros",https://example.com/img/coca2l.jpg,true,CARDAPIO,14,true
+Coca-Cola Zero 350ml,"Versão sem açúcar em lata",https://example.com/img/cocazero350.jpg,true,CARDAPIO,14,true
+Coca-Cola Zero 500ml,"Versão sem açúcar em garrafa plástica",https://example.com/img/cocazero500.jpg,true,CARDAPIO,14,true
+Coca-Cola Zero 2L,"Versão sem açúcar 2 litros",https://example.com/img/cocazero2l.jpg,true,CARDAPIO,14,true
+Coca-Cola Vidro 250ml,"Refrigerante em garrafa de vidro retornável",https://example.com/img/cocavidro290.jpg,true,CARDAPIO,14,true
+Guaraná Antarctica 350ml,"Guaraná tradicional em lata",https://example.com/img/guarana350.jpg,true,CARDAPIO,14,true
+Guaraná Antarctica 500ml,"Guaraná em garrafa plástica 500ml",https://example.com/img/guarana500.jpg,true,CARDAPIO,14,true
+Guaraná Antarctica 2L,"Guaraná PET de 2 litros",https://example.com/img/guarana2l.jpg,true,CARDAPIO,14,true
+Guaraná Zero 350ml,"Versão sem açúcar em lata",https://example.com/img/guaranazero350.jpg,true,CARDAPIO,14,true
+Guaraná Zero 2L,"Guaraná sem açúcar 2 litros",https://example.com/img/guaranazero2l.jpg,true,CARDAPIO,14,true
+Pepsi 350ml,"Refrigerante de cola em lata",https://example.com/img/pepsi350.jpg,true,CARDAPIO,14,true
+Pepsi 500ml,"Refrigerante de cola em garrafa plástica",https://example.com/img/pepsi500.jpg,true,CARDAPIO,14,true
+Pepsi 2L,"Garrafa PET de 2 litros",https://example.com/img/pepsi2l.jpg,true,CARDAPIO,14,true
+Pepsi Black 350ml,"Versão sem açúcar em lata",https://example.com/img/pepsiblack350.jpg,true,CARDAPIO,14,true
+Pepsi Black 500ml,"Sem açúcar 500ml",https://example.com/img/pepsiblack500.jpg,true,CARDAPIO,14,true
+Fanta Laranja 350ml,"Refrigerante sabor laranja em lata",https://example.com/img/fantalaranja350.jpg,true,CARDAPIO,14,true
+Fanta Laranja 2L,"Garrafa PET 2 litros",https://example.com/img/fantalaranja2l.jpg,true,CARDAPIO,14,true
+Fanta Uva 350ml,"Refrigerante sabor uva em lata",https://example.com/img/fantauva350.jpg,true,CARDAPIO,14,true
+Fanta Uva 2L,"Garrafa PET 2 litros",https://example.com/img/fantauva2l.jpg,true,CARDAPIO,14,true
+Sprite 350ml,"Refrigerante de limão em lata",https://example.com/img/sprite350.jpg,true,CARDAPIO,14,true
+Sprite 500ml,"Garrafa PET de 500ml",https://example.com/img/sprite500.jpg,true,CARDAPIO,14,true
+Sprite 2L,"Refrigerante de limão PET 2L",https://example.com/img/sprite2l.jpg,true,CARDAPIO,14,true
+Coxinha de Frango,"Tradicional massa de batata com recheio de frango desfiado",https://example.com/img/coxinha-frango.jpg,true,CARDAPIO,13,true
+Coxinha de Frango com Catupiry,"Coxinha cremosa com frango e catupiry",https://example.com/img/coxinha-catupiry.jpg,true,CARDAPIO,13,true
+Coxinha de Queijo,"Recheada apenas com queijo mussarela",https://example.com/img/coxinha-queijo.jpg,true,CARDAPIO,13,true
+Pastel de Carne,"Pastel frito recheado com carne moída temperada",https://example.com/img/pastel-carne.jpg,true,CARDAPIO,13,true
+Pastel de Queijo,"Pastel crocante com recheio de queijo",https://example.com/img/pastel-queijo.jpg,true,CARDAPIO,13,true
+Pastel de Frango,"Recheado com frango e temperos caseiros",https://example.com/img/pastel-frango.jpg,true,CARDAPIO,13,true
+Pastel de Pizza,"Recheado com presunto, queijo e orégano",https://example.com/img/pastel-pizza.jpg,true,CARDAPIO,13,true
+Pastel de Calabresa,"Pastel com recheio de calabresa e queijo",https://example.com/img/pastel-calabresa.jpg,true,CARDAPIO,13,true
+Pastel de Chocolate,"Pastel doce recheado com chocolate cremoso",https://example.com/img/pastel-chocolate.jpg,true,CARDAPIO,13,true
+Pastel de Banana com Canela,"Pastel doce com banana e toque de canela",https://example.com/img/pastel-banana.jpg,true,CARDAPIO,13,true
+Enroladinho de Salsicha,"Massa fofa com recheio de salsicha",https://example.com/img/enroladinho-salsicha.jpg,true,CARDAPIO,13,true
+Enroladinho de Presunto e Queijo,"Recheado com presunto e queijo derretido",https://example.com/img/enroladinho-presunto.jpg,true,CARDAPIO,13,true
+Enroladinho de Calabresa,"Massa fofinha com calabresa picada",https://example.com/img/enroladinho-calabresa.jpg,true,CARDAPIO,13,true
+Empada de Frango,"Empadinha recheada com frango desfiado e catupiry",https://example.com/img/empada-frango.jpg,true,CARDAPIO,13,true
+Empada de Palmito,"Recheio cremoso de palmito com ervilhas",https://example.com/img/empada-palmito.jpg,true,CARDAPIO,13,true
+Pastel de Forno de Frango,"Pastel assado com recheio de frango",https://example.com/img/pastelforno-frango.jpg,true,CARDAPIO,13,true
+Pastel de Forno de Palmito,"Pastel assado com recheio de palmito",https://example.com/img/pastelforno-palmito.jpg,true,CARDAPIO,13,true
+Pastel de Forno de Queijo,"Pastel de forno com queijo derretido",https://example.com/img/pastelforno-queijo.jpg,true,CARDAPIO,13,true
+Pastel de Forno de Carne,"Pastel assado com carne moída",https://example.com/img/pastelforno-carne.jpg,true,CARDAPIO,13,true
+X-Burger,"Hambúrguer com queijo e molho especial",https://example.com/img/xburger.jpg,true,CARDAPIO,13,true
+X-Salada,"Hambúrguer com alface, tomate e queijo",https://example.com/img/xsalada.jpg,true,CARDAPIO,13,true
+X-Bacon,"Hambúrguer com bacon crocante",https://example.com/img/xbacon.jpg,true,CARDAPIO,13,true
+X-Frango,"Sanduíche de frango grelhado com queijo",https://example.com/img/xfrango.jpg,true,CARDAPIO,13,true
+Cachorro-Quente Tradicional,"Pão com salsicha, batata palha e molhos",https://example.com/img/cachorroquente.jpg,true,CARDAPIO,13,true
+Cachorro-Quente Especial,"Versão com purê, queijo e milho",https://example.com/img/cachorroquente-especial.jpg,true,CARDAPIO,13,true
+Pão de Queijo,"Tradicional pão de queijo mineiro",https://example.com/img/paodequeijo.jpg,true,CARDAPIO,13,true
+Almoço Bife Acebolado,"Arroz, feijão, bife acebolado e salada",https://example.com/img/almoco-bife-acebolado.jpg,true,CARDAPIO,12,false
+Almoço Frango Frito,"Arroz, feijão, frango frito e vinagrete",https://example.com/img/almoco-frango-frito.jpg,true,CARDAPIO,12,false
+Almoço Frango Cozido,"Arroz, feijão, frango cozido e legumes",https://example.com/img/almoco-frango-cozido.jpg,true,CARDAPIO,12,false
+Almoço Fígado Acebolado,"Arroz, feijão, fígado acebolado e farofa",https://example.com/img/almoco-figado.jpg,true,CARDAPIO,12,false
+Almoço Carne de Sol,"Arroz, feijão, carne de sol, macaxeira e vinagrete",https://example.com/img/almoco-carnesol.jpg,true,CARDAPIO,12,false
+Almoço Frango Grelhado,"Arroz, feijão, frango grelhado e salada verde",https://example.com/img/almoco-frangogrelhado.jpg,true,CARDAPIO,12,false
+Almoço Carne de Panela,"Arroz, feijão, carne de panela e batatas",https://example.com/img/almoco-carnepanela.jpg,true,CARDAPIO,12,false
+Almoço Bife à Parmegiana,"Arroz, feijão, bife empanado com molho e queijo",https://example.com/img/almoco-parmegiana.jpg,true,CARDAPIO,12,false
+Almoço Frango à Parmegiana,"Arroz, feijão, frango empanado com molho e queijo",https://example.com/img/almoco-frangoparmegiana.jpg,true,CARDAPIO,12,false
+Almoço Carne Assada,"Arroz, feijão, carne assada e purê de batata",https://example.com/img/almoco-carneassada.jpg,true,CARDAPIO,12,false
+Quentinha Bife Acebolado,"Marmita com bife acebolado, arroz, feijão e salada",https://example.com/img/quentinha-bife.jpg,true,CARDAPIO,12,false
+Quentinha Frango Frito,"Marmita com frango frito, arroz, feijão e vinagrete",https://example.com/img/quentinha-frango-frito.jpg,true,CARDAPIO,12,false
+Quentinha Frango Cozido,"Marmita com frango cozido, legumes e arroz",https://example.com/img/quentinha-frango-cozido.jpg,true,CARDAPIO,12,false
+Quentinha Fígado Acebolado,"Marmita com fígado acebolado, arroz, feijão e farofa",https://example.com/img/quentinha-figado.jpg,true,CARDAPIO,12,false
+Quentinha Carne de Sol,"Marmita de carne de sol com arroz, feijão e macaxeira",https://example.com/img/quentinha-carnesol.jpg,true,CARDAPIO,12,false
+Quentinha Frango Grelhado,"Marmita com frango grelhado, arroz e salada",https://example.com/img/quentinha-frango-grelhado.jpg,true,CARDAPIO,12,false
+Quentinha Carne de Panela,"Marmita com carne de panela e batatas",https://example.com/img/quentinha-carnepanela.jpg,true,CARDAPIO,12,false
+Quentinha Bife à Parmegiana,"Marmita com bife à parmegiana, arroz e feijão",https://example.com/img/quentinha-parmegiana.jpg,true,CARDAPIO,12,false
+Quentinha Frango à Parmegiana,"Marmita com frango à parmegiana",https://example.com/img/quentinha-frangoparmegiana.jpg,true,CARDAPIO,12,false
+Quentinha Carne Assada,"Marmita com carne assada e purê",https://example.com/img/quentinha-carneassada.jpg,true,CARDAPIO,12,false
+Suco de Polpa de Acerola,"Suco natural feito com polpa de acerola",https://example.com/img/suco-acerola.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Caju,"Suco natural feito com polpa de caju",https://example.com/img/suco-caju.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Goiaba,"Suco de polpa de goiaba cremoso",https://example.com/img/suco-goiaba.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Manga,"Suco natural de manga",https://example.com/img/suco-manga.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Maracujá,"Suco natural de maracujá",https://example.com/img/suco-maracuja.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Graviola,"Suco cremoso de graviola",https://example.com/img/suco-graviola.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Cajá,"Suco típico do nordeste, sabor cajá",https://example.com/img/suco-caja.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Umbu,"Suco de polpa natural de umbu",https://example.com/img/suco-umbu.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Açaí,"Suco natural de açaí batido",https://example.com/img/suco-acai.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Pitanga,"Suco ácido e refrescante de pitanga",https://example.com/img/suco-pitanga.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Laranja,"Suco natural de laranja",https://example.com/img/suco-laranja.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Limão,"Suco natural de limão",https://example.com/img/suco-limao.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Melancia,"Suco refrescante de melancia",https://example.com/img/suco-melancia.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Acerola com Laranja,"Mistura natural de acerola e laranja",https://example.com/img/suco-acerolalaranja.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Maracujá com Manga,"Combinação tropical de sabores",https://example.com/img/suco-maracujamanga.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Goiaba com Laranja,"Suco misto de polpa natural",https://example.com/img/suco-goiabalaranja.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Morango,"Suco natural de morango",https://example.com/img/suco-morango.jpg,true,CARDAPIO,14,true
+Suco de Polpa de Abacaxi,"Suco natural de abacaxi gelado",https://example.com/img/suco-abacaxi.jpg,true,CARDAPIO,14,true
+Fandangos Queijo,"Salgadinho de milho sabor queijo.",,true,CARDAPIO,20,true
+Fandangos Presunto,"Salgadinho de milho sabor presunto.",,true,CARDAPIO,20,true
+Fandangos Cebola e Salsa,"Salgadinho sabor cebola e salsa, pacote 45g.",,true,CARDAPIO,20,true
+Doritos Queijo Nacho,"Tortilhas crocantes sabor queijo nacho.",,true,CARDAPIO,20,true
+Doritos Sweet Chili,"Tortilhas sabor picante doce, levemente ardidas.",,true,CARDAPIO,20,true
+Doritos BBQ,"Tortilhas sabor churrasco defumado.",,true,CARDAPIO,20,true
+Cheetos Requeijão,"Salgadinho de milho sabor requeijão.",,true,CARDAPIO,20,true
+Cheetos Lua,"Salgadinho leve e crocante sabor queijo.",,true,CARDAPIO,20,true
+Cheetos Bola,"Salgadinho em formato de bola, sabor queijo intenso.",,true,CARDAPIO,20,true
+Ruffles Original,"Batata frita em fatias onduladas, salgada.",,true,CARDAPIO,20,true
+Ruffles Cebola e Salsa,"Batata ondulada sabor cebola e salsa.",,true,CARDAPIO,20,true
+Ruffles Churrasco,"Batata frita sabor churrasco.",,true,CARDAPIO,20,true
+Bala de Café,"Bala macia com sabor intenso de café.",,true,CARDAPIO,20,true
+Bala de Hortelã,"Bala refrescante sabor menta.",,true,CARDAPIO,20,true
+Bala de Morango,"Bala sabor morango com recheio suave.",,true,CARDAPIO,20,true
+Bala Caramelo,"Bala cremosa sabor caramelo.",,true,CARDAPIO,20,true
+Pastilha Halls Extra Forte,"Pastilha refrescante sabor mentol forte.",,true,CARDAPIO,20,true
+Pastilha Halls Mel e Limão,"Pastilha sabor mel e limão, refrescante.",,true,CARDAPIO,20,true
+Pastilha Tic Tac Laranja,"Mini pastilhas sabor laranja.",,true,CARDAPIO,20,true
+Pastilha Tic Tac Hortelã,"Mini pastilhas sabor hortelã.",,true,CARDAPIO,20,true
+Chiclete Trident Menta,"Chiclete sabor menta, embalagem com 8 unidades.",,true,CARDAPIO,20,true
+Chiclete Trident Melancia,"Chiclete sabor melancia.",,true,CARDAPIO,20,true
+Chiclete Trident Morango,"Chiclete sabor morango refrescante.",,true,CARDAPIO,20,true
+Água Mineral 500ml Sem Gás,"Água mineral natural sem gás, garrafa 500ml.",,true,CARDAPIO,14,true
+Água Mineral 1L Sem Gás,"Água mineral natural sem gás, garrafa 1 litro.",,true,CARDAPIO,14,true
+Água Mineral 2L Sem Gás,"Água mineral sem gás, ideal para consumo familiar.",,true,CARDAPIO,14,true
+Água Mineral 500ml Com Gás,"Água mineral gaseificada, garrafa 500ml.",,true,CARDAPIO,14,true
+Água Mineral 1L Com Gás,"Água mineral com gás, garrafa 1 litro.",,true,CARDAPIO,14,true
+Água Mineral 2L Com Gás,"Água mineral natural, garrafa 2 litros.",,true,CARDAPIO,14,true
+Tapioca de Queijo,"Tapioca recheada com queijo derretido, servida quente.",,true,CARDAPIO,18,true
+Tapioca de Frango com Queijo,"Tapioca recheada com frango desfiado e queijo coalho.",,true,CARDAPIO,18,true
+Tapioca de Coco com Leite Condensado,"Tapioca doce com coco ralado e leite condensado.",,true,CARDAPIO,18,true
+Tapioca de Café com Leite,"Tapioca sabor café com toque de leite condensado.",,true,CARDAPIO,18,true
+Tapioca de Carne de Sol,"Tapioca recheada com carne de sol e manteiga de garrafa.",,true,CARDAPIO,18,true
+Tapioca de Presunto e Queijo,"Tapioca recheada com presunto e queijo muçarela.",,true,CARDAPIO,18,true
+Tapioca de Banana com Canela,"Tapioca doce com banana e canela.",,true,CARDAPIO,18,true
+Tapioca de Chocolate com Morango,"Tapioca doce recheada com chocolate e morangos.",,true,CARDAPIO,18,true
+Tapioca de Calabresa com Queijo,"Tapioca recheada com calabresa e queijo derretido.",,true,CARDAPIO,18,true
+Tapioca de Doce de Leite,"Tapioca doce recheada com doce de leite cremoso.",,true,CARDAPIO,18,true
+Tapioca de Coco com Goiabada,"Tapioca recheada com coco e goiabada derretida.",,true,CARDAPIO,18,true
+Tapioca de Frango com Catupiry,"Tapioca recheada com frango e catupiry cremoso.",,true,CARDAPIO,18,true
+Tapioca de Queijo Coalho com Mel,"Tapioca salgada com queijo coalho e mel.",,true,CARDAPIO,18,true
+Tapioca de Chocolate com Banana,"Tapioca doce com banana e chocolate derretido.",,true,CARDAPIO,18,true
+Tira-Gosto Calabresa Acebolada,"Porção de calabresa fatiada refogada com cebola.",,true,CARDAPIO,16,false
+Tira-Gosto Batata Frita,"Porção de batata frita crocante.",,true,CARDAPIO,16,false
+Tira-Gosto Batata Frita com Queijo e Bacon,"Batata frita coberta com queijo e bacon crocante.",,true,CARDAPIO,16,false
+Tira-Gosto Mandioca Frita,"Porção de mandioca frita dourada.",,true,CARDAPIO,16,false
+Tira-Gosto Torresmo,"Torresmo pururuca crocante e salgado.",,true,CARDAPIO,16,false
+Tira-Gosto Isca de Frango,"Tirinhas de frango empanadas e fritas.",,true,CARDAPIO,16,false
+Tira-Gosto Frango à Passarinho,"Porção de frango temperado e frito.",,true,CARDAPIO,16,false
+Tira-Gosto Queijo Coalho Grelhado,"Espetinho de queijo coalho grelhado na chapa.",,true,CARDAPIO,16,false
+Tira-Gosto Mini Coxinha,"Porção de mini coxinhas fritas, recheadas com frango.",,true,CARDAPIO,16,false

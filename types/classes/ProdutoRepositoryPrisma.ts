@@ -52,6 +52,9 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
         categoria: true,
         estoques: true,
       },
+      orderBy: {
+        nome: 'asc',
+      },
     });
 
     return produtos;
@@ -79,6 +82,9 @@ export class ProdutoRepositoryPrisma implements IProdutoRepository {
       include: {
         categoria: true,
         estoques: true,
+      },
+      orderBy: {
+        nome: 'asc',
       },
     });
 
