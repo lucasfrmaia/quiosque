@@ -15,7 +15,6 @@ export class ProdutoEstoqueRepositoryPrisma implements IProdutoEstoqueRepository
         quantidade: produtoEstoque.quantidade,
         dataValidade: produtoEstoque.dataValidade,
         preco: produtoEstoque.preco,
-        unidade: produtoEstoque.unidade,
         produtoId: Number(produtoEstoque.produtoId),
         estocavel: produtoEstoque.estocavel,
       },

@@ -1,5 +1,3 @@
-import { TipoUnidade } from '../types/types';
-
 export interface User {
   id: number;
   name: string;
@@ -45,7 +43,6 @@ export interface ProdutoEstoque {
   quantidade: number;
   dataValidade: Date | null;
   estocavel: boolean;
-  unidade: TipoUnidade;
   produtoId: number;
   produto?: Produto;
 }
@@ -65,7 +62,6 @@ export interface ProdutoCompra {
   notaFiscalId: number;
   produtoId: number;
   quantidade: number;
-  unidade: TipoUnidade;
   precoUnitario: number;
   produto?: Produto;
   notaFiscal?: NotaFiscalCompra;

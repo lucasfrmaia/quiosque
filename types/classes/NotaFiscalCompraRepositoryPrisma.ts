@@ -36,7 +36,6 @@ export class NotaFiscalCompraRepositoryPrisma implements INotaFiscalCompraReposi
       produtos: {
         create: produtos.map((pc) => ({
           quantidade: pc.quantidade,
-          unidade: pc.unidade,
           precoUnitario: pc.precoUnitario,
           produto: {
             connect: { id: pc.produtoId },

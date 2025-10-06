@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/select';
 import { Produto } from '@/types/interfaces/entities';
 import { EstoqueSchema } from '@/types/validation';
-import { SelectTipoUnidade } from '../common/SelectTipoUnidade';
 
 interface EstoqueFormProps {
   produtos: Produto[];
@@ -124,15 +123,6 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
         />
         <Label>Sim/Não</Label>
         {errors.estocavel && <p className="text-sm text-red-500">{errors.estocavel.message}</p>}
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="unidade" className="text-right">
-          Unidade
-        </Label>
-        <div className="col-span-3 space-y-1">
-          <SelectTipoUnidade control={control} />
-        </div>
       </div>
     </div>
   );

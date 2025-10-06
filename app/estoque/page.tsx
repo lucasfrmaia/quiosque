@@ -115,7 +115,6 @@ const EstoquePage: FC = () => {
       preco: 0,
       quantidade: 0,
       dataValidade: undefined,
-      unidade: undefined,
       produtoId: undefined,
     },
   });
@@ -126,7 +125,6 @@ const EstoquePage: FC = () => {
       preco: 0,
       quantidade: 0,
       dataValidade: undefined,
-      unidade: undefined,
       produtoId: undefined,
     },
   });
@@ -136,7 +134,6 @@ const EstoquePage: FC = () => {
       preco: data.preco,
       quantidade: data.quantidade,
       dataValidade: data.dataValidade || null,
-      unidade: data.unidade,
       produtoId: data.produtoId,
       estocavel: data.estocavel,
     });
@@ -150,7 +147,6 @@ const EstoquePage: FC = () => {
       preco: data.preco,
       quantidade: data.quantidade,
       dataValidade: data.dataValidade,
-      unidade: data.unidade,
       produtoId: data.produtoId,
       estocavel: data.estocavel,
     });
@@ -164,7 +160,6 @@ const EstoquePage: FC = () => {
     editForm.setValue('preco', item.preco);
     editForm.setValue('quantidade', item.quantidade);
     editForm.setValue('dataValidade', item.dataValidade ?? undefined);
-    editForm.setValue('unidade', item.unidade || 'UNIDADE');
     editForm.setValue('produtoId', item.produtoId);
     editForm.setValue('estocavel', item.estocavel);
     setIsEditModalOpen(true);

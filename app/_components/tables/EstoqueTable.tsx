@@ -75,11 +75,7 @@ const columns = [
     key: 'estoque',
     header: 'Estoque',
     sortKey: 'quantidade',
-    render: (item: ProdutoEstoque) => (
-      <div className="text-sm">
-        {item.quantidade} {item.unidade}
-      </div>
-    ),
+    render: (item: ProdutoEstoque) => <div className="text-sm">{item.quantidade} Unidades</div>,
     sortable: true,
     sorter: (a: ProdutoEstoque, b: ProdutoEstoque) => a.quantidade - b.quantidade,
   },

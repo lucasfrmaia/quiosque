@@ -15,13 +15,6 @@ enum TipoProduto {
   CARDAPIO
 }
 
-enum TipoUnidadeProduto {
-  UNIDADE
-  KG
-  MG
-  G
-}
-
 // =====================
 // Usuários do Sistema
 // =====================
@@ -87,15 +80,13 @@ model Produto {
 // Estoque
 // =====================
 model ProdutoEstoque {
-  id           Int                @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   preco        Float
   quantidade   Int
   dataValidade DateTime?
-  estocavel    Boolean            @default(true)
-  unidade      TipoUnidadeProduto @default(UNIDADE)
-
-  produtoId Int
-  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  estocavel    Boolean   @default(true)
+  produtoId    Int
+  produto      Produto   @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@map("produto_estoque")
 }
@@ -118,15 +109,13 @@ model NotaFiscalCompra {
 }
 
 model ProdutoCompra {
-  id            Int                @id @default(autoincrement())
+  id            Int              @id @default(autoincrement())
   notaFiscalId  Int
   produtoId     Int
   quantidade    Float
   precoUnitario Float
-  unidade       TipoUnidadeProduto @default(UNIDADE)
-
-  produto    Produto          @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  notaFiscal NotaFiscalCompra @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)
+  produto       Produto          @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  notaFiscal    NotaFiscalCompra @relation(fields: [notaFiscalId], references: [id], onDelete: Cascade)
 
   @@unique([notaFiscalId, produtoId])
   @@map("produto_compra")

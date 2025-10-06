@@ -116,7 +116,7 @@ export const NotaDetails: FC<NotaDetailsProps> = ({ nota }) => {
                             </div>
                           </TableCell>
                           <TableCell className="text-right font-semibold text-gray-900">
-                            {produto.quantidade} {(produto as ProdutoCompra).unidade || ''}
+                            {produto.quantidade}
                           </TableCell>
                           <TableCell className="text-right text-gray-600">
                             {formatCurrency(produto.precoUnitario)}

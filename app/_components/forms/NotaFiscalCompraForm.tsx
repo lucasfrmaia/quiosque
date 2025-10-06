@@ -20,8 +20,6 @@ import type { Option } from '../common/SearchableSelect';
 import { z } from 'zod';
 import { notaFiscalCompraSchema } from '@/types/validation';
 import { Package, X } from 'lucide-react';
-import { SelectTipoUnidade } from '../common/SelectTipoUnidade';
-import { TipoUnidade } from '@/types/types/types';
 
 type NotaFiscalCompraFormData = z.infer<typeof notaFiscalCompraSchema>;
 
@@ -56,7 +54,6 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
   const [selectedProduto, setSelectedProduto] = useState<Option | null>(null);
   const [quantidade, setQuantidade] = useState<number | string>('');
   const [precoUnitario, setPrecoUnitario] = useState<number | string>('');
-  const [selectedTipoUnidade, setSelectedTipoUnidade] = useState<TipoUnidade>('UNIDADE');
 
   const produtoOptions = allProdutos.map((p) => ({ name: p.nome, id: p.id.toString() }) as Option);
 
@@ -64,7 +61,6 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
     if (!selectedProduto || !quantidade || !precoUnitario) return;
 
     append({
-      unidade: selectedTipoUnidade,
       produtoId: Number(selectedProduto.id),
       precoUnitario: Number(precoUnitario),
       quantidade: Number(quantidade),
@@ -206,11 +202,6 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Unidade</Label>
-            <SelectTipoUnidade changeUnidade={setSelectedTipoUnidade} control={control} />
-          </div>
-
           <Button
             type="button"
             onClick={handleAddProduto}
@@ -244,7 +235,7 @@ export const NotaFiscalCompraForm: FC<NotaFiscalCompraFormProps> = ({
                 return (
                   <div key={field.id} className="flex items-center justify-between p-2">
                     <Badge variant="secondary" className="mr-2">
-                      {produto.nome} • Qtd: {produtoCompra.quantidade} {produtoCompra.unidade} • R${' '}
+                      {produto.nome} • Qtd: {produtoCompra.quantidade} • R${' '}
                       {produtoCompra.precoUnitario.toFixed(2)}
                     </Badge>
                     <div className="flex items-center gap-2 min-w-0">
