@@ -28,7 +28,7 @@ export const produtoEstoqueSchema = z.object({
     .number()
     .min(0, 'Quantidade deve ser positiva')
     .max(1000000, 'Quantidade muito alta'),
-  dataValidade: z.date({ message: 'Escolha uma Data!' }).optional(),
+  dataValidade: z.date({ message: 'Escolha uma Data!' }).nullable(),
   estocavel: z.boolean(),
   produtoId: z.number({ message: 'Escolha um Produto!' }).int().positive(),
 });

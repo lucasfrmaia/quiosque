@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,24 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
     control,
     register,
     formState: { errors },
+    setValue,
   } = useFormContext<EstoqueSchema>();
+
+  const produtoEstocavelProps = register('estocavel');
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  const handleOnChangeEstocavel = (e: ChangeEvent<HTMLInputElement>) => {
+    const targetValue = e.target.checked;
+    console.log(targetValue);
+
+    if (!targetValue) {
+      setValue('quantidade', 0);
+      setValue('dataValidade', new Date());
+      setIsDisabled(true);
+    } else {
+      setIsDisabled(false);
+    }
+  };
 
   return (
     <div className="grid gap-4 py-4">
@@ -82,10 +99,11 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
         </Label>
         <div className="col-span-3 space-y-1">
           <Input
+            {...register('quantidade', { valueAsNumber: true })}
             id="quantidade"
             type="number"
             step="0.01"
-            {...register('quantidade', { valueAsNumber: true })}
+            disabled={isDisabled}
             className={errors.quantidade ? 'border-red-500 focus:border-red-500' : ''}
             placeholder="Quantidade em estoque"
           />
@@ -99,9 +117,10 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
         </Label>
         <div className="col-span-3 space-y-1">
           <Input
+            {...register('dataValidade', { valueAsDate: true })}
+            disabled={isDisabled}
             id="dataValidade"
             type="date"
-            {...register('dataValidade', { valueAsDate: true })}
             className={errors.dataValidade ? 'border-red-500 focus:border-red-500' : ''}
           />
           {errors.dataValidade && (
@@ -118,7 +137,11 @@ export const EstoqueForm: FC<EstoqueFormProps> = ({ produtos }) => {
           id="estocavel"
           defaultChecked={true}
           type="checkbox"
-          {...register('estocavel')}
+          {...produtoEstocavelProps}
+          onChange={(e) => {
+            produtoEstocavelProps.onChange(e);
+            handleOnChangeEstocavel(e);
+          }}
           className={errors.estocavel ? 'border-red-500 focus:border-red-500' : '' + 'w-4 h-4'}
         />
         <Label>Sim/Não</Label>
