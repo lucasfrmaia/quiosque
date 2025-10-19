@@ -4,6 +4,8 @@ import { Produto, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ProdutoInsertData, ProdutoPatchData } from '@/types/types/types';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const defaultFilters: FilterValues & { categoryId?: number } = {
   currentPage: 1,
   itemsPerPage: 5,
@@ -47,7 +49,7 @@ export const useProduto = () => {
     return useQuery<Produto[]>({
       queryKey: ['produtos-all'],
       queryFn: async () => {
-        const response = await fetch(`/api/produto/findAll`);
+        const response = await fetch(`${api_url}/api/produto/findAll`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch products');
@@ -64,7 +66,7 @@ export const useProduto = () => {
     return useQuery<{ produtos: Produto[]; total: number }>({
       queryKey: ['produtos', paramsToString],
       queryFn: async () => {
-        const response = await fetch(`/api/produto/findPerPage?${paramsToString}`);
+        const response = await fetch(`${api_url}/api/produto/findPerPage?${paramsToString}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch products');
@@ -79,7 +81,7 @@ export const useProduto = () => {
 
   const createMutation = useMutation({
     mutationFn: async (produto: ProdutoInsertData) => {
-      const response = await fetch('/api/produto/create', {
+      const response = await fetch(`${api_url}/api/produto/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(produto),
@@ -105,7 +107,7 @@ export const useProduto = () => {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: ProdutoPatchData) => {
-      const response = await fetch(`/api/produto/update/${id}`, {
+      const response = await fetch(`${api_url}/api/produto/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -133,7 +135,7 @@ export const useProduto = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/produto/delete/${id}`, {
+      const response = await fetch(`${api_url}/api/produto/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

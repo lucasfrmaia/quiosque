@@ -14,6 +14,8 @@ import { z } from 'zod';
 import { notaFiscalVendaSchema } from '@/types/validation';
 import { Package } from 'lucide-react';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 type NotaFiscalVendaFormData = z.infer<typeof notaFiscalVendaSchema>;
 
 interface NotaFiscalVendaFormProps {
@@ -54,7 +56,7 @@ export const NotaFiscalVendaForm: FC<NotaFiscalVendaFormProps> = ({ editing = fa
   } = useQuery<ProdutoEstoque[]>({
     queryKey: ['all-estoque-venda'],
     queryFn: async () => {
-      const response = await fetch('/api/estoque/findAll');
+      const response = await fetch(`${api_url}/api/estoque/findAll`);
       if (!response.ok) {
         throw new Error('Failed to fetch estoque');
       }

@@ -4,6 +4,8 @@ import { Category, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CategoryNewData, CategoryUpdateData } from '@/types/types/types';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 5,
@@ -40,7 +42,7 @@ export const useCategory = () => {
   const categoryParams = useQuery<{ categories: Category[]; total: number }>({
     queryKey: ['categories', paramsToString],
     queryFn: async () => {
-      const response = await fetch(`/api/category/findPerPage?${paramsToString}`);
+      const response = await fetch(`${api_url}/api/category/findPerPage?${paramsToString}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch categories');
@@ -56,7 +58,7 @@ export const useCategory = () => {
     return useQuery<Category[]>({
       queryKey: ['categories'],
       queryFn: async () => {
-        const response = await fetch(`/api/category/findAll`);
+        const response = await fetch(`${api_url}/api/category/findAll`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
@@ -71,7 +73,7 @@ export const useCategory = () => {
 
   const createMutation = useMutation({
     mutationFn: async (category: CategoryNewData) => {
-      const response = await fetch('/api/category/create', {
+      const response = await fetch(`${api_url}/api/category/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(category),
@@ -96,7 +98,7 @@ export const useCategory = () => {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: CategoryUpdateData) => {
-      const response = await fetch(`/api/category/update/${id}`, {
+      const response = await fetch(`${api_url}/api/category/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -121,7 +123,7 @@ export const useCategory = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/category/delete/${id}`, {
+      const response = await fetch(`${api_url}/api/category/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

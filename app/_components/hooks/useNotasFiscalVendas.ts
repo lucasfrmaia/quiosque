@@ -5,6 +5,8 @@ import { NotaFiscalVenda, FilterValues } from '@/types/interfaces/entities';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { NotaFiscalCreatePayload, NotaFiscalEditPayload } from '@/types/types/types';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 10,
@@ -55,7 +57,7 @@ export const useNotasFiscaisVendas = () => {
     useQuery<{ notas: NotaFiscalVenda[]; total: number }>({
       queryKey: ['notas', queryString],
       queryFn: async () => {
-        const response = await fetch(`/api/nota-fiscal-venda/findPerPage?${queryString}`);
+        const response = await fetch(`${api_url}/api/nota-fiscal-venda/findPerPage?${queryString}`);
         if (!response.ok) {
           throw new Error('Failed to fetch notas fiscais de venda');
         }
@@ -69,7 +71,7 @@ export const useNotasFiscaisVendas = () => {
     return useQuery<NotaFiscalVenda[]>({
       queryKey: ['notas'],
       queryFn: async () => {
-        const response = await fetch(`/api/nota-fiscal-venda/findAll`);
+        const response = await fetch(`${api_url}/api/nota-fiscal-venda/findAll`);
         if (!response.ok) {
           throw new Error('Failed to fetch all notas fiscais de venda');
         }
@@ -82,7 +84,7 @@ export const useNotasFiscaisVendas = () => {
   // Mutations
   const createMutation = useMutation({
     mutationFn: async (nota: NotaFiscalCreatePayload) => {
-      const response = await fetch('/api/nota-fiscal-venda/create', {
+      const response = await fetch(`${api_url}/api/nota-fiscal-venda/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nota),
@@ -108,7 +110,7 @@ export const useNotasFiscaisVendas = () => {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: NotaFiscalEditPayload) => {
-      const response = await fetch(`/api/nota-fiscal-venda/update/${id}`, {
+      const response = await fetch(`${api_url}/api/nota-fiscal-venda/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -137,7 +139,7 @@ export const useNotasFiscaisVendas = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/nota-fiscal-venda/delete/${id}`, {
+      const response = await fetch(`${api_url}/api/nota-fiscal-venda/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

@@ -4,6 +4,8 @@ import { ProdutoEstoque, Produto, FilterValues, SortDirection } from '@/types/in
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EstoqueNewData, EstoqueUpdatePayload } from '@/types/types/types';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 10,
@@ -63,7 +65,7 @@ export const useEstoque = () => {
   const estoqueQuery = useQuery({
     queryKey: ['estoque', paramsToString],
     queryFn: async () => {
-      const response = await fetch(`/api/estoque/findPerPage?${paramsToString}`);
+      const response = await fetch(`${api_url}/api/estoque/findPerPage?${paramsToString}`);
 
       if (!response.ok) throw new Error('Failed to fetch estoque');
 
@@ -75,7 +77,7 @@ export const useEstoque = () => {
 
   const createMutation = useMutation({
     mutationFn: async (estoque: EstoqueNewData) => {
-      const response = await fetch('/api/estoque/create', {
+      const response = await fetch(`${api_url}/api/estoque/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(estoque),
@@ -95,7 +97,7 @@ export const useEstoque = () => {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: EstoqueUpdatePayload) => {
-      const response = await fetch(`/api/estoque/update/${id}`, {
+      const response = await fetch(`${api_url}/api/estoque/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -115,7 +117,7 @@ export const useEstoque = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/estoque/delete/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${api_url}/api/estoque/delete/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete estoque');
       const result = await response.json();
       if (!result.success) throw new Error(result.error || 'Failed to delete estoque');

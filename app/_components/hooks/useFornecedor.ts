@@ -4,6 +4,8 @@ import { Fornecedor, FilterValues, SortDirection } from '@/types/interfaces/enti
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FornecedorCreationInput, FornecedorUpdateInput } from '@/types/types/types';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const defaultFilters: FilterValues = {
   currentPage: 1,
   itemsPerPage: 10,
@@ -40,7 +42,7 @@ export const useFornecedor = () => {
   const fornecedorQuery = useQuery<{ fornecedores: Fornecedor[]; total: number }>({
     queryKey: ['fornecedores', paramsToString],
     queryFn: async () => {
-      const response = await fetch(`/api/fornecedor/findPerPage?${paramsToString}`);
+      const response = await fetch(`${api_url}/api/fornecedor/findPerPage?${paramsToString}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch fornecedores');
@@ -55,7 +57,7 @@ export const useFornecedor = () => {
     return useQuery<Fornecedor[]>({
       queryKey: ['fornecedores'],
       queryFn: async () => {
-        const response = await fetch(`/api/fornecedor/findAll`);
+        const response = await fetch(`${api_url}/api/fornecedor/findAll`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch fornecedores');
@@ -69,7 +71,7 @@ export const useFornecedor = () => {
 
   const createMutation = useMutation({
     mutationFn: async (fornecedor: FornecedorCreationInput) => {
-      const response = await fetch('/api/fornecedor/create', {
+      const response = await fetch(`${api_url}/api/fornecedor/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fornecedor),
@@ -95,7 +97,7 @@ export const useFornecedor = () => {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: FornecedorUpdateInput) => {
-      const response = await fetch(`/api/fornecedor/update/${id}`, {
+      const response = await fetch(`${api_url}/api/fornecedor/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -124,7 +126,7 @@ export const useFornecedor = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/fornecedor/delete/${id}`, {
+      const response = await fetch(`${api_url}/api/fornecedor/delete/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

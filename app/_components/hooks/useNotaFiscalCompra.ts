@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { NotaFiscalCompra, ProdutoCompra, FilterValues } from '@/types/interfaces/entities';
 import { NotaFiscalCompraCreationData, NotaFiscalCompraUpdateData } from '@/types/types/types';
 
+const api_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export const useNotaFiscalCompra = () => {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -67,7 +69,7 @@ export const useNotaFiscalCompra = () => {
     useQuery<{ notas: NotaFiscalCompra[]; total: number }>({
       queryKey: ['notaFiscalCompra', queryString],
       queryFn: async () => {
-        const response = await fetch(`/api/nota-fiscal-compra/findPerPage?${queryString}`);
+        const response = await fetch(`${api_url}/api/nota-fiscal-compra/findPerPage?${queryString}`);
         const result = await response.json();
 
         if (!response.ok) throw new Error('Erro ao buscar notas fiscais de compra');
@@ -177,7 +179,7 @@ export const useNotaFiscalCompra = () => {
 
   const createMutation = useMutation({
     mutationFn: async (nota: NotaFiscalCompraCreationData) => {
-      const response = await fetch('/api/nota-fiscal-compra/create', {
+      const response = await fetch(`${api_url}/api/nota-fiscal-compra/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nota),
@@ -199,7 +201,7 @@ export const useNotaFiscalCompra = () => {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, updates }: NotaFiscalCompraUpdateData) => {
-      const response = await fetch(`/api/nota-fiscal-compra/update/${id}`, {
+      const response = await fetch(`${api_url}/api/nota-fiscal-compra/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -225,7 +227,7 @@ export const useNotaFiscalCompra = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/nota-fiscal-compra/delete/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${api_url}/api/nota-fiscal-compra/delete/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Erro ao excluir nota fiscal de compra');
       const result = await response.json();
       if (!result.success) throw new Error(result.error || 'Erro ao excluir nota fiscal de compra');
